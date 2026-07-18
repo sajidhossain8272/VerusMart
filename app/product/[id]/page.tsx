@@ -4,8 +4,9 @@ import Link from 'next/link'
 import DOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
 
-export default async function ProductDetails({ params }: { params: { id: string } }) {
-  const productId = parseInt(params.id)
+export default async function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const productId = parseInt(id)
   
   if (isNaN(productId)) {
     return notFound()
