@@ -1,0 +1,308 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model admins {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(100)
+  email      String   @unique(map: "email") @db.VarChar(150)
+  password   String   @db.VarChar(255)
+  image      String?  @db.VarChar(255)
+  role       String?  @default("admin") @db.VarChar(50)
+  created_at DateTime @default(now()) @db.Timestamp(0)
+}
+
+model banners {
+  id         Int               @id @default(autoincrement())
+  title      String?           @db.VarChar(255)
+  image      String            @db.VarChar(255)
+  position   banners_position? @default(main)
+  status     banners_status?   @default(active)
+  created_at DateTime?         @default(now()) @db.Timestamp(0)
+}
+
+model brands {
+  id         Int            @id @default(autoincrement())
+  name       String         @db.VarChar(255)
+  logo       String?        @db.VarChar(255)
+  priority   Int?           @default(1)
+  status     brands_status? @default(active)
+  created_at DateTime?      @default(now()) @db.Timestamp(0)
+}
+
+model business_settings {
+  id               Int      @id @default(autoincrement())
+  company_name     String?  @db.VarChar(255)
+  logo             String?  @db.VarChar(255)
+  phone            String?  @db.VarChar(50)
+  email            String?  @db.VarChar(100)
+  address          String?  @db.Text
+  footer_about     String?  @db.Text
+  facebook         String?  @db.VarChar(255)
+  instagram        String?  @db.VarChar(255)
+  twitter          String?  @db.VarChar(255)
+  youtube          String?  @db.VarChar(255)
+  currency         String?  @default("$") @db.VarChar(10)
+  tiktok           String?  @db.VarChar(255)
+  shipping_inside  Decimal? @default(60.00) @db.Decimal(10, 2)
+  shipping_outside Decimal? @default(120.00) @db.Decimal(10, 2)
+}
+
+model categories {
+  id       Int                @id @default(autoincrement())
+  name     String             @db.VarChar(255)
+  priority Int?               @default(0)
+  image    String?            @db.VarChar(255)
+  status   categories_status? @default(active)
+  banner   String?            @db.VarChar(255)
+}
+
+model colors {
+  id         Int     @id @default(autoincrement())
+  color_name String  @db.VarChar(50)
+  color_code String? @db.VarChar(20)
+}
+
+model contact_messages {
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(255)
+  email      String    @db.VarChar(255)
+  subject    String?   @db.VarChar(255)
+  message    String    @db.Text
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model customers {
+  id         Int       @id @default(autoincrement())
+  name       String?   @db.VarChar(255)
+  email      String?   @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model faqs {
+  id       Int    @id @default(autoincrement())
+  question String @db.Text
+  answer   String @db.Text
+}
+
+model order_items {
+  id           Int      @id @default(autoincrement())
+  order_id     Int?
+  product_name String?  @db.VarChar(255)
+  price        Decimal? @db.Decimal(10, 2)
+  quantity     Int?
+  image        String?  @db.VarChar(255)
+}
+
+model orders {
+  id            Int       @id @default(autoincrement())
+  user_id       Int?
+  customer_name String    @db.VarChar(255)
+  email         String?   @db.VarChar(100)
+  phone         String?   @db.VarChar(20)
+  address       String?   @db.Text
+  order_note    String?   @db.Text
+  total_amount  Decimal   @db.Decimal(10, 2)
+  status        String?   @default("pending") @db.VarChar(50)
+  order_date    DateTime? @default(now()) @db.DateTime(0)
+}
+
+model pages {
+  id         Int       @id @default(autoincrement())
+  slug       String    @unique(map: "slug") @db.VarChar(100)
+  title      String    @db.VarChar(255)
+  content    String    @db.Text
+  updated_at DateTime? @default(now()) @db.Timestamp(0)
+  status     String?   @default("active") @db.VarChar(20)
+}
+
+model payment_methods {
+  id              Int                     @id @default(autoincrement())
+  name            String                  @db.VarChar(100)
+  logo            String?                 @db.VarChar(255)
+  account_details String?                 @db.Text
+  status          payment_methods_status? @default(active)
+  created_at      DateTime?               @default(now()) @db.Timestamp(0)
+}
+
+model phone_sell_requests {
+  id              Int      @id @default(autoincrement())
+  user_id         Int?
+  full_name       String   @db.VarChar(255)
+  phone_number    String   @db.VarChar(20)
+  brand           String   @db.VarChar(100)
+  model           String   @db.VarChar(255)
+  phone_condition String   @db.VarChar(100)
+  expected_price  Decimal  @db.Decimal(10, 2)
+  original_price  Decimal? @db.Decimal(10, 2)
+  details         String?  @db.Text
+  image_1         String?  @db.VarChar(255)
+  image_2         String?  @db.VarChar(255)
+  image_3         String?  @db.VarChar(255)
+  status          String?  @default("pending") @db.VarChar(50)
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  otp_code        String?  @db.VarChar(4)
+  is_verified     Boolean? @default(false)
+}
+
+model product_colors {
+  id         Int @id @default(autoincrement())
+  product_id Int
+  color_id   Int
+}
+
+model product_gallery {
+  id         Int       @id @default(autoincrement())
+  product_id Int
+  image      String    @db.VarChar(255)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model product_sizes {
+  id         Int @id @default(autoincrement())
+  product_id Int
+  size_id    Int
+}
+
+model product_variants {
+  id           Int      @id @default(autoincrement())
+  product_id   Int
+  variant_name String   @db.VarChar(100)
+  price        Decimal  @db.Decimal(10, 2)
+  old_price    Decimal? @default(0.00) @db.Decimal(10, 2)
+}
+
+model products {
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(255)
+  description      String?   @db.MediumText
+  category_id      Int?
+  brand_id         Int?      @default(0)
+  price            Decimal?  @db.Decimal(10, 2)
+  stock            Int?      @default(0)
+  created_at       DateTime? @default(now()) @db.Timestamp(0)
+  status           String?   @default("active") @db.VarChar(20)
+  is_recommended   Boolean?  @default(false)
+  is_featured      Boolean?  @default(false)
+  image            String?   @db.VarChar(255)
+  image_2          String?   @db.VarChar(255)
+  image_3          String?   @db.VarChar(255)
+  old_price        Decimal?  @default(0.00) @db.Decimal(10, 2)
+  discount_percent Int?      @default(0)
+  rating           Int?      @default(5)
+  unit             String?   @default("per lb") @db.VarChar(50)
+  total_reviews    Int?      @default(0)
+  is_trending      Boolean?  @default(false)
+  is_best_seller   Boolean?  @default(false)
+  is_weekday_deal  Boolean?  @default(false)
+}
+
+model refund_requests {
+  id            Int                     @id @default(autoincrement())
+  order_id      String                  @db.VarChar(50)
+  customer_name String?                 @db.VarChar(100)
+  amount        Decimal?                @db.Decimal(10, 2)
+  reason        String?                 @db.Text
+  status        refund_requests_status? @default(pending)
+  created_at    DateTime?               @default(now()) @db.Timestamp(0)
+}
+
+model section_labels {
+  id           Int     @id @default(autoincrement())
+  section_key  String? @unique(map: "section_key") @db.VarChar(50)
+  label_text   String? @db.VarChar(255)
+  banner_image String? @db.VarChar(255)
+}
+
+model serving_areas {
+  id                  Int     @id @default(autoincrement())
+  zone_name           String  @db.VarChar(255)
+  delivery_time       String? @db.VarChar(100)
+  areas               String? @db.Text
+  delivery_charge     String? @db.VarChar(50)
+  free_delivery_limit Int?
+  status              String? @default("active") @db.VarChar(20)
+}
+
+model sizes {
+  id        Int    @id @default(autoincrement())
+  size_name String @db.VarChar(50)
+}
+
+model sub_categories {
+  id          Int      @id @default(autoincrement())
+  category_id Int
+  name        String   @db.VarChar(255)
+  priority    Int?     @default(1)
+  status      String?  @default("active") @db.VarChar(50)
+  created_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model users {
+  id         Int       @id @default(autoincrement())
+  full_name  String    @db.VarChar(100)
+  email      String    @unique(map: "email") @db.VarChar(100)
+  phone      String    @unique(map: "phone") @db.VarChar(20)
+  password   String    @db.VarChar(255)
+  status     String?   @default("active") @db.VarChar(20)
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+model vendors {
+  id         Int             @id @default(autoincrement())
+  name       String          @db.VarChar(100)
+  shop_name  String?         @db.VarChar(150)
+  email      String          @unique(map: "email") @db.VarChar(100)
+  phone      String          @db.VarChar(20)
+  status     vendors_status? @default(active)
+  created_at DateTime?       @default(now()) @db.Timestamp(0)
+}
+
+model wishlist {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  product_id Int
+  created_at DateTime? @default(now()) @db.Timestamp(0)
+}
+
+enum banners_position {
+  main
+  side_top
+  side_bottom
+}
+
+enum brands_status {
+  active
+  inactive
+}
+
+enum categories_status {
+  active
+  inactive
+}
+
+enum banners_status {
+  active
+  inactive
+}
+
+enum payment_methods_status {
+  active
+  inactive
+}
+
+enum vendors_status {
+  active
+  inactive
+}
+
+enum refund_requests_status {
+  pending
+  approved
+  rejected
+}
