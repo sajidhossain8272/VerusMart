@@ -3,6 +3,7 @@ import { Roboto } from 'next/font/google'
 import './globals.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import { CartProvider } from './context/CartContext'
 
 const roboto = Roboto({
   weight: ['300', '400', '500', '700', '900'],
@@ -26,9 +27,11 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
       <body className={roboto.variable}>
-        <Header />
-        <main className="min-h-screen bg-[#eff0f5]">{children}</main>
-        <Footer />
+        <CartProvider>
+          <Header />
+          <main className="min-h-screen bg-[#eff0f5]">{children}</main>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   )

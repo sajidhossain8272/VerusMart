@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import CartCountBadge from './CartCountBadge'
 
 export default async function Header() {
   const siteSettings = await prisma.business_settings.findFirst({
@@ -45,7 +46,7 @@ export default async function Header() {
           <Link href="/wishlist" className="text-[#444] text-[22px] relative"><i className="fa-regular fa-heart"></i></Link>
           <Link href="/cart" className="text-[#444] text-[22px] relative">
             <i className="fa-solid fa-cart-shopping"></i>
-            <span className="absolute -top-[8px] -right-[10px] bg-[#f85606] text-white text-[10px] px-[6px] py-[2px] rounded-full font-bold">0</span>
+            <CartCountBadge />
           </Link>
         </div>
       </header>
@@ -83,7 +84,7 @@ export default async function Header() {
         <div className="w-[50px] flex items-center justify-end">
            <Link href="/cart" className="text-[#444] text-[20px] relative">
             <i className="fa-solid fa-cart-shopping"></i>
-            <span className="absolute -top-[5px] -right-[8px] bg-[#f85606] text-white text-[10px] px-[6px] py-[2px] rounded-full font-bold">0</span>
+            <CartCountBadge />
           </Link>
         </div>
       </div>

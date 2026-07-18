@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import DOMPurify from 'dompurify'
 import { JSDOM } from 'jsdom'
+import ProductActions from './ProductActions'
 
 export default async function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -42,6 +43,14 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
   const purify = DOMPurify(window)
   const cleanDescription = purify.sanitize(product.description || '')
 
+  // Serialize variants for client component (Decimal → number)
+  const serializedVariants = variants.map(v => ({
+    id: v.id,
+    variant_name: v.variant_name,
+    price: Number(v.price),
+    old_price: Number(v.old_price ?? 0),
+  }))
+
   return (
     <div className="w-[90%] max-w-[1200px] mx-auto py-[20px]">
       
@@ -52,52 +61,23 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
         <span className="text-[#212121]">{product.name}</span>
       </div>
 
+      {/* Main product card - ProductActions renders both image gallery and info side by side */}
       <div className="bg-white rounded-[12px] p-[25px] shadow-[0_4px_15px_rgba(0,0,0,0.03)] flex flex-col md:flex-row gap-[40px] mb-[30px]">
-        {/* Images */}
-        <div className="flex-1 md:max-w-[40%] flex flex-col gap-[15px]">
-          <div className="w-full aspect-square border border-[#e0e0e0] rounded-[8px] flex items-center justify-center p-[10px] bg-[#fafafa]">
-             <img src={product.image ? `/admin_uploads/products/${product.image}` : 'https://placehold.jp/500x500.png'} className="w-full h-full object-contain" alt={product.name} />
-          </div>
-          {/* Thumbnails placeholder */}
-          <div className="flex gap-[10px]">
-            {product.image && (
-               <div className="w-[80px] h-[80px] border border-[#e0e0e0] rounded p-[5px] cursor-pointer hover:border-[#f85606] transition-colors"><img src={`/admin_uploads/products/${product.image}`} className="w-full h-full object-contain" /></div>
-            )}
-            {product.image_2 && (
-               <div className="w-[80px] h-[80px] border border-[#e0e0e0] rounded p-[5px] cursor-pointer hover:border-[#f85606] transition-colors"><img src={`/admin_uploads/products/${product.image_2}`} className="w-full h-full object-contain" /></div>
-            )}
-            {product.image_3 && (
-               <div className="w-[80px] h-[80px] border border-[#e0e0e0] rounded p-[5px] cursor-pointer hover:border-[#f85606] transition-colors"><img src={`/admin_uploads/products/${product.image_3}`} className="w-full h-full object-contain" /></div>
-            )}
-          </div>
-        </div>
-
-        {/* Info */}
-        <div className="flex-[1.5]">
-          <h1 className="text-[22px] font-black text-[#212121] leading-[1.3] mb-[15px]">{product.name}</h1>
-          <div className="text-[14px] text-[#1a9cb7] mb-[20px] font-medium">Brand: <Link href="#" className="hover:underline">No Brand</Link></div>
-          
-          <hr className="border-[#f1f1f1] my-[20px]" />
-
-          <div className="mb-[25px]">
-            <div className="text-[32px] text-[#f85606] font-black leading-[1]">${defaultPrice.toFixed(2)}</div>
-            {defaultOldPrice > 0 && defaultOldPrice > defaultPrice && (
-              <div className="text-[14px] text-[#9e9e9e] line-through mt-[5px] font-medium">
-                ${defaultOldPrice.toFixed(2)} 
-                <span className="text-[#212121] ml-[10px] bg-[#ffe1d2] p-[2px_6px] rounded text-[12px] font-bold no-underline">
-                   -{Math.round(((defaultOldPrice - defaultPrice) / defaultOldPrice) * 100)}%
-                </span>
-              </div>
-            )}
-          </div>
-
-          <hr className="border-[#f1f1f1] my-[20px]" />
-
-          <div className="flex gap-[15px] mt-[30px] flex-col md:flex-row">
-            <button className="flex-1 p-[15px] text-[15px] font-bold uppercase rounded-[8px] cursor-pointer border-none bg-[#2fc5f1] text-white hover:bg-[#1a9cb7] transition-colors">Buy Now</button>
-            <button className="flex-1 p-[15px] text-[15px] font-bold uppercase rounded-[8px] cursor-pointer border-none bg-[#f85606] text-white hover:bg-[#d04000] transition-colors">Add to Cart</button>
-          </div>
-        </div>
+        <ProductActions
+          product={{
+            id: product.id,
+            name: product.name,
+            image: product.image ?? null,
+            image_2: product.image_2 ?? null,
+            image_3: product.image_3 ?? null,
+            price: defaultPrice,
+            old_price: defaultOldPrice,
+          }}
+          variants={serializedVariants}
+          defaultPrice={defaultPrice}
+          defaultOldPrice={defaultOldPrice}
+          defaultVName={defaultVName}
+        />
       </div>
 
       {/* Description */}
