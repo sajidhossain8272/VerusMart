@@ -1,0 +1,336 @@
+[10-Jan-2026 14:30:04 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'status' in 'WHERE' in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:10
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(10): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 10
+[10-Jan-2026 14:30:29 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'status' in 'WHERE' in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:10
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(10): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 10
+[10-Jan-2026 14:30:53 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:19
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(19): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 19
+[10-Jan-2026 14:32:25 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:92
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(92): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 92
+[10-Jan-2026 14:46:09 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'position' in 'WHERE' in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:7
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(7): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 7
+[10-Jan-2026 16:43:53 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:24
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(24): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 24
+[10-Jan-2026 16:46:47 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:24
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(24): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 24
+[10-Jan-2026 16:51:08 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:24
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(24): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 24
+[10-Jan-2026 16:51:19 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:128
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(128): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 128
+[10-Jan-2026 16:57:08 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:128
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(128): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 128
+[10-Jan-2026 16:57:09 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:128
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(128): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 128
+[10-Jan-2026 16:57:12 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:128
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(128): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 128
+[10-Jan-2026 16:57:25 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:128
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(128): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 128
+[10-Jan-2026 16:57:26 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:128
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(128): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 128
+[10-Jan-2026 16:57:28 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:128
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(128): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 128
+[10-Jan-2026 16:57:45 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.testimonials' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:128
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(128): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 128
+[13-Jan-2026 07:45:00 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/mobileh1/bazaar2.microjobbd.xyz/cart.php on line 8
+[13-Jan-2026 07:45:13 UTC] PHP Warning:  session_start(): Session cannot be started after headers have already been sent in /home/mobileh1/bazaar2.microjobbd.xyz/cart.php on line 8
+[13-Jan-2026 08:22:26 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 184
+[13-Jan-2026 08:22:26 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 245
+[13-Jan-2026 08:27:43 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 184
+[13-Jan-2026 08:27:43 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 245
+[13-Jan-2026 08:28:24 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 184
+[13-Jan-2026 08:28:24 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 245
+[13-Jan-2026 08:29:16 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 181
+[13-Jan-2026 08:29:16 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 241
+[13-Jan-2026 08:32:34 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 147
+[13-Jan-2026 08:32:34 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 197
+[13-Jan-2026 08:33:18 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 147
+[13-Jan-2026 08:33:18 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 197
+[13-Jan-2026 08:33:25 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 147
+[13-Jan-2026 08:33:25 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 197
+[13-Jan-2026 08:33:30 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 147
+[13-Jan-2026 08:33:30 UTC] PHP Warning:  Undefined array key "description" in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 197
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 40
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 40
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 42
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 42
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 44
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 44
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 45
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 45
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 46
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 46
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 47
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 47
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 79
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 79
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 80
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 80
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 81
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 81
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 93
+[13-Jan-2026 14:02:26 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 93
+[13-Jan-2026 14:05:19 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 40
+[13-Jan-2026 14:05:19 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 40
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 42
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 42
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 44
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 44
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 45
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 45
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 46
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 46
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 47
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 47
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 79
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 79
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 80
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 80
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 81
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 81
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 93
+[13-Jan-2026 14:05:20 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 93
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 40
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 40
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 42
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 42
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 44
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 44
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 45
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 45
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 46
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 46
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 47
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 47
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 79
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 79
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 80
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 80
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 81
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 81
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 93
+[13-Jan-2026 14:05:28 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 93
+[13-Jan-2026 16:21:34 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:21:39 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:21:39 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:21:39 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:21:39 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:21:39 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:21:39 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:21:40 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:22:03 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:22:09 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:22:30 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[13-Jan-2026 16:23:12 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 185
+[14-Jan-2026 09:03:31 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'p.is_trending' in 'WHERE' in /home/mobileh1/bazaar2.microjobbd.xyz/index.php:21
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(21): mysqli_query()
+#1 /home/mobileh1/bazaar2.microjobbd.xyz/index.php(25): getProductsBySection()
+#2 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 21
+[16-Jan-2026 07:44:53 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'mobileh1_bazaar2.users' doesn't exist in /home/mobileh1/bazaar2.microjobbd.xyz/register_process.php:27
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/register_process.php(27): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/register_process.php on line 27
+[18-Jan-2026 10:09:26 UTC] PHP Warning:  Undefined variable $bestseller_res in /home/mobileh1/bazaar2.microjobbd.xyz/index.php on line 249
+[27-Jan-2026 17:24:43 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:24:43 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:24:43 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:24:43 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:24:54 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:24:54 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:24:54 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:24:54 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:24:57 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:24:57 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:24:57 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:24:57 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:25:08 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:25:08 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:25:08 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:25:08 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:39:20 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:39:20 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:39:20 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:39:20 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:39:36 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:39:36 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:39:36 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:39:36 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:42:30 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:42:30 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:42:30 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:42:30 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:42:35 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:42:35 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:42:35 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:42:35 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:42:44 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:42:44 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:42:44 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:42:44 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:42:59 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:42:59 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:42:59 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:42:59 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:43:11 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:43:11 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:43:11 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:43:11 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:44:24 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:44:24 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:44:24 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:44:24 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:52:01 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:52:01 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:52:01 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:52:01 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:52:33 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:52:33 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:52:33 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:52:33 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:53:13 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 17:53:13 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:53:13 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 17:53:13 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[27-Jan-2026 17:56:51 UTC] PHP Warning:  Undefined array key "product_id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:57:59 UTC] PHP Warning:  Undefined array key "product_id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:58:06 UTC] PHP Warning:  Undefined array key "product_id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:58:18 UTC] PHP Warning:  Undefined array key "product_id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 17:58:41 UTC] PHP Warning:  Undefined array key "product_id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 18:00:21 UTC] PHP Warning:  Undefined array key "id" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 5
+[27-Jan-2026 18:00:21 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 6
+[27-Jan-2026 18:00:21 UTC] PHP Warning:  Undefined array key "price" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 7
+[27-Jan-2026 18:00:21 UTC] PHP Warning:  Undefined array key "image" in /home/mobileh1/bazaar2.microjobbd.xyz/manage_cart.php on line 8
+[29-Jan-2026 11:28:13 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 142
+[29-Jan-2026 11:28:13 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 142
+[29-Jan-2026 11:28:13 UTC] PHP Warning:  Undefined variable $biz in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 169
+[29-Jan-2026 11:28:13 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/footer.php on line 169
+[30-Jan-2026 19:33:40 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Too many connections in /home/mobileh1/bazaar2.microjobbd.xyz/db.php:8
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/db.php(8): mysqli_connect()
+#1 /home/mobileh1/bazaar2.microjobbd.xyz/header.php(5): include('/home/mobileh1/...')
+#2 /home/mobileh1/bazaar2.microjobbd.xyz/products.php(5): include('/home/mobileh1/...')
+#3 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/db.php on line 8
+[03-Feb-2026 10:33:52 UTC] PHP Warning:  include(config.php): Failed to open stream: No such file or directory in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 5
+[03-Feb-2026 10:33:52 UTC] PHP Warning:  include(config.php): Failed to open stream: No such file or directory in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 5
+[03-Feb-2026 10:33:52 UTC] PHP Warning:  include(): Failed opening 'config.php' for inclusion (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 5
+[03-Feb-2026 10:33:52 UTC] PHP Warning:  Undefined variable $conn in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 10
+[03-Feb-2026 10:33:52 UTC] PHP Fatal error:  Uncaught TypeError: mysqli_real_escape_string(): Argument #1 ($mysql) must be of type mysqli, null given in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php:10
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php(10): mysqli_real_escape_string()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 10
+[03-Feb-2026 10:52:51 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 28
+[03-Feb-2026 10:52:54 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'user_id' in 'WHERE' in /home/mobileh1/bazaar2.microjobbd.xyz/profile.php:18
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/profile.php(18): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/profile.php on line 18
+[03-Feb-2026 10:54:17 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'customer_id' in 'WHERE' in /home/mobileh1/bazaar2.microjobbd.xyz/profile.php:18
+Stack trace:
+#0 /home/mobileh1/bazaar2.microjobbd.xyz/profile.php(18): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/bazaar2.microjobbd.xyz/profile.php on line 18
+[03-Feb-2026 10:56:56 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/profile.php on line 131
+[03-Feb-2026 10:59:27 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 28
+[03-Feb-2026 15:10:43 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 28
+[16-Feb-2026 16:10:14 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 28
+[16-Feb-2026 16:23:55 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 28
+[16-Feb-2026 17:39:56 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 28
+[18-Feb-2026 19:27:22 UTC] PHP Warning:  Undefined variable $GET in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 6
+[18-Feb-2026 19:27:22 UTC] PHP Warning:  Trying to access array offset on value of type null in /home/mobileh1/bazaar2.microjobbd.xyz/product_details.php on line 6
+[18-Feb-2026 19:44:25 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/bazaar2.microjobbd.xyz/login_process.php on line 28
+[18-Feb-2026 19:45:00 UTC] PHP Warning:  Cannot modify header information - headers already sent by (output started at /home/mobileh1/bazaar2.microjobbd.xyz/header.php:23) in /home/mobileh1/bazaar2.microjobbd.xyz/wishlist.php on line 17
+[08-Apr-2026 10:01:15 UTC] PHP Warning:  Undefined variable $main_slides in /home/mobileh1/update.dalvendilo.com/index.php on line 12
+[08-Apr-2026 10:01:15 UTC] PHP Fatal error:  Uncaught TypeError: mysqli_fetch_assoc(): Argument #1 ($result) must be of type mysqli_result, null given in /home/mobileh1/update.dalvendilo.com/index.php:12
+Stack trace:
+#0 /home/mobileh1/update.dalvendilo.com/index.php(12): mysqli_fetch_assoc()
+#1 {main}
+  thrown in /home/mobileh1/update.dalvendilo.com/index.php on line 12
+[20-Apr-2026 18:10:02 UTC] PHP Warning:  Undefined array key "name" in /home/mobileh1/update.dalvendilo.com/login_process.php on line 28
+[30-Apr-2026 19:57:24 UTC] PHP Warning:  require(phpmailer/src/Exception.php): Failed to open stream: No such file or directory in /home/mobileh1/verusmart.com/checkout.php on line 10
+[30-Apr-2026 19:57:24 UTC] PHP Warning:  require(phpmailer/src/Exception.php): Failed to open stream: No such file or directory in /home/mobileh1/verusmart.com/checkout.php on line 10
+[30-Apr-2026 19:57:24 UTC] PHP Fatal error:  Uncaught Error: Failed opening required 'phpmailer/src/Exception.php' (include_path='.:/opt/alt/php81/usr/share/pear:/opt/alt/php81/usr/share/php:/usr/share/pear:/usr/share/php') in /home/mobileh1/verusmart.com/checkout.php:10
+Stack trace:
+#0 {main}
+  thrown in /home/mobileh1/verusmart.com/checkout.php on line 10
+[30-Apr-2026 20:14:11 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'order_note' in 'INSERT INTO' in /home/mobileh1/verusmart.com/checkout.php:61
+Stack trace:
+#0 /home/mobileh1/verusmart.com/checkout.php(61): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/verusmart.com/checkout.php on line 61
+[02-May-2026 09:23:46 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'status' in 'WHERE' in /home/mobileh1/verusmart.com/page.php:10
+Stack trace:
+#0 /home/mobileh1/verusmart.com/page.php(10): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/verusmart.com/page.php on line 10
+[02-May-2026 09:23:50 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'status' in 'WHERE' in /home/mobileh1/verusmart.com/page.php:10
+Stack trace:
+#0 /home/mobileh1/verusmart.com/page.php(10): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/verusmart.com/page.php on line 10
+[02-May-2026 09:23:55 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'status' in 'WHERE' in /home/mobileh1/verusmart.com/page.php:10
+Stack trace:
+#0 /home/mobileh1/verusmart.com/page.php(10): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/verusmart.com/page.php on line 10
+[02-May-2026 09:23:59 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Unknown column 'status' in 'WHERE' in /home/mobileh1/verusmart.com/page.php:10
+Stack trace:
+#0 /home/mobileh1/verusmart.com/page.php(10): mysqli_query()
+#1 {main}
+  thrown in /home/mobileh1/verusmart.com/page.php on line 10
+[07-May-2026 21:01:38 UTC] PHP Fatal error:  Uncaught mysqli_sql_exception: Too many connections in /home/mobileh1/verusmart.com/db.php:7
+Stack trace:
+#0 /home/mobileh1/verusmart.com/db.php(7): mysqli_connect()
+#1 /home/mobileh1/verusmart.com/index.php(4): include('/home/mobileh1/...')
+#2 {main}
+  thrown in /home/mobileh1/verusmart.com/db.php on line 7
