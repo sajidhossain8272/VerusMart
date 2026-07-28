@@ -11,13 +11,13 @@ export default async function HomePage() {
   const mainSlides = JSON.parse(JSON.stringify(activeSlides))
 
   const catIconRes = await prisma.categories.findMany({
-    where: { id: { in: [13, 14, 15, 16] } },
-    orderBy: { id: 'asc' }
+    take: 4,
+    orderBy: { priority: 'asc' }
   }).catch(() => [])
 
   const promoRes = await prisma.categories.findMany({
-    where: { id: { in: [17, 18, 19, 20] } },
-    orderBy: { id: 'asc' }
+    take: 4,
+    orderBy: { priority: 'asc' }
   }).catch(() => [])
 
   const rawRecProducts = await prisma.products.findMany({
