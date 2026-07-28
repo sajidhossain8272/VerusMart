@@ -16,6 +16,9 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: 'Verus Mart - Online Shopping in Bangladesh',
   description: 'Shop authentic products with fast delivery and cash on delivery at Verus Mart Bangladesh.',
+  verification: {
+    google: '23w6Aq7mtz8WzfF9RyqAIv9zaQ6ou3yxDiwV_XEeC4U',
+  },
 }
 
 export default async function RootLayout({
@@ -33,6 +36,7 @@ export default async function RootLayout({
     return (
       <html lang="en">
         <head>
+          <meta name="google-site-verification" content="23w6Aq7mtz8WzfF9RyqAIv9zaQ6ou3yxDiwV_XEeC4U" />
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         </head>
         <body className={roboto.variable}>
@@ -47,6 +51,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="google-site-verification" content="23w6Aq7mtz8WzfF9RyqAIv9zaQ6ou3yxDiwV_XEeC4U" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
       <body className={roboto.variable}>
