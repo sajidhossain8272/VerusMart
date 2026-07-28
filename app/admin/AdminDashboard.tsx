@@ -69,7 +69,7 @@ interface Order {
   order_note: string | null
   total_amount: number
   status: string | null
-  order_date: Date | null
+  order_date: string | Date | null
   items: OrderItem[]
 }
 

@@ -44,6 +44,7 @@ export default async function AdminPage() {
 
   const ordersWithItems = orders.map(order => ({
     ...order,
+    order_date: order.order_date ? order.order_date.toISOString() : null,
     total_amount: Number(order.total_amount),
     items: orderItems
       .filter(item => item.order_id === order.id)
@@ -55,8 +56,14 @@ export default async function AdminPage() {
 
   const serializedProducts = products.map(p => ({
     ...p,
+    created_at: p.created_at ? p.created_at.toISOString() : null,
     price: Number(p.price),
     old_price: Number(p.old_price)
+  }))
+
+  const serializedBanners = banners.map(b => ({
+    ...b,
+    created_at: b.created_at ? b.created_at.toISOString() : null,
   }))
 
   const serializedSettings = siteSettings ? {
@@ -72,7 +79,7 @@ export default async function AdminPage() {
       initialCategories={categories}
       initialOrders={ordersWithItems}
       initialSettings={serializedSettings}
-      initialBanners={banners}
+      initialBanners={serializedBanners}
     />
   )
 }

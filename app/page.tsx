@@ -3,10 +3,19 @@ import { prisma } from '@/lib/prisma'
 import HomeSlider from '@/app/components/HomeSlider'
 
 export default async function HomePage() {
-  const mainSlides = await prisma.banners.findMany({
+  const rawSlides = await prisma.banners.findMany({
     where: { position: 'main', status: 'active' },
     orderBy: { id: 'desc' }
   })
+
+  // Convert Date and Enum objects to plain primitives for Client Component serialization
+  const mainSlides = rawSlides.map(b => ({
+    id: b.id,
+    title: b.title,
+    image: b.image,
+    position: b.position ? String(b.position) : 'main',
+    status: b.status ? String(b.status) : 'active',
+  }))
 
   const catIconRes = await prisma.categories.findMany({
     where: { id: { in: [13, 14, 15, 16] }, status: 'active' },
@@ -18,10 +27,17 @@ export default async function HomePage() {
     orderBy: { id: 'asc' }
   })
 
-  const recProducts = await prisma.products.findMany({
+  const rawRecProducts = await prisma.products.findMany({
     where: { status: 'active', is_recommended: true },
     take: 6
   })
+
+  const recProducts = rawRecProducts.map(p => ({
+    id: p.id,
+    name: p.name,
+    price: Number(p.price ?? 0),
+    image: p.image,
+  }))
 
   const subtexts = ["Up to 50% Off!", "Bestsellers", "Latest Collection", "Limited Time Offer"];
 
@@ -94,7 +110,7 @@ export default async function HomePage() {
               </div>
               <div className="p-[10px]">
                 <div className="text-[12px] text-[#212121] h-[32px] overflow-hidden mb-1">{p.name}</div>
-                <div className="text-[17px] text-[#f85606] font-[#002b5b] font-extrabold block mb-2">৳{Number(p.price).toLocaleString('en-BD')}</div>
+                <div className="text-[17px] text-[#f85606] font-[#002b5b] font-extrabold block mb-2">৳{p.price.toLocaleString('en-BD')}</div>
               </div>
             </Link>
             <div className="px-[10px] pb-[10px]">
