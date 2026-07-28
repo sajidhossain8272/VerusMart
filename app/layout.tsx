@@ -16,6 +16,13 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: 'Verus Mart - Online Shopping in Bangladesh',
   description: 'Shop authentic products with fast delivery and cash on delivery at Verus Mart Bangladesh.',
+  icons: {
+    icon: '/admin_uploads/logo.png',
+    apple: '/admin_uploads/logo.png',
+  },
+  appleWebApp: {
+    title: 'VerusMart',
+  },
 }
 
 export default async function RootLayout({
@@ -33,6 +40,9 @@ export default async function RootLayout({
     return (
       <html lang="en">
         <head>
+          <meta name="apple-mobile-web-app-title" content="VerusMart" />
+          <link rel="icon" href="/admin_uploads/logo.png" />
+          <link rel="apple-touch-icon" href="/admin_uploads/logo.png" />
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
         </head>
         <body className={roboto.variable}>
@@ -47,6 +57,9 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta name="apple-mobile-web-app-title" content="VerusMart" />
+        <link rel="icon" href="/admin_uploads/logo.png" />
+        <link rel="apple-touch-icon" href="/admin_uploads/logo.png" />
         {/* Google Tag Manager */}
         <script
           dangerouslySetInnerHTML={{
