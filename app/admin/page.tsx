@@ -42,8 +42,14 @@ export default async function AdminPage() {
     orderBy: { id: 'desc' }
   })
 
+  const serializedCategories = categories.map(c => ({
+    ...c,
+    status: c.status ? String(c.status) : 'active',
+  }))
+
   const ordersWithItems = orders.map(order => ({
     ...order,
+    status: order.status ? String(order.status) : 'pending',
     order_date: order.order_date ? order.order_date.toISOString() : null,
     total_amount: Number(order.total_amount),
     items: orderItems
@@ -63,6 +69,8 @@ export default async function AdminPage() {
 
   const serializedBanners = banners.map(b => ({
     ...b,
+    position: b.position ? String(b.position) : 'main',
+    status: b.status ? String(b.status) : 'active',
     created_at: b.created_at ? b.created_at.toISOString() : null,
   }))
 
@@ -76,7 +84,7 @@ export default async function AdminPage() {
     <AdminDashboard 
       isAuthenticated={true}
       initialProducts={serializedProducts}
-      initialCategories={categories}
+      initialCategories={serializedCategories}
       initialOrders={ordersWithItems}
       initialSettings={serializedSettings}
       initialBanners={serializedBanners}
