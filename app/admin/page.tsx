@@ -42,15 +42,11 @@ export default async function AdminPage() {
     orderBy: { id: 'desc' }
   })
 
-  const serializedCategories = categories.map(c => ({
-    ...c,
-    status: c.status ? String(c.status) : 'active',
-  }))
+  // Deep JSON serialization ensures zero non-plain objects, dates or Prisma symbols pass into Client Components
+  const serializedCategories = JSON.parse(JSON.stringify(categories))
 
-  const ordersWithItems = orders.map(order => ({
+  const ordersWithItems = JSON.parse(JSON.stringify(orders.map(order => ({
     ...order,
-    status: order.status ? String(order.status) : 'pending',
-    order_date: order.order_date ? order.order_date.toISOString() : null,
     total_amount: Number(order.total_amount),
     items: orderItems
       .filter(item => item.order_id === order.id)
@@ -58,27 +54,21 @@ export default async function AdminPage() {
         ...item,
         price: Number(item.price)
       }))
-  }))
+  }))))
 
-  const serializedProducts = products.map(p => ({
+  const serializedProducts = JSON.parse(JSON.stringify(products.map(p => ({
     ...p,
-    created_at: p.created_at ? p.created_at.toISOString() : null,
     price: Number(p.price),
     old_price: Number(p.old_price)
-  }))
+  }))))
 
-  const serializedBanners = banners.map(b => ({
-    ...b,
-    position: b.position ? String(b.position) : 'main',
-    status: b.status ? String(b.status) : 'active',
-    created_at: b.created_at ? b.created_at.toISOString() : null,
-  }))
+  const serializedBanners = JSON.parse(JSON.stringify(banners))
 
-  const serializedSettings = siteSettings ? {
+  const serializedSettings = siteSettings ? JSON.parse(JSON.stringify({
     ...siteSettings,
     shipping_inside: Number(siteSettings.shipping_inside),
     shipping_outside: Number(siteSettings.shipping_outside)
-  } : null
+  })) : null
 
   return (
     <AdminDashboard 
