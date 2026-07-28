@@ -1,8 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import DOMPurify from 'dompurify'
-import { JSDOM } from 'jsdom'
 import type { Metadata } from 'next'
 import ProductActions from './ProductActions'
 import AddToCartBtn from '@/app/products/AddToCartBtn'
@@ -16,8 +14,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!product) return {}
 
   const metaTitle = (product as any).meta_title || `${product.name} | Verus Mart`
-  const metaDesc = (product as any).meta_description || product.description?.substring(0, 160) || `Buy ${product.name} at Verus Mart Bangladesh with fast delivery.`
-  const imageUrl = product.image ? `/admin_uploads/products/${product.image}` : '/admin_uploads/logo.png'
+  const cleanDesc = product.description?.replace(/<[^>]*>?/gm, '').trim() || ''
+  const metaDesc = (product as any).meta_description || cleanDesc.substring(0, 160) || `Buy ${product.name} at Verus Mart Bangladesh with fast delivery.`
+  const imageUrl = product.image ? `https://verusmart.com/admin_uploads/products/${product.image}` : 'https://verusmart.com/admin_uploads/logo.png'
 
   return {
     title: metaTitle,
@@ -69,7 +68,10 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
   })
 
   const related = await prisma.products.findMany({
-    where: { category_id: product.category_id, id: { not: productId } },
+    where: { 
+      category_id: product.category_id ?? undefined, 
+      id: { not: productId } 
+    },
     take: 4
   })
 
@@ -77,9 +79,9 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
   const defaultOldPrice = Number(product.old_price || variants[0]?.old_price || 0)
   const defaultVName = variants[0]?.variant_name || 'Regular'
 
-  const window = new JSDOM('').window
-  const purify = DOMPurify(window)
-  const cleanDescription = purify.sanitize(product.description || '')
+  // Clean script tags if present
+  const cleanDescription = (product.description || '')
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
 
   // Serialize variants for client component
   const serializedVariants = variants.map(v => ({
