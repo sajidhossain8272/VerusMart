@@ -37,21 +37,21 @@ export default function CartPage() {
 
   return (
     <div className="w-[90%] max-w-[1200px] mx-auto my-[30px]">
-      <div className="flex items-center justify-between mb-[20px]">
-        <h1 className="font-medium text-[24px]">Your Shopping Cart <span className="text-[16px] text-[#888] font-normal">({cartCount} item{cartCount !== 1 ? 's' : ''})</span></h1>
-        <button onClick={clearCart} className="text-[13px] text-[#e53935] hover:underline cursor-pointer bg-none border-none font-medium">
-          <i className="fa-solid fa-trash mr-[5px]"></i>Clear Cart
+      <div className="flex items-center justify-between mb-5">
+        <h1 className="font-bold text-[18px] sm:text-[24px]">Your Cart <span className="text-[14px] text-[#888] font-normal">({cartCount} item{cartCount !== 1 ? 's' : ''})</span></h1>
+        <button onClick={clearCart} className="text-[12px] sm:text-[13px] text-[#e53935] hover:underline cursor-pointer bg-none border-none font-medium flex items-center gap-1">
+          <i className="fa-solid fa-trash"></i><span className="hidden sm:inline">Clear Cart</span>
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[1.3fr_0.7fr] gap-[20px] items-start">
+      <div className="flex flex-col lg:grid lg:grid-cols-[1.3fr_0.7fr] gap-4 sm:gap-[20px] items-start">
 
         {/* Cart items */}
         <div className="flex flex-col gap-[12px]">
           {cartItems.map(item => (
-            <div key={`${item.id}-${item.variantName}`} className="bg-white rounded-[8px] p-[15px] border border-[#f0f0f0] shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex gap-[15px] items-center">
+            <div key={`${item.id}-${item.variantName}`} className="bg-white rounded-xl p-3 sm:p-[15px] border border-[#f0f0f0] shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex gap-3 sm:gap-[15px] items-center">
               <Link href={`/product/${item.id}`} className="shrink-0">
-                <div className="w-[80px] h-[80px] border border-[#eee] rounded-[6px] flex items-center justify-center overflow-hidden bg-[#fafafa]">
+                <div className="w-[65px] h-[65px] sm:w-[80px] sm:h-[80px] border border-[#eee] rounded-[6px] flex items-center justify-center overflow-hidden bg-[#fafafa]">
                   {item.image ? (
                     <img src={`/admin_uploads/products/${item.image}`} alt={item.name} className="max-w-full max-h-full object-contain" />
                   ) : (
@@ -61,40 +61,40 @@ export default function CartPage() {
               </Link>
 
               <div className="flex-1 min-w-0">
-                <Link href={`/product/${item.id}`} className="text-[14px] font-medium text-[#212121] hover:text-[#f85606] transition-colors line-clamp-2 block mb-[4px]">
+                <Link href={`/product/${item.id}`} className="text-[13px] sm:text-[14px] font-medium text-[#212121] hover:text-[#f85606] transition-colors line-clamp-2 block mb-1">
                   {item.name}
                 </Link>
                 {item.variantName && item.variantName !== 'Regular' && (
-                  <div className="text-[12px] text-[#888] mb-[8px]">Variant: <span className="text-[#555] font-medium">{item.variantName}</span></div>
+                  <div className="text-[11px] text-[#888] mb-1">Variant: <span className="text-[#555] font-medium">{item.variantName}</span></div>
                 )}
-                <div className="text-[16px] text-[#f85606] font-bold">৳{item.price.toLocaleString('en-BD')}</div>
+                <div className="text-[15px] sm:text-[16px] text-[#f85606] font-bold">৳{item.price.toLocaleString('en-BD')}</div>
               </div>
 
-              <div className="flex flex-col items-end gap-[10px] shrink-0">
+              <div className="flex flex-col items-end gap-2 shrink-0">
                 {/* Qty controls */}
                 <div className="flex items-center border border-[#ddd] rounded-[6px] overflow-hidden">
                   <button
                     onClick={() => updateQty(item.id, item.variantName, item.quantity - 1)}
-                    className="w-[32px] h-[32px] bg-[#f5f5f5] border-none text-[16px] cursor-pointer hover:bg-[#ffe1d2] hover:text-[#f85606] transition-colors font-bold"
+                    className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] bg-[#f5f5f5] border-none text-[14px] cursor-pointer hover:bg-[#ffe1d2] hover:text-[#f85606] transition-colors font-bold"
                   >
                     −
                   </button>
-                  <span className="px-[12px] text-[14px] font-bold text-[#212121]">{item.quantity}</span>
+                  <span className="px-2 sm:px-[12px] text-[13px] sm:text-[14px] font-bold text-[#212121]">{item.quantity}</span>
                   <button
                     onClick={() => updateQty(item.id, item.variantName, item.quantity + 1)}
-                    className="w-[32px] h-[32px] bg-[#f5f5f5] border-none text-[16px] cursor-pointer hover:bg-[#ffe1d2] hover:text-[#f85606] transition-colors font-bold"
+                    className="w-[28px] h-[28px] sm:w-[32px] sm:h-[32px] bg-[#f5f5f5] border-none text-[14px] cursor-pointer hover:bg-[#ffe1d2] hover:text-[#f85606] transition-colors font-bold"
                   >
                     +
                   </button>
                 </div>
 
-                <div className="text-[14px] font-bold text-[#333]">
+                <div className="text-[13px] sm:text-[14px] font-bold text-[#333]">
                   ৳{(item.price * item.quantity).toLocaleString('en-BD')}
                 </div>
 
                 <button
                   onClick={() => removeFromCart(item.id, item.variantName)}
-                  className="text-[12px] text-[#e53935] hover:underline cursor-pointer bg-none border-none font-medium"
+                  className="text-[11px] sm:text-[12px] text-[#e53935] hover:underline cursor-pointer bg-none border-none font-medium"
                 >
                   <i className="fa-solid fa-trash-can mr-[4px]"></i>Remove
                 </button>
@@ -108,7 +108,7 @@ export default function CartPage() {
         </div>
 
         {/* Order summary */}
-        <div className="bg-white rounded-[8px] p-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] sticky top-[80px]">
+        <div className="bg-white rounded-xl p-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] lg:sticky lg:top-[80px]">
           <h3 className="text-[18px] mb-[15px] pb-[10px] border-b border-[#eee] font-bold">Order Summary</h3>
 
           <div className="flex justify-between mb-[10px] text-[#444] text-[14px]">

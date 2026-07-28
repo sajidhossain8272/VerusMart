@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import CartCountBadge from './CartCountBadge'
+import MobileMenuClient from './MobileMenuClient'
 
 let cachedSettings: any = null
 let cachedCategories: any[] = []
@@ -32,9 +33,7 @@ export default async function Header() {
   const rawCats = await getCategories()
 
   const headerCats = rawCats.filter(c => !c.status || String(c.status) === 'active')
-
-  const companyName = siteSettings?.company_name || 'Verus Mart'
-  const finalLogo = siteSettings?.logo ? `/admin_uploads/business/${siteSettings.logo}` : '/assets/images/logo.png'
+  const serializedCats = headerCats.map(c => ({ id: c.id, name: c.name }))
 
   return (
     <>
@@ -86,19 +85,16 @@ export default async function Header() {
       </nav>
 
       {/* Mobile Header */}
-      <div className="flex lg:hidden bg-white p-[10px_15px] items-center justify-between border-b border-[#eee] sticky top-0 z-[1001]">
-        <div className="w-[50px] flex items-center"><i className="fa-solid fa-bars text-[22px] text-[#444] cursor-pointer"></i></div>
-        <div className="flex-1 flex justify-center items-center">
-           <Link href="/" className="flex items-center justify-center">
-             <img src="/admin_uploads/logo.png" alt="VerusMart" className="h-[28px] w-auto object-contain" />
-          </Link>
-        </div>
-        <div className="w-[50px] flex items-center justify-end">
-           <Link href="/cart" className="text-[#444] text-[20px] relative">
-            <i className="fa-solid fa-cart-shopping"></i>
-            <CartCountBadge />
-          </Link>
-        </div>
+      <div className="flex lg:hidden bg-white items-center justify-between border-b border-[#eee] sticky top-0 z-[1001] shadow-sm">
+        {/* Logo center, menu left, cart right */}
+        <MobileMenuClient categories={serializedCats} />
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center">
+          <img src="/admin_uploads/logo.png" alt="VerusMart" className="h-[28px] w-auto object-contain" />
+        </Link>
+        <Link href="/cart" className="ml-auto p-3 text-[#444] text-[20px] relative">
+          <i className="fa-solid fa-cart-shopping"></i>
+          <CartCountBadge />
+        </Link>
       </div>
     </>
   )

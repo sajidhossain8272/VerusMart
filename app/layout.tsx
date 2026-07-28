@@ -4,6 +4,7 @@ import Script from 'next/script'
 import './globals.css'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import MobileNav from './components/MobileNav'
 import { CartProvider } from './context/CartContext'
 import { headers } from 'next/headers'
 
@@ -120,8 +121,9 @@ fbq('track', 'PageView');`,
           ) : (
             <>
               <Header />
-              <main className="min-h-screen bg-[#eff0f5] flow-root">{children}</main>
+              <main className="min-h-screen bg-[#eff0f5] flow-root pb-16 lg:pb-0">{children}</main>
               <Footer />
+              <MobileNav />
             </>
           )}
         </CartProvider>
