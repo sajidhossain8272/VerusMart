@@ -12,6 +12,16 @@ export function middleware(req: NextRequest) {
   requestHeaders.set('x-pathname', url.pathname)
 
   if (isAdminSubdomain) {
+    // Prevent rewriting manifest.json, robots.txt, and files with extensions (e.g. .png, .ico)
+    const isStaticFile = url.pathname.includes('.') || url.pathname === '/manifest.json' || url.pathname === '/robots.txt'
+    if (isStaticFile) {
+      return NextResponse.next({
+        request: {
+          headers: requestHeaders,
+        }
+      })
+    }
+
     // If accessing root, rewrite to /admin
     if (url.pathname === '/') {
       url.pathname = '/admin'

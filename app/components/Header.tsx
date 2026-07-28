@@ -19,11 +19,8 @@ export default async function Header() {
     <>
       {/* Desktop Top Nav */}
       <div className="hidden lg:flex bg-[#f5f5f5] text-[12px] px-[8%] py-[5px] justify-end gap-[20px] text-[#555]">
-        <Link href="#" className="hover:text-[#f85606]">SAVE MORE ON APP</Link>
         <Link href="#" className="hover:text-[#f85606]">CUSTOMER CARE</Link>
         <Link href="/track-order" className="hover:text-[#f85606]">TRACK MY ORDER</Link>
-        <Link href="/login" className="hover:text-[#f85606]">LOGIN</Link>
-        <Link href="/register" className="hover:text-[#f85606]">SIGNUP</Link>
       </div>
 
       {/* Main Header Desktop */}
