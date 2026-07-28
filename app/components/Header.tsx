@@ -2,14 +2,34 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import CartCountBadge from './CartCountBadge'
 
-export default async function Header() {
-  const siteSettings = await prisma.business_settings.findFirst({
-    where: { id: 1 }
-  }).catch(() => null)
+let cachedSettings: any = null
+let cachedCategories: any[] = []
 
-  const rawCats = await prisma.categories.findMany({
-    orderBy: { priority: 'asc' }
-  }).catch(() => [])
+async function getSettings() {
+  if (cachedSettings) return cachedSettings
+  try {
+    const res = await prisma.business_settings.findFirst({ where: { id: 1 } })
+    if (res) cachedSettings = res
+    return res
+  } catch {
+    return cachedSettings || null
+  }
+}
+
+async function getCategories() {
+  if (cachedCategories.length > 0) return cachedCategories
+  try {
+    const res = await prisma.categories.findMany({ orderBy: { priority: 'asc' } })
+    if (res.length > 0) cachedCategories = res
+    return res
+  } catch {
+    return cachedCategories || []
+  }
+}
+
+export default async function Header() {
+  const siteSettings = await getSettings()
+  const rawCats = await getCategories()
 
   const headerCats = rawCats.filter(c => !c.status || String(c.status) === 'active')
 

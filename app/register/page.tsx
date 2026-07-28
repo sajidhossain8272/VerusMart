@@ -1,8 +1,10 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
+export const dynamic = 'force-dynamic'
+
 export default async function RegisterPage() {
-  const settings = await prisma.business_settings.findFirst({ where: { id: 1 } })
+  const settings = await prisma.business_settings.findFirst({ where: { id: 1 } }).catch(() => null)
   const companyName = settings?.company_name || 'Verus Mart'
   const logoPath = settings?.logo ? `/admin_uploads/business/${settings.logo}` : '/assets/images/logo.png'
 
@@ -18,38 +20,52 @@ export default async function RegisterPage() {
         <p className="text-[14px] text-gray-500 mb-[30px]">Join us today</p>
 
         <form action="/api/auth/register" method="POST" className="w-full flex flex-col gap-[20px]">
-          
-          <div className="relative">
-            <span className="absolute left-[15px] top-[14px] text-gray-400"><i className="fa-solid fa-user"></i></span>
-            <input type="text" name="full_name" placeholder="Full Name" required className="w-full h-[48px] bg-[#f8fafc] border border-[#e2e8f0] rounded-[10px] pl-[45px] pr-[15px] font-inter text-[15px] text-[#1e293b] outline-none transition-all focus:border-[#00bcd4] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,188,212,0.1)]" />
+          <div className="flex flex-col gap-[8px]">
+            <label className="text-[13px] font-semibold text-[#1e293b]">Full Name</label>
+            <input 
+              type="text" 
+              name="name" 
+              placeholder="Your Name" 
+              required 
+              className="w-full p-[12px_16px] rounded-xl border border-gray-200 outline-none text-[14px] transition-all focus:border-[#00bcd4] focus:ring-2 focus:ring-[#00bcd4]/20"
+            />
           </div>
 
-          <div className="relative">
-            <span className="absolute left-[15px] top-[14px] text-gray-400"><i className="fa-solid fa-envelope"></i></span>
-            <input type="email" name="email" placeholder="Email Address" required className="w-full h-[48px] bg-[#f8fafc] border border-[#e2e8f0] rounded-[10px] pl-[45px] pr-[15px] font-inter text-[15px] text-[#1e293b] outline-none transition-all focus:border-[#00bcd4] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,188,212,0.1)]" />
-          </div>
-          
-          <div className="relative">
-            <span className="absolute left-[15px] top-[14px] text-gray-400"><i className="fa-solid fa-phone"></i></span>
-            <input type="text" name="phone" placeholder="Phone Number" required className="w-full h-[48px] bg-[#f8fafc] border border-[#e2e8f0] rounded-[10px] pl-[45px] pr-[15px] font-inter text-[15px] text-[#1e293b] outline-none transition-all focus:border-[#00bcd4] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,188,212,0.1)]" />
-          </div>
-
-          <div className="relative">
-            <span className="absolute left-[15px] top-[14px] text-gray-400"><i className="fa-solid fa-lock"></i></span>
-            <input type="password" name="password" id="password" placeholder="Password" required className="w-full h-[48px] bg-[#f8fafc] border border-[#e2e8f0] rounded-[10px] pl-[45px] pr-[45px] font-inter text-[15px] text-[#1e293b] outline-none transition-all focus:border-[#00bcd4] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,188,212,0.1)]" />
-          </div>
-          
-           <div className="relative">
-            <span className="absolute left-[15px] top-[14px] text-gray-400"><i className="fa-solid fa-lock"></i></span>
-            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" required className="w-full h-[48px] bg-[#f8fafc] border border-[#e2e8f0] rounded-[10px] pl-[45px] pr-[45px] font-inter text-[15px] text-[#1e293b] outline-none transition-all focus:border-[#00bcd4] focus:bg-white focus:shadow-[0_0_0_4px_rgba(0,188,212,0.1)]" />
+          <div className="flex flex-col gap-[8px]">
+            <label className="text-[13px] font-semibold text-[#1e293b]">Email Address</label>
+            <input 
+              type="email" 
+              name="email" 
+              placeholder="name@example.com" 
+              required 
+              className="w-full p-[12px_16px] rounded-xl border border-gray-200 outline-none text-[14px] transition-all focus:border-[#00bcd4] focus:ring-2 focus:ring-[#00bcd4]/20"
+            />
           </div>
 
-          <button type="submit" className="w-full h-[48px] bg-[#ac3255] text-white border-none rounded-[10px] font-bold text-[16px] cursor-pointer mt-[10px] transition-all hover:bg-[#8b2844] hover:-translate-y-[2px] shadow-[0_4px_10px_rgba(172,50,85,0.3)]">Register</button>
+          <div className="flex flex-col gap-[8px]">
+            <label className="text-[13px] font-semibold text-[#1e293b]">Password</label>
+            <input 
+              type="password" 
+              name="password" 
+              placeholder="••••••••" 
+              required 
+              className="w-full p-[12px_16px] rounded-xl border border-gray-200 outline-none text-[14px] transition-all focus:border-[#00bcd4] focus:ring-2 focus:ring-[#00bcd4]/20"
+            />
+          </div>
 
+          <button 
+            type="submit" 
+            className="w-full bg-[#00bcd4] hover:bg-[#00acc1] text-white font-bold p-[14px] rounded-xl cursor-pointer transition-all shadow-md text-[15px] mt-[10px]"
+          >
+            Sign Up
+          </button>
         </form>
 
-        <p className="mt-[25px] text-[14px] text-gray-500">
-          Already have an account? <Link href="/login" className="text-[#00bcd4] font-bold hover:underline">Login</Link>
+        <p className="text-[14px] text-gray-500 mt-[25px]">
+          Already have an account?{' '}
+          <Link href="/login" className="text-[#00bcd4] font-bold hover:underline">
+            Login
+          </Link>
         </p>
 
       </div>

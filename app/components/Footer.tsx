@@ -1,10 +1,21 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
+let cachedBiz: any = null
+
+async function getBizSettings() {
+  if (cachedBiz) return cachedBiz
+  try {
+    const res = await prisma.business_settings.findFirst({ where: { id: 1 } })
+    if (res) cachedBiz = res
+    return res
+  } catch {
+    return cachedBiz || null
+  }
+}
+
 export default async function Footer() {
-  const biz = await prisma.business_settings.findFirst({
-    where: { id: 1 }
-  }).catch(() => null)
+  const biz = await getBizSettings()
 
   return (
     <footer className="bg-[#2e2e2e] text-white pt-[60px] pb-[40px] px-[8%] mt-[50px] font-roboto">
@@ -26,6 +37,7 @@ export default async function Footer() {
             <li><Link href="/how-to-buy" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">How to Buy</Link></li>
             <li><Link href="/returns-refunds" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Returns & Refunds</Link></li>
             <li><Link href="/contact" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Contact Us</Link></li>
+            <li><Link href="/terms-conditions" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Terms & Conditions</Link></li>
           </ul>
         </div>
 
@@ -35,32 +47,29 @@ export default async function Footer() {
           <ul className="list-none flex flex-col gap-[10px]">
             <li><Link href="/about" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">About Us</Link></li>
             <li><Link href="/privacy-policy" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Privacy Policy</Link></li>
-            <li><Link href="/terms-conditions" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Terms & Conditions</Link></li>
           </ul>
         </div>
 
         {/* Section 4 */}
         <div>
           <h4 className="text-[16px] font-semibold text-white uppercase mb-[20px]">Contact Info</h4>
-          <ul className="list-none flex flex-col gap-[12px]">
-            <li className="flex items-start gap-[10px] text-[13px] text-[#ababab]">
-              <i className="fa-solid fa-location-dot mt-[4px] text-[#f85606]"></i>
-              <span>{biz?.address || 'Your Address'}</span>
-            </li>
-            <li className="flex items-center gap-[10px] text-[13px] text-[#ababab]">
-              <i className="fa-solid fa-phone text-[#f85606]"></i>
-              <span>{biz?.phone || 'Your Phone'}</span>
-            </li>
-            <li className="flex items-center gap-[10px] text-[13px] text-[#ababab]">
-              <i className="fa-solid fa-envelope text-[#f85606]"></i>
-              <span>{biz?.email || 'Your Email'}</span>
-            </li>
-          </ul>
+          <div className="flex flex-col gap-[12px]">
+            <p className="text-[13px] text-[#ababab] flex items-center gap-[10px]">
+              <i className="fa-solid fa-[#f85606] fa-location-dot text-[#f85606]"></i> {biz?.address || 'Dhaka, Bangladesh'}
+            </p>
+            <p className="text-[13px] text-[#ababab] flex items-center gap-[10px]">
+              <i className="fa-solid fa-[#f85606] fa-phone text-[#f85606]"></i> {biz?.phone || '+880 1700-000000'}
+            </p>
+            <p className="text-[13px] text-[#ababab] flex items-center gap-[10px]">
+              <i className="fa-solid fa-[#f85606] fa-envelope text-[#f85606]"></i> {biz?.email || 'support@verusmart.com'}
+            </p>
+          </div>
         </div>
+
       </div>
-      
-      <div className="text-center pt-[20px] border-t border-[#444] text-[12px] text-[#888]">
-        &copy; {new Date().getFullYear()} {biz?.company_name || 'Verus Mart'}. All Rights Reserved.
+
+      <div className="border-t border-[#444] pt-[20px] text-center text-[12px] text-[#888]">
+        &copy; {new Date().getFullYear()} Verus Mart. All Rights Reserved.
       </div>
     </footer>
   )
