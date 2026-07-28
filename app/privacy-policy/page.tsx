@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function PrivacyPolicyPage() {
   return (
     <div className="w-[92%] max-w-[800px] mx-auto py-[40px] font-sans">

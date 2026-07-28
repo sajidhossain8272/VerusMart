@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default function AboutPage() {
   return (
     <div className="w-[92%] max-w-[800px] mx-auto py-[40px] font-sans">
@@ -13,34 +15,21 @@ export default function AboutPage() {
         </h1>
         
         <p className="text-[#444] text-[15px] leading-[1.8] mb-[20px]">
-          Welcome to <strong>Verus Mart</strong>, one of Bangladesh's fastest-growing e-commerce platforms. Based in the heart of Dhaka, we are dedicated to bringing high-quality products directly to your doorstep with unmatched reliability and top-tier service.
+          Welcome to <strong className="text-[#002b5b]">Verus Mart</strong>, your trusted online shopping destination in Bangladesh. We are committed to offering high-quality products ranging from premium fragrances and electronics to home essentials and trending lifestyle items at competitive prices.
         </p>
 
         <p className="text-[#444] text-[15px] leading-[1.8] mb-[20px]">
-          Our collection features curated items ranging from beauty products, home essentials, to electronics. We focus on ensuring authenticity in every product we deliver, addressing the core need of Bangladeshi shoppers for genuine quality.
+          At Verus Mart, customer satisfaction is our top priority. We provide fast nationwide delivery, cash on delivery payment options, and hassle-free returns to ensure a seamless shopping experience for all our customers.
         </p>
 
-        <h3 className="text-[18px] font-bold text-[#002b5b] mt-[30px] mb-[10px]">Our Mission</h3>
-        <p className="text-[#444] text-[15px] leading-[1.8] mb-[20px]">
-          To redefine online shopping in Bangladesh by establishing trust, providing authentic goods, ensuring super-fast deliveries, and maintaining customer-first support services.
-        </p>
-
-        <h3 className="text-[18px] font-bold text-[#002b5b] mt-[30px] mb-[10px]">Why Shop With Us?</h3>
-        <ul className="list-disc pl-[20px] text-[#444] text-[15px] leading-[1.8] space-y-[10px]">
-          <li><strong>100% Authentic Products:</strong> Directly sourced or verified through official channels.</li>
-          <li><strong>Super-fast Delivery:</strong> Next-day delivery within Dhaka metropolitan area and rapid shipping nationwide.</li>
-          <li><strong>Flexible Payment Methods:</strong> Cash on Delivery (COD), bKash, Nagad, and secure online bank transfers.</li>
-          <li><strong>Easy Returns:</strong> 7-day hassle-free return policy if products do not match descriptions.</li>
-        </ul>
-
-        <div className="bg-[#fff6f2] border-l-4 border-[#f85606] p-[20px] mt-[40px] rounded-r-xl">
-          <h4 className="text-[#f85606] font-bold text-[16px] mb-[5px]">Contact Corporate Office</h4>
-          <p className="text-[#555] text-[14px] leading-[1.6]">
-            Verus Mart Headquarters<br />
-            Kawla, Dhaka - 1229, Bangladesh<br />
-            Email: <span className="font-semibold text-[#002b5b]">verusmart4@gmail.com</span><br />
-            Hotline: <span className="font-semibold text-[#002b5b]">+880 1628083370</span>
-          </p>
+        <div className="mt-[30px] p-[20px] bg-[#f8fafc] rounded-xl border border-[#e2e8f0]">
+          <h3 className="text-[16px] font-bold text-[#002b5b] mb-[10px]">Why Choose Us?</h3>
+          <ul className="list-disc pl-[20px] text-[14px] text-[#555] space-y-2">
+            <li>100% Authentic and Carefully Selected Products</li>
+            <li>Fast Home Delivery Across Bangladesh</li>
+            <li>Cash on Delivery & Secure Online Payments</li>
+            <li>Dedicated Customer Support</li>
+          </ul>
         </div>
       </div>
     </div>
