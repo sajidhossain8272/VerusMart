@@ -8,14 +8,8 @@ export default async function HomePage() {
     orderBy: { id: 'desc' }
   })
 
-  // Convert Date and Enum objects to plain primitives for Client Component serialization
-  const mainSlides = rawSlides.map(b => ({
-    id: b.id,
-    title: b.title,
-    image: b.image,
-    position: b.position ? String(b.position) : 'main',
-    status: b.status ? String(b.status) : 'active',
-  }))
+  // Deep JSON serialization ensures zero non-plain objects, dates or Prisma symbols pass into Client Components
+  const mainSlides = JSON.parse(JSON.stringify(rawSlides))
 
   const catIconRes = await prisma.categories.findMany({
     where: { id: { in: [13, 14, 15, 16] }, status: 'active' },
