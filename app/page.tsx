@@ -6,7 +6,7 @@ export default async function HomePage() {
   const rawSlides = await prisma.banners.findMany({
     where: { position: 'main', status: 'active' },
     orderBy: { id: 'desc' }
-  })
+  }).catch(() => [])
 
   // Deep JSON serialization ensures zero non-plain objects, dates or Prisma symbols pass into Client Components
   const mainSlides = JSON.parse(JSON.stringify(rawSlides))
@@ -14,17 +14,17 @@ export default async function HomePage() {
   const catIconRes = await prisma.categories.findMany({
     where: { id: { in: [13, 14, 15, 16] }, status: 'active' },
     orderBy: { id: 'asc' }
-  })
+  }).catch(() => [])
 
   const promoRes = await prisma.categories.findMany({
     where: { id: { in: [17, 18, 19, 20] }, status: 'active' },
     orderBy: { id: 'asc' }
-  })
+  }).catch(() => [])
 
   const rawRecProducts = await prisma.products.findMany({
     where: { status: 'active', is_recommended: true },
     take: 6
-  })
+  }).catch(() => [])
 
   const recProducts = rawRecProducts.map(p => ({
     id: p.id,
