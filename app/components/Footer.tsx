@@ -4,7 +4,7 @@ import { prisma } from '@/lib/prisma'
 export default async function Footer() {
   const biz = await prisma.business_settings.findFirst({
     where: { id: 1 }
-  })
+  }).catch(() => null)
 
   return (
     <footer className="bg-[#2e2e2e] text-white pt-[60px] pb-[40px] px-[8%] mt-[50px] font-roboto">

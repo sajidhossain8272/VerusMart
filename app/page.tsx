@@ -4,20 +4,19 @@ import HomeSlider from '@/app/components/HomeSlider'
 
 export default async function HomePage() {
   const rawSlides = await prisma.banners.findMany({
-    where: { position: 'main', status: 'active' },
     orderBy: { id: 'desc' }
   }).catch(() => [])
 
-  // Deep JSON serialization ensures zero non-plain objects, dates or Prisma symbols pass into Client Components
-  const mainSlides = JSON.parse(JSON.stringify(rawSlides))
+  const activeSlides = rawSlides.filter(b => !b.status || String(b.status) === 'active')
+  const mainSlides = JSON.parse(JSON.stringify(activeSlides))
 
   const catIconRes = await prisma.categories.findMany({
-    where: { id: { in: [13, 14, 15, 16] }, status: 'active' },
+    where: { id: { in: [13, 14, 15, 16] } },
     orderBy: { id: 'asc' }
   }).catch(() => [])
 
   const promoRes = await prisma.categories.findMany({
-    where: { id: { in: [17, 18, 19, 20] }, status: 'active' },
+    where: { id: { in: [17, 18, 19, 20] } },
     orderBy: { id: 'asc' }
   }).catch(() => [])
 

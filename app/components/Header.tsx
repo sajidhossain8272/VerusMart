@@ -5,12 +5,13 @@ import CartCountBadge from './CartCountBadge'
 export default async function Header() {
   const siteSettings = await prisma.business_settings.findFirst({
     where: { id: 1 }
-  })
+  }).catch(() => null)
 
-  const headerCats = await prisma.categories.findMany({
-    where: { status: 'active' },
+  const rawCats = await prisma.categories.findMany({
     orderBy: { priority: 'asc' }
-  })
+  }).catch(() => [])
+
+  const headerCats = rawCats.filter(c => !c.status || String(c.status) === 'active')
 
   const companyName = siteSettings?.company_name || 'Verus Mart'
   const finalLogo = siteSettings?.logo ? `/admin_uploads/business/${siteSettings.logo}` : '/assets/images/logo.png'
