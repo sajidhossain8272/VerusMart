@@ -18,7 +18,7 @@ export default async function ProductsPage({
   const sort = params.sort || 'newest'
 
   // Build where clause
-  const where: Record<string, unknown> = { status: 'active' }
+  const where: Record<string, unknown> = {}
   if (categoryId && !isNaN(categoryId)) where.category_id = categoryId
   if (search) where.name = { contains: search, mode: 'insensitive' }
   if (type === 'hot') where.is_featured = true
@@ -34,12 +34,15 @@ export default async function ProductsPage({
   }
   const orderBy = orderByMap[sort] || orderByMap.newest
 
-  const [products, total, categories, selectedCat] = await Promise.all([
-    prisma.products.findMany({ where, orderBy, skip, take: PAGE_SIZE }),
-    prisma.products.count({ where }),
-    prisma.categories.findMany({ where: { status: 'active' }, orderBy: { priority: 'asc' } }),
-    categoryId ? prisma.categories.findUnique({ where: { id: categoryId } }) : Promise.resolve(null),
+  const [rawProducts, total, rawCategories, selectedCat] = await Promise.all([
+    prisma.products.findMany({ where, orderBy, skip, take: PAGE_SIZE }).catch(() => []),
+    prisma.products.count({ where }).catch(() => 0),
+    prisma.categories.findMany({ orderBy: { priority: 'asc' } }).catch(() => []),
+    categoryId && !isNaN(categoryId) ? prisma.categories.findUnique({ where: { id: categoryId } }).catch(() => null) : Promise.resolve(null),
   ])
+
+  const products = rawProducts.filter(p => !p.status || String(p.status) === 'active')
+  const categories = rawCategories.filter(c => !c.status || String(c.status) === 'active')
 
   const totalPages = Math.ceil(total / PAGE_SIZE)
 
