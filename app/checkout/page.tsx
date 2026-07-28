@@ -3,14 +3,16 @@ import { prisma } from '@/lib/prisma'
 import CheckoutCartSummary from './CheckoutCartSummary'
 import CheckoutForm from './CheckoutForm'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CheckoutPage() {
   const servingAreas = await prisma.serving_areas.findMany({
     where: { status: 'active' }
-  })
+  }).catch(() => [])
   
   const paymentMethods = await prisma.payment_methods.findMany({
     where: { status: 'active' }
-  })
+  }).catch(() => [])
 
   return (
     <div className="w-[90%] max-w-[1200px] mx-auto my-[30px] font-roboto">
