@@ -200,6 +200,8 @@ model products {
   is_trending      Boolean?  @default(false)
   is_best_seller   Boolean?  @default(false)
   is_weekday_deal  Boolean?  @default(false)
+  meta_title       String?   @db.VarChar(255)
+  meta_description String?   @db.Text
 }
 
 model refund_requests {

@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import HomeSlider from '@/app/components/HomeSlider'
 
 export default async function HomePage() {
   const mainSlides = await prisma.banners.findMany({
@@ -27,14 +28,8 @@ export default async function HomePage() {
   return (
     <div className="w-[92%] max-w-[1200px] mx-auto pb-10">
       
-      {/* Slider Placeholder (Can be implemented with a Next.js carousel component later) */}
-      <div className="w-full h-[180px] md:h-[350px] rounded-xl mt-[15px] overflow-hidden bg-gray-200 relative group flex items-center justify-center text-gray-500">
-        {mainSlides.length > 0 ? (
-           <img src={`/admin_uploads/banners/${mainSlides[0].image}`} alt="Banner" className="w-full h-full object-cover" />
-        ) : (
-           <span>No Banners Available</span>
-        )}
-      </div>
+      {/* Dynamic Banner Slider */}
+      <HomeSlider banners={mainSlides} />
 
       {/* Mega Offer Banner */}
       <div className="bg-gradient-to-br from-[#f85606] to-[#ff8c00] p-[12px_25px] rounded-xl mt-[10px] flex justify-between items-center text-white">
@@ -99,7 +94,7 @@ export default async function HomePage() {
               </div>
               <div className="p-[10px]">
                 <div className="text-[12px] text-[#212121] h-[32px] overflow-hidden mb-1">{p.name}</div>
-                <div className="text-[17px] text-[#f85606] font-medium block mb-2">${Number(p.price).toFixed(2)}</div>
+                <div className="text-[17px] text-[#f85606] font-[#002b5b] font-extrabold block mb-2">৳{Number(p.price).toLocaleString('en-BD')}</div>
               </div>
             </Link>
             <div className="px-[10px] pb-[10px]">

@@ -43,10 +43,10 @@ export default function CheckoutCartSummary({ onCartLoaded }: Props) {
                 {item.variantName && item.variantName !== 'Regular' && (
                   <div className="text-[11px] text-[#888]">{item.variantName}</div>
                 )}
-                <div className="text-[11px] text-[#555]">{item.quantity} × ${item.price.toFixed(2)}</div>
+                <div className="text-[11px] text-[#555]">{item.quantity} × ৳{item.price.toLocaleString('en-BD')}</div>
               </div>
               <div className="text-[13px] font-bold text-[#212121] shrink-0">
-                ${(item.price * item.quantity).toFixed(2)}
+                ৳{(item.price * item.quantity).toLocaleString('en-BD')}
               </div>
             </div>
           ))
@@ -56,17 +56,17 @@ export default function CheckoutCartSummary({ onCartLoaded }: Props) {
       {/* Totals */}
       <div className="flex justify-between py-[10px] border-t border-[#eee] text-[14px]">
         <span className="text-[#666]">Subtotal ({cartCount} item{cartCount !== 1 ? 's' : ''})</span>
-        <span className="font-bold text-[#212121]">${cartTotal.toFixed(2)}</span>
+        <span className="font-bold text-[#212121]">৳{cartTotal.toLocaleString('en-BD')}</span>
       </div>
       <div className="flex justify-between py-[10px] border-b border-[#eee] text-[14px]">
         <span className="text-[#666]">Delivery Fee</span>
         <span className={`font-bold ${deliveryFee === 0 ? 'text-[#10b981]' : 'text-[#212121]'}`}>
-          {deliveryFee === 0 ? 'FREE' : `$${deliveryFee.toFixed(2)}`}
+          {deliveryFee === 0 ? 'FREE' : `৳${deliveryFee.toLocaleString('en-BD')}`}
         </span>
       </div>
       <div className="flex justify-between items-center py-[18px]">
         <span className="text-[16px] font-bold text-[#212121]">Total to Pay</span>
-        <span className="text-[24px] font-black text-[#f85606]">${grandTotal.toFixed(2)}</span>
+        <span className="text-[24px] font-black text-[#f85606]">৳{grandTotal.toLocaleString('en-BD')}</span>
       </div>
     </>
   )

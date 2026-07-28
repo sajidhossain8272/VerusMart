@@ -28,11 +28,8 @@ export default async function Header() {
 
       {/* Main Header Desktop */}
       <header className="hidden lg:flex bg-white py-[15px] px-[8%] items-center justify-between gap-[30px] sticky top-0 z-[1000] shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
-        <Link href="/" className="flex items-center gap-[10px] min-w-[150px]">
-          <div className="w-[45px] h-[45px] rounded-full overflow-hidden border-2 border-white shadow-[0_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center bg-white p-[2px]">
-            <img src={finalLogo} alt="Logo" className="w-full h-full object-contain" />
-          </div>
-          <h2 className="text-[#f85606] text-[18px] font-black whitespace-nowrap">{companyName}</h2>
+        <Link href="/" className="flex items-center">
+          <img src="/admin_uploads/logo.png" alt="VerusMart" className="h-[36px] w-auto object-contain" />
         </Link>
 
         <div className="flex-1 relative flex">
@@ -74,11 +71,8 @@ export default async function Header() {
       <div className="flex lg:hidden bg-white p-[10px_15px] items-center justify-between border-b border-[#eee] sticky top-0 z-[1001]">
         <div className="w-[50px] flex items-center"><i className="fa-solid fa-bars text-[22px] text-[#444] cursor-pointer"></i></div>
         <div className="flex-1 flex justify-center items-center">
-           <Link href="/" className="flex items-center gap-[10px] justify-center w-auto">
-            <div className="w-[35px] h-[35px] rounded-full overflow-hidden border-2 border-white shadow-[0_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center bg-white p-[2px]">
-              <img src={finalLogo} alt="Logo" className="w-full h-full object-contain" />
-            </div>
-            <h2 className="text-[#f85606] text-[20px] font-black whitespace-nowrap">{companyName}</h2>
+           <Link href="/" className="flex items-center justify-center">
+             <img src="/admin_uploads/logo.png" alt="VerusMart" className="h-[28px] w-auto object-contain" />
           </Link>
         </div>
         <div className="w-[50px] flex items-center justify-end">

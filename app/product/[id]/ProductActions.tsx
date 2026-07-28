@@ -49,120 +49,167 @@ export default function ProductActions({ product, variants, defaultPrice, defaul
 
   const handleBuyNow = () => {
     addToCart({ id: product.id, name: product.name, price, image: product.image ?? null, variantName }, qty)
-    router.push('/cart')
+    router.push('/checkout')
   }
 
   const images = [product.image, product.image_2, product.image_3].filter(Boolean) as string[]
 
   return (
     <>
-      {/* Toast notification */}
-      <div className={`fixed top-[80px] right-[20px] z-[9999] bg-[#10b981] text-white px-[20px] py-[14px] rounded-[10px] shadow-[0_4px_20px_rgba(0,0,0,0.15)] font-bold text-[14px] flex items-center gap-[10px] transition-all duration-300 ${toast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-[10px] pointer-events-none'}`}>
-        <i className="fa-solid fa-circle-check text-[18px]"></i>
-        Item added to cart!
+      {/* Toast Notification */}
+      <div className={`fixed top-20 right-6 z-[9999] bg-[#001f40] text-white px-5 py-3.5 rounded-xl shadow-xl font-bold text-xs flex items-center gap-3 border border-[#003d80] transition-all duration-300 ${toast ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'}`}>
+        <div className="w-7 h-7 bg-[#f85606] rounded-full flex items-center justify-center text-white">
+          <i className="fa-solid fa-check text-xs"></i>
+        </div>
+        <span>Item added to your shopping cart!</span>
       </div>
 
-      {/* Image gallery */}
-      <div className="flex-1 md:max-w-[40%] flex flex-col gap-[15px]">
-        <div className="w-full aspect-square border border-[#e0e0e0] rounded-[8px] flex items-center justify-center p-[10px] bg-[#fafafa]">
+      {/* Image Gallery Column */}
+      <div className="flex-1 lg:max-w-[45%] flex flex-col gap-4">
+        <div className="w-full aspect-square border border-gray-200/80 rounded-2xl flex items-center justify-center p-6 bg-gradient-to-b from-[#f9fafb] to-[#f1f5f9] relative overflow-hidden shadow-sm">
+          {discount > 0 && (
+            <span className="absolute top-4 left-4 z-10 bg-[#f85606] text-white text-xs font-black px-3 py-1 rounded-full shadow-md">
+              -{discount}% OFF
+            </span>
+          )}
           <img
             src={activeImage ? `/admin_uploads/products/${activeImage}` : 'https://placehold.jp/500x500.png'}
-            className="w-full h-full object-contain"
+            className="max-h-full max-w-full object-contain filter drop-shadow-md transition-all duration-300 hover:scale-105"
             alt={product.name}
           />
         </div>
-        {images.length > 0 && (
-          <div className="flex gap-[10px]">
+
+        {images.length > 1 && (
+          <div className="flex gap-3 overflow-x-auto pb-1">
             {images.map((img, idx) => (
               <button
                 key={idx}
                 onClick={() => setActiveImage(img)}
-                className={`w-[80px] h-[80px] border rounded p-[5px] cursor-pointer transition-colors ${activeImage === img ? 'border-[#f85606]' : 'border-[#e0e0e0] hover:border-[#f85606]'}`}
+                className={`w-20 h-20 border-2 rounded-xl p-1.5 cursor-pointer bg-white transition-all overflow-hidden ${activeImage === img ? 'border-[#f85606] shadow-sm' : 'border-gray-200 opacity-70 hover:opacity-100'}`}
               >
-                <img src={`/admin_uploads/products/${img}`} className="w-full h-full object-contain" alt={`View ${idx + 1}`} />
+                <img src={`/admin_uploads/products/${img}`} className="w-full h-full object-contain" alt={`Thumbnail ${idx + 1}`} />
               </button>
             ))}
           </div>
         )}
       </div>
 
-      {/* Product info */}
-      <div className="flex-[1.5]">
-        <h1 className="text-[22px] font-black text-[#212121] leading-[1.3] mb-[15px]">{product.name}</h1>
-        <div className="text-[14px] text-[#1a9cb7] mb-[20px] font-medium">Brand: No Brand</div>
-
-        <hr className="border-[#f1f1f1] my-[20px]" />
-
-        {/* Price */}
-        <div className="mb-[20px]">
-          <div className="text-[32px] text-[#f85606] font-black leading-[1]">${price.toFixed(2)}</div>
-          {discount > 0 && (
-            <div className="text-[14px] text-[#9e9e9e] line-through mt-[5px] font-medium">
-              ${oldPrice.toFixed(2)}
-              <span className="text-[#212121] ml-[10px] bg-[#ffe1d2] p-[2px_6px] rounded text-[12px] font-bold no-underline">
-                -{discount}%
-              </span>
+      {/* Product Details & Actions Column */}
+      <div className="flex-[1.4] flex flex-col justify-between">
+        <div>
+          {/* Stock & Rating Header */}
+          <div className="flex items-center gap-3 mb-2">
+            <span className="bg-emerald-50 text-emerald-700 text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-full border border-emerald-200 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span>
+              In Stock & Ready to Ship
+            </span>
+            <div className="flex items-center gap-1 text-amber-400 text-xs">
+              <i className="fa-solid fa-star"></i>
+              <i className="fa-solid fa-star"></i>
+              <i className="fa-solid fa-star"></i>
+              <i className="fa-solid fa-star"></i>
+              <i className="fa-solid fa-star"></i>
+              <span className="text-gray-400 text-xs font-bold ml-1">(4.9)</span>
             </div>
-          )}
-        </div>
+          </div>
 
-        {/* Variants */}
-        {variants.length > 0 && (
-          <>
-            <hr className="border-[#f1f1f1] my-[15px]" />
-            <div className="mb-[15px]">
-              <div className="text-[13px] font-bold text-[#444] mb-[10px] uppercase tracking-[0.5px]">Variant:</div>
-              <div className="flex flex-wrap gap-[8px]">
-                {variants.map(v => (
+          <h1 className="text-xl sm:text-2xl font-black text-[#002b5b] leading-snug mb-3">
+            {product.name}
+          </h1>
+
+          {/* Pricing Banner */}
+          <div className="bg-[#fff6f2] border border-orange-100 p-4 rounded-2xl mb-6 flex items-baseline gap-3">
+            <span className="text-3xl font-black text-[#f85606]">
+              ৳{price.toLocaleString('en-BD')}
+            </span>
+            {discount > 0 && (
+              <span className="text-sm text-gray-400 line-through font-semibold">
+                ৳{oldPrice.toLocaleString('en-BD')}
+              </span>
+            )}
+          </div>
+
+          {/* Variants Selector */}
+          {variants.length > 0 && (
+            <div className="mb-6">
+              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
+                Select Option / Size:
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((v) => (
                   <button
                     key={v.id}
                     onClick={() => setSelectedVariant(v)}
-                    className={`px-[14px] py-[7px] rounded-[6px] text-[13px] font-bold border-2 transition-all cursor-pointer ${selectedVariant?.id === v.id ? 'border-[#f85606] bg-[#fff6f2] text-[#f85606]' : 'border-[#ddd] bg-white text-[#444] hover:border-[#f85606]'}`}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold border-2 transition-all cursor-pointer ${
+                      selectedVariant?.id === v.id
+                        ? 'border-[#f85606] bg-[#f85606] text-white shadow-sm'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-[#f85606]'
+                    }`}
                   >
-                    {v.variant_name} — ${Number(v.price).toFixed(2)}
+                    {v.variant_name} — ৳{Number(v.price).toLocaleString('en-BD')}
                   </button>
                 ))}
               </div>
             </div>
-          </>
-        )}
+          )}
 
-        <hr className="border-[#f1f1f1] my-[15px]" />
-
-        {/* Quantity */}
-        <div className="mb-[20px]">
-          <div className="text-[13px] font-bold text-[#444] mb-[10px] uppercase tracking-[0.5px]">Quantity:</div>
-          <div className="flex items-center gap-0 border border-[#ddd] rounded-[8px] w-fit overflow-hidden">
-            <button
-              onClick={() => setQty(q => Math.max(1, q - 1))}
-              className="w-[40px] h-[42px] bg-[#f5f5f5] border-none text-[18px] font-bold cursor-pointer hover:bg-[#ffe1d2] hover:text-[#f85606] transition-colors"
-            >
-              −
-            </button>
-            <span className="px-[20px] text-[16px] font-bold text-[#212121] min-w-[50px] text-center">{qty}</span>
-            <button
-              onClick={() => setQty(q => q + 1)}
-              className="w-[40px] h-[42px] bg-[#f5f5f5] border-none text-[18px] font-bold cursor-pointer hover:bg-[#ffe1d2] hover:text-[#f85606] transition-colors"
-            >
-              +
-            </button>
+          {/* Quantity Selector */}
+          <div className="mb-6">
+            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
+              Quantity:
+            </label>
+            <div className="flex items-center border border-gray-300 rounded-xl w-fit overflow-hidden bg-white shadow-sm">
+              <button
+                onClick={() => setQty((q) => Math.max(1, q - 1))}
+                className="w-10 h-10 bg-gray-100 text-gray-700 font-bold hover:bg-[#fff6f2] hover:text-[#f85606] transition-colors cursor-pointer"
+              >
+                −
+              </button>
+              <span className="px-5 text-sm font-extrabold text-[#002b5b] min-w-[40px] text-center">
+                {qty}
+              </span>
+              <button
+                onClick={() => setQty((q) => q + 1)}
+                className="w-10 h-10 bg-gray-100 text-gray-700 font-bold hover:bg-[#fff6f2] hover:text-[#f85606] transition-colors cursor-pointer"
+              >
+                +
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Action buttons */}
-        <div className="flex gap-[15px] flex-col md:flex-row">
-          <button
-            onClick={handleBuyNow}
-            className="flex-1 p-[15px] text-[15px] font-bold uppercase rounded-[8px] cursor-pointer border-none bg-[#2fc5f1] text-white hover:bg-[#1a9cb7] transition-colors"
-          >
-            Buy Now
-          </button>
-          <button
-            onClick={handleAddToCart}
-            className="flex-1 p-[15px] text-[15px] font-bold uppercase rounded-[8px] cursor-pointer border-none bg-[#f85606] text-white hover:bg-[#d04000] transition-colors"
-          >
-            Add to Cart
-          </button>
+        {/* Action Buttons */}
+        <div className="space-y-3 pt-4 border-t border-gray-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <button
+              onClick={handleAddToCart}
+              className="w-full py-3.5 px-6 rounded-xl font-extrabold text-xs uppercase tracking-wider bg-white border-2 border-[#002b5b] text-[#002b5b] hover:bg-[#002b5b] hover:text-white transition-all cursor-pointer flex items-center justify-center gap-2 shadow-sm"
+            >
+              <i className="fa-solid fa-bag-shopping"></i> Add to Cart
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="w-full py-3.5 px-6 rounded-xl font-extrabold text-xs uppercase tracking-wider bg-[#f85606] hover:bg-[#d04300] text-white transition-all cursor-pointer flex items-center justify-center gap-2 shadow-md shadow-orange-100"
+            >
+              <i className="fa-solid fa-[#002b5b] fa-bolt"></i> Buy Now (Cash On Delivery)
+            </button>
+          </div>
+
+          {/* Trust Guarantees */}
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3.5 grid grid-cols-3 gap-2 text-center mt-4">
+            <div className="flex flex-col items-center gap-1">
+              <i className="fa-solid fa-[#002b5b] fa-shield-halved text-[#002b5b]"></i>
+              <span className="text-[10px] font-bold text-gray-700">100% Authentic</span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <i className="fa-solid fa-truck-fast text-[#f85606]"></i>
+              <span className="text-[10px] font-bold text-gray-700">Fast Delivery</span>
+            </div>
+            <div className="flex flex-col items-center gap-1">
+              <i className="fa-solid fa-money-bill-transfer text-emerald-600"></i>
+              <span className="text-[10px] font-bold text-gray-700">Cash on Delivery</span>
+            </div>
+          </div>
         </div>
       </div>
     </>

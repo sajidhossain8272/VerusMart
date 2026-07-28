@@ -16,11 +16,34 @@ export const metadata: Metadata = {
   description: 'Verus Mart E-Commerce',
 }
 
-export default function RootLayout({
+import { headers } from 'next/headers'
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const headerList = await headers()
+  const pathname = headerList.get('x-pathname') || ''
+  const host = headerList.get('host') || ''
+
+  const isAdmin = pathname.startsWith('/admin') || host.startsWith('admin.verusmart.com') || host.startsWith('admin.localhost')
+
+  if (isAdmin) {
+    return (
+      <html lang="en">
+        <head>
+          <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+        </head>
+        <body className={roboto.variable}>
+          <CartProvider>
+            <main className="min-h-screen bg-[#eff0f5]">{children}</main>
+          </CartProvider>
+        </body>
+      </html>
+    )
+  }
+
   return (
     <html lang="en">
       <head>
@@ -29,7 +52,7 @@ export default function RootLayout({
       <body className={roboto.variable}>
         <CartProvider>
           <Header />
-          <main className="min-h-screen bg-[#eff0f5]">{children}</main>
+          <main className="min-h-screen bg-[#eff0f5] flow-root">{children}</main>
           <Footer />
         </CartProvider>
       </body>

@@ -1,0 +1,1019 @@
+
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VerusMart</title>
+    
+    <!-- FAVICON -->
+    <link rel="icon" type="image/png" href="assets/images/logo.png">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        :root { 
+            --main-color: #f85606; 
+            --bg-light: #eff0f5;
+            --white: #ffffff;
+            --text-dark: #212121;
+        }
+
+        body { background-color: var(--bg-light); }
+
+        /* পিক্সেল এনিমেশন লোগো এরিয়া */
+        .animated-logo-area { 
+            display: flex; align-items: center; justify-content: flex-start; 
+            text-decoration: none; position: relative; 
+            width: 180px; height: 45px; overflow: hidden;
+        }
+        .banner-item { position: absolute; width: 100%; height: 100%; display: flex; align-items: center; opacity: 0; }
+        .logo-box img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        .logo-box { animation: slideRightToLeft 6s infinite; }
+        .name-box { animation: slideRightToLeft 6s infinite; animation-delay: 3s; }
+        
+        @keyframes slideRightToLeft {
+            0% { transform: translateX(100%); opacity: 0; }
+            10% { transform: translateX(0); opacity: 1; }
+            45% { transform: translateX(0); opacity: 1; }
+            50% { transform: translateX(-100%); opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* ডেস্কটপ হেডার */
+        .top-nav { background: #f7f7f7; padding: 5px 8%; display: flex; justify-content: flex-end; gap: 20px; font-size: 12px; color: #666; border-bottom: 1px solid #eee; }
+        .top-nav a { text-decoration: none; color: inherit; transition: 0.2s; }
+        .top-nav a:hover { color: var(--main-color); }
+
+        .main-header { background: var(--white); padding: 12px 8%; display: flex; align-items: center; justify-content: space-between; gap: 30px; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        .search-box { flex: 1; position: relative; display: flex; }
+        .search-box input { width: 100%; padding: 10px 15px; background: #eff0f5; border: 1.5px solid transparent; border-radius: 8px; outline: none; font-size: 14px; transition: 0.3s; }
+        .search-box input:focus { border-color: var(--main-color); background: #fff; }
+        .search-box button { position: absolute; right: 0; top: 0; height: 100%; width: 50px; background: #ffe1d2; border: none; border-radius: 0 8px 8px 0; color: var(--main-color); cursor: pointer; font-size: 18px; }
+
+        .header-actions { display: flex; align-items: center; gap: 20px; }
+        .action-link { text-decoration: none; color: #444; font-size: 22px; position: relative; transition: 0.2s; }
+        .action-link:hover { color: var(--main-color); }
+        .badge { position: absolute; top: -8px; right: -10px; background: var(--main-color); color: white; font-size: 10px; padding: 2px 6px; border-radius: 50%; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+        .nav-bar { background: var(--white); padding: 0 8%; border-bottom: 1px solid #eee; display: flex; align-items: center; }
+        .cat-dropdown { position: relative; padding: 12px 0; cursor: pointer; color: var(--text-dark); font-weight: 500; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+        .dropdown-content { position: absolute; top: 100%; left: 0; width: 240px; background: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: none; list-style: none; z-index: 999; border-radius: 0 0 8px 8px; border: 1px solid #f1f1f1; }
+        .cat-dropdown:hover .dropdown-content { display: block; }
+        .dropdown-content li a { display: block; padding: 12px 20px; text-decoration: none; color: #333; font-size: 13px; border-bottom: 1px solid #f8f8f8; transition: 0.2s; }
+        .dropdown-content li a:hover { background: #fff4f0; color: var(--main-color); padding-left: 25px; }
+
+        .nav-links { display: flex; list-style: none; margin-left: 40px; }
+        .nav-links li a { text-decoration: none; color: #444; padding: 12px 15px; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .nav-links li a:hover { color: var(--main-color); }
+
+        /* =========================================
+           MOBILE APP STYLE VIEW
+        ========================================= */
+        .mobile-header-wrap { display: none; background: var(--white); padding: 10px 15px; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; position: sticky; top: 0; z-index: 1001; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
+        .mobile-header-wrap .m-left, .mobile-header-wrap .m-right { width: 40px; display: flex; align-items: center; }
+        .mobile-header-wrap .m-right { justify-content: flex-end; }
+        .mobile-header-wrap .m-center { flex: 1; display: flex; justify-content: center; }
+        
+        .mobile-header-wrap .animated-logo-area { width: 150px; justify-content: center; }
+        .mobile-header-wrap .name-box h2 { font-size: 20px !important; font-weight: 900; color: var(--main-color) !important; }
+
+        .side-menu { position: fixed; top: 0; left: -100%; width: 80%; max-width: 300px; height: 100%; background: white; z-index: 2000; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 10px 0 30px rgba(0,0,0,0.1); }
+        .side-menu.open { left: 0; }
+        .menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1999; display: none; backdrop-filter: blur(3px); }
+
+        .menu-header { padding: 25px 20px; background: linear-gradient(45deg, var(--main-color), #ff8c52); color: white; }
+
+        @media (max-width: 992px) {
+            .top-nav, .main-header, .nav-bar { display: none; }
+            .mobile-header-wrap { display: flex; }
+        }
+    </style>
+
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    
+    // নিচের লাইনে 'আপনার_আসল_পিক্সেল_আইডি' এর জায়গায় আপনার ফেসবুক পিক্সেল আইডি বসান (উদাঃ 123456789)
+    fbq('init', 'আপনার_আসল_পিক্সেল_আইডি'); 
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=আপনার_আসল_পিক্সেল_আইডি&ev=PageView&noscript=1"/></noscript>
+    <!-- End Meta Pixel Code -->
+
+</head>
+<body>
+
+    <!-- ডেস্কটপ ভিউ হেডার -->
+    <div class="top-nav">
+        <a href="#">SAVE MORE ON APP</a>
+        <a href="#">CUSTOMER CARE</a>
+        <a href="track-order.php">TRACK MY ORDER</a>
+                    <a href="login.php">LOGIN</a> <a href="login.php">SIGNUP</a>
+            </div>
+
+    <header class="main-header">
+        <a href="index.php" class="animated-logo-area">
+            <div class="banner-item logo-box"><img src="admin/uploads/business/logo_1777616159_ffffff.png" alt="Logo"></div>
+            <div class="banner-item name-box"><h2 style="color:var(--main-color); font-size:18px; font-weight:900; white-space: nowrap;">VerusMart</h2></div>
+        </a>
+
+        <div class="search-box">
+            <form action="products.php" method="GET" style="width: 100%; display: flex;">
+                <input type="text" name="search" placeholder="Search in Verus Mart..." required>
+                <button type="submit"><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+
+        <div class="header-actions">
+            <a href="wishlist.php" class="action-link" title="Wishlist"><i class="fa-regular fa-heart"></i></a>
+            <a href="cart.php" class="action-link" title="My Cart">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="badge">0</span>
+            </a>
+                    </div>
+    </header>
+
+    <nav class="nav-bar">
+        <div class="cat-dropdown">
+            <i class="fa-solid fa-list-ul"></i> Categories <i class="fa-solid fa-chevron-down" style="font-size:10px; color:#888;"></i>
+            <ul class="dropdown-content">
+                                    <li><a href="products.php?category=13">Electronics</a></li>
+                                    <li><a href="products.php?category=15">Home & Living</a></li>
+                                    <li><a href="products.php?category=16">Toys & Games</a></li>
+                                    <li><a href="products.php?category=17">Mega Sale</a></li>
+                                    <li><a href="products.php?category=18">TRENDING PRODUCTS</a></li>
+                                    <li><a href="products.php?category=19">TRENDING PRODUCTS</a></li>
+                                    <li><a href="products.php?category=20">SUPER DEALS</a></li>
+                                    <li><a href="products.php?category=14">Perfume</a></li>
+                            </ul>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.php">Home</a></li>
+            <li><a href="products.php">Collections</a></li>
+            <li><a href="products.php?type=hot">Hot Deals</a></li>
+            <li><a href="products.php?type=weekly">Weekly Deals</a></li>
+            <li><a href="serving-area.php">Serving Area</a></li>
+        </ul>
+    </nav>
+
+    <!-- মোবাইল ভিউ হেডার (Sticky App Style) -->
+    <div class="mobile-header-wrap">
+        <div class="m-left">
+            <i class="fa-solid fa-bars-staggered" onclick="toggleMenu()" style="font-size:22px; color:#444; cursor:pointer;"></i>
+        </div>
+        
+        <div class="m-center">
+            <a href="index.php" class="animated-logo-area">
+                <div class="banner-item logo-box"><img src="admin/uploads/business/logo_1777616159_ffffff.png" alt="Logo"></div>
+                <div class="banner-item name-box"><h2>VerusMart</h2></div>
+            </a>
+        </div>
+
+        <div class="m-right">
+            <a href="cart.php" class="action-link" style="font-size: 20px; color:#444;">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="badge" style="top:-5px; right:-8px;">0</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- মোবাইল সাইড মেনু (Drawer) -->
+    <div class="menu-overlay" id="menuOverlay" onclick="toggleMenu()"></div>
+    <div class="side-menu" id="sideMenu">
+        <div class="menu-header">
+            <h3 style="margin:0; font-size:18px;">Welcome to Verus Mart</h3>
+            <p style="font-size:12px; margin-top:5px; opacity:0.8;">Quality you can trust</p>
+        </div>
+        <ul style="list-style:none; padding:15px;">
+            <li style="padding:15px 0; border-bottom:1px solid #f5f5f5;"><a href="index.php" style="text-decoration:none; color:#333; font-weight:500;"><i class="fa fa-home" style="width:30px; color:var(--main-color);"></i> Home</a></li>
+            <li style="padding:15px 0; border-bottom:1px solid #f5f5f5;"><a href="products.php" style="text-decoration:none; color:#333; font-weight:500;"><i class="fa fa-th-large" style="width:30px; color:var(--main-color);"></i> All Collections</a></li>
+            <li style="padding:15px 0; border-bottom:1px solid #f5f5f5;"><a href="wishlist.php" style="text-decoration:none; color:#333; font-weight:500;"><i class="fa fa-heart" style="width:30px; color:var(--main-color);"></i> Wishlist</a></li>
+            
+            <p style="font-size:11px; color:#999; text-transform:uppercase; margin:20px 0 10px; font-weight:bold;">Categories</p>
+                            <li style="padding:10px 0;"><a href="products.php?category=13" style="text-decoration:none; color:#555; font-size:13px;"><i class="fa fa-chevron-right" style="width:20px; font-size:10px;"></i> Electronics</a></li>
+                            <li style="padding:10px 0;"><a href="products.php?category=15" style="text-decoration:none; color:#555; font-size:13px;"><i class="fa fa-chevron-right" style="width:20px; font-size:10px;"></i> Home & Living</a></li>
+                            <li style="padding:10px 0;"><a href="products.php?category=16" style="text-decoration:none; color:#555; font-size:13px;"><i class="fa fa-chevron-right" style="width:20px; font-size:10px;"></i> Toys & Games</a></li>
+                            <li style="padding:10px 0;"><a href="products.php?category=17" style="text-decoration:none; color:#555; font-size:13px;"><i class="fa fa-chevron-right" style="width:20px; font-size:10px;"></i> Mega Sale</a></li>
+                            <li style="padding:10px 0;"><a href="products.php?category=18" style="text-decoration:none; color:#555; font-size:13px;"><i class="fa fa-chevron-right" style="width:20px; font-size:10px;"></i> TRENDING PRODUCTS</a></li>
+                            <li style="padding:10px 0;"><a href="products.php?category=19" style="text-decoration:none; color:#555; font-size:13px;"><i class="fa fa-chevron-right" style="width:20px; font-size:10px;"></i> TRENDING PRODUCTS</a></li>
+                            <li style="padding:10px 0;"><a href="products.php?category=20" style="text-decoration:none; color:#555; font-size:13px;"><i class="fa fa-chevron-right" style="width:20px; font-size:10px;"></i> SUPER DEALS</a></li>
+                            <li style="padding:10px 0;"><a href="products.php?category=14" style="text-decoration:none; color:#555; font-size:13px;"><i class="fa fa-chevron-right" style="width:20px; font-size:10px;"></i> Perfume</a></li>
+            
+            <div style="margin-top:30px; padding-top:20px; border-top:1px solid #eee;">
+                                    <a href="login.php" style="display:block; text-align:center; background:var(--main-color); color:white; padding:12px; border-radius:8px; text-decoration:none; font-weight:bold;">Login / Register</a>
+                            </div>
+        </ul>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('sideMenu');
+            const overlay = document.getElementById('menuOverlay');
+            if(menu.classList.contains('open')) {
+                menu.classList.remove('open');
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            } else {
+                menu.classList.add('open');
+                overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // স্ক্রলিং বন্ধ করবে যখন মেনু খোলা থাকবে
+            }
+        }
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        :root {
+            --primary-green: #15a34a;
+            --price-red: #e11d48;
+            --text-gray: #94a3b8;
+            --star-yellow: #facc15;
+            --border-light: #86efac;
+            --shadow-heavy: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        body { background-color: #fcfdfb; font-family: 'Segoe UI', sans-serif; margin: 0; color: #1e293b; }
+        .container { width: 94%; max-width: 1400px; margin: 0 auto; padding-top: 30px; }
+
+        .page-header { 
+            background: white; padding: 40px 0; border-bottom: 1px solid #f1f5f9; margin-bottom: 40px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02); text-align: center;
+        }
+        .page-header h1 { font-size: 32px; font-weight: 900; color: #0f172a; margin: 0; text-transform: uppercase; }
+        .breadcrumb { font-size: 14px; color: var(--text-gray); margin-top: 10px; }
+        .breadcrumb a { color: var(--primary-green); text-decoration: none; font-weight: bold; }
+
+        .product-grid { 
+            display: grid; 
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 25px; 
+            margin-bottom: 60px;
+        }
+
+        .product-card {
+            background: #fff; border-radius: 22px; overflow: hidden;
+            border: 1.5px solid var(--border-light); 
+            box-shadow: var(--shadow-heavy); 
+            transition: all 0.4s ease; position: relative; display: flex; flex-direction: column;
+            height: 100%;
+        }
+        .product-card:hover { transform: translateY(-12px); box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15); }
+
+        .img-area { position: relative; width: 100%; height: 240px; background: #fff; display: flex; align-items: center; justify-content: center; padding: 15px; box-sizing: border-box; }
+        .img-area img { max-width: 95%; max-height: 95%; object-fit: contain; transition: 0.5s ease; }
+        
+        .badge-discount { position: absolute; top: 12px; left: 12px; background: var(--price-red); color: white; padding: 5px 12px; border-radius: 10px; font-size: 12px; font-weight: bold; z-index: 2; }
+        
+        .side-icons { position: absolute; top: 12px; right: 12px; display: flex; flex-direction: column; gap: 8px; z-index: 3; }
+        .icon-btn { width: 36px; height: 36px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.1); cursor: pointer; color: #333; border:none; transition: 0.3s; }
+        .icon-btn:hover { background: var(--primary-green); color: #fff; transform: rotate(15deg); }
+
+        .product-info { padding: 15px 20px 20px; text-align: left; flex-grow: 1; display: flex; flex-direction: column; }
+        .title-text { font-size: 17px; font-weight: 700; color: #064e3b; margin: 5px 0; text-decoration: none; display: block; height: 44px; overflow: hidden; line-height: 1.3; }
+        .rating-box { color: var(--star-yellow); font-size: 13px; margin: 8px 0; }
+        .price-row { display: flex; align-items: baseline; gap: 8px; margin-top: auto; }
+        .current-price { font-size: 24px; font-weight: 800; color: #111; }
+        .old-price { color: var(--text-gray); text-decoration: line-through; font-size: 16px; }
+
+        .add-bag-btn { 
+            background: var(--primary-green); color: white; border: none; padding: 12px; border-radius: 12px; 
+            font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(21, 128, 61, 0.2); margin-top: 15px;
+        }
+        .add-bag-btn:hover { background: #166534; transform: scale(1.02); }
+
+        .no-products { text-align: center; padding: 100px 0; grid-column: 1 / -1; }
+        .no-products i { font-size: 60px; color: #cbd5e1; margin-bottom: 20px; }
+
+        @media (max-width: 1024px) { .product-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .img-area { height: 170px; }
+            .current-price { font-size: 19px; }
+            .page-header h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="page-header">
+    <div class="container">
+        <h1>All Products</h1>
+        <div class="breadcrumb">
+            <a href="index.php">Home</a> / Products / All Products        </div>
+    </div>
+</div>
+
+<main class="container">
+    <div class="product-grid">
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-20%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(95, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=95" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=95" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781111513_298_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=95" class="title-text">Vampire Blood Perfume – Long Lasting Sweet Fruity Luxury Fragrance</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (289)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳160</span>
+                        <span class="old-price">৳199</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(95, 160.00, 'prod_1781111513_298_0.webp', 'Vampire Blood Perfume – Long Lasting Sweet Fruity Luxury Fragrance')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-7%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(94, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=94" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=94" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781110934_535_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=94" class="title-text">Dior Sauvage Inspired Perfume for Men – Long Lasting Fresh &amp; Spicy Luxury Fragrance</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (231)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳279</span>
+                        <span class="old-price">৳299</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(94, 279.00, 'prod_1781110934_535_0.webp', 'Dior Sauvage Inspired Perfume for Men – Long Lasting Fresh & Spicy Luxury Fragrance')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-23%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(92, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=92" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=92" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781110442_192_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=92" class="title-text">Pink Chiffon Inspired Perfume for Women – Long Lasting Sweet &amp; Floral Luxury Fragrance</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (198)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳230</span>
+                        <span class="old-price">৳299</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(92, 230.00, 'prod_1781110442_192_0.webp', 'Pink Chiffon Inspired Perfume for Women – Long Lasting Sweet & Floral Luxury Fragrance')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-7%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(91, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=91" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=91" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781110150_693_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Electronics</div>
+                    <a href="product_details.php?id=91" class="title-text">Dior Sauvage Inspired Perfume for Men – Long Lasting Fresh &amp; Spicy Luxury Fragrance</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (221)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳279</span>
+                        <span class="old-price">৳299</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(91, 279.00, 'prod_1781110150_693_0.webp', 'Dior Sauvage Inspired Perfume for Men – Long Lasting Fresh & Spicy Luxury Fragrance')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-7%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(90, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=90" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=90" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781109811_695_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=90" class="title-text">Bleu de Chanel Inspired Perfume for Men – Long Lasting Fresh &amp; Woody Luxury Fragrance</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (188)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳279</span>
+                        <span class="old-price">৳299</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(90, 279.00, 'prod_1781109811_695_0.webp', 'Bleu de Chanel Inspired Perfume for Men – Long Lasting Fresh & Woody Luxury Fragrance')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                                        
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(89, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=89" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=89" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781109444_825_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=89" class="title-text">Hudson Valley – Long Lasting Fresh &amp; Elegant Luxury Perfume</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (237)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳349</span>
+                                            </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(89, 349.00, 'prod_1781109444_825_0.webp', 'Hudson Valley – Long Lasting Fresh & Elegant Luxury Perfume')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-20%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(88, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=88" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=88" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781109018_981_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=88" class="title-text">Creed Aventus Inspired Perfume for Men – Long Lasting Fresh &amp; Woody Luxury Fragrance</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (143)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳199</span>
+                        <span class="old-price">৳249</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(88, 199.00, 'prod_1781109018_981_0.webp', 'Creed Aventus Inspired Perfume for Men – Long Lasting Fresh & Woody Luxury Fragrance')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-20%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(87, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=87" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=87" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781107880_955_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=87" class="title-text">Coffee Perfume – Long Lasting Rich &amp; Warm Luxury Fragrance</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (178)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳160</span>
+                        <span class="old-price">৳199</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(87, 160.00, 'prod_1781107880_955_0.webp', 'Coffee Perfume – Long Lasting Rich & Warm Luxury Fragrance')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-20%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(86, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=86" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=86" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781107529_719_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=86" class="title-text">Club de Nuit Intense Man Inspired By Creed Aventus – Long Lasting Fresh &amp; Woody Luxury Perfume for Men</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (26)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳199</span>
+                        <span class="old-price">৳249</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(86, 199.00, 'prod_1781107529_719_0.webp', 'Club de Nuit Intense Man Inspired By Creed Aventus – Long Lasting Fresh & Woody Luxury Perfume for Men')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-20%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(85, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=85" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=85" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781106758_510_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=85" class="title-text">Inspired By Good Girl – Long Lasting Sweet &amp; Sensual Luxury Perfume for Women</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (67)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳160</span>
+                        <span class="old-price">৳199</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(85, 160.00, 'prod_1781106758_510_0.webp', 'Inspired By Good Girl – Long Lasting Sweet & Sensual Luxury Perfume for Women')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-18%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(84, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=84" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=84" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781106363_800_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=84" class="title-text">Magical Charlie – Long Lasting Premium Luxury Perfume</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (43)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳180</span>
+                        <span class="old-price">৳219</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(84, 180.00, 'prod_1781106363_800_0.webp', 'Magical Charlie – Long Lasting Premium Luxury Perfume')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-20%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(83, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=83" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=83" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781106015_705_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=83" class="title-text">Inspired By Gucci Flora – Long Lasting Floral Luxury Perfume for Women</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (64)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳160</span>
+                        <span class="old-price">৳199</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(83, 160.00, 'prod_1781106015_705_0.webp', 'Inspired By Gucci Flora – Long Lasting Floral Luxury Perfume for Women')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+                    <div class="product-card">
+                <div class="img-area">
+                    <div class="badge-discount">-20%</div>                    
+                    <div class="side-icons">
+                        <button class="icon-btn" onclick="addToWishlist(82, this)">
+                            <i class="fa-regular fa-heart" style=""></i>
+                        </button>
+                        <a href="product_details.php?id=82" class="icon-btn"><i class="fa-regular fa-eye"></i></a>
+                    </div>
+
+                    <a href="product_details.php?id=82" style="display:contents;">
+                        <img src="admin/uploads/products/prod_1781105673_279_0.webp" onerror="this.src='https://placehold.jp/200x200.png?text=Product';">
+                    </a>
+                </div>
+
+                <div class="product-info">
+                    <div style="font-size: 11px; color: var(--text-gray); text-transform: uppercase; font-weight: 700;">Perfume</div>
+                    <a href="product_details.php?id=82" class="title-text">Inspired By Black Opium – Long Lasting Coffee &amp; Vanilla Luxury Perfume for Women</a>
+                    
+                    <div class="rating-box">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>                        <span style="color:var(--text-gray); font-size:12px;"> (87)</span>
+                    </div>
+                    
+                    <div class="price-row">
+                        <!-- Taka Currency Update -->
+                        <span class="current-price">৳230</span>
+                        <span class="old-price">৳289</span>                    </div>
+                    <div style="font-size:12px; color:var(--text-gray); margin-top:5px;"></div>
+
+                    <button class="add-bag-btn" onclick="addToBag(82, 230.00, 'prod_1781105673_279_0.webp', 'Inspired By Black Opium – Long Lasting Coffee & Vanilla Luxury Perfume for Women')">
+                        <i class="fa-solid fa-cart-shopping"></i> Add to Bag
+                    </button>
+                </div>
+            </div>
+            </div>
+</main>
+
+<script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true
+    });
+
+    function addToWishlist(pId, btn) {
+        let fd = new FormData();
+        fd.append('product_id', pId);
+        fd.append('add_to_wishlist', true);
+
+        fetch('manage_wishlist.php', { method: 'POST', body: fd })
+        .then(res => res.text())
+        .then(data => {
+            if (data === "login_required") {
+                Swal.fire('Login Required', 'Please login to add to wishlist', 'info');
+            } else {
+                let icon = btn.querySelector('i');
+                icon.classList.toggle('fa-regular');
+                icon.classList.toggle('fa-solid');
+                icon.style.color = icon.classList.contains('fa-solid') ? '#e11d48' : '';
+                Toast.fire({ icon: 'success', title: data === "added" ? 'Added to wishlist!' : 'Removed from wishlist!' });
+            }
+        });
+    }
+
+    function addToBag(pId, price, image, name) {
+        let fd = new FormData();
+        fd.append('product_id', pId);
+        fd.append('price', price);
+        fd.append('image', image);
+        fd.append('name', name);
+        fd.append('quantity', 1);
+        fd.append('add_to_cart', true);
+
+        fetch('manage_cart.php', { method: 'POST', body: fd })
+        .then(() => {
+            Swal.fire({
+                title: 'Added to Bag!',
+                text: "Do you want to checkout now?",
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonColor: '#0f172a',
+                cancelButtonColor: '#f36d21',
+                confirmButtonText: 'Checkout Now',
+                cancelButtonText: 'Continue Shopping'
+            }).then((result) => {
+                if (result.isConfirmed) { window.location.href = 'cart.php'; }
+            });
+        });
+    }
+</script>
+
+
+<style>
+    /* --- ফুটার জেনারেল স্টাইল (Daraz Orange Theme) --- */
+    :root {
+        --footer-bg: #2e2e2e; 
+        --daraz-orange: #f85606; 
+        --text-gray: #ababab;
+        --white: #ffffff;
+    }
+
+    .main-footer {
+        background-color: var(--footer-bg);
+        color: var(--white);
+        padding: 60px 8% 40px 8%;
+        font-family: 'Roboto', 'Poppins', sans-serif;
+        margin-top: 50px;
+    }
+
+    .footer-container {
+        display: grid;
+        grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+        gap: 30px;
+        margin-bottom: 40px;
+    }
+
+    /* লোগো ও বর্ণনা */
+    .footer-logo { 
+        height: 45px; 
+        width: auto;
+        object-fit: contain;
+        margin-bottom: 20px;
+    }
+    
+    .footer-about { 
+        font-size: 13px; 
+        line-height: 1.6; 
+        color: var(--text-gray); 
+        max-width: 300px; 
+    }
+
+    .footer-col h3 {
+        color: var(--white);
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 20px;
+    }
+
+    /* সোশ্যাল আইকন - এডমিন থেকে লিঙ্ক আসবে */
+    .social-icons { display: flex; gap: 15px; margin-top: 20px; }
+    .social-icons a {
+        color: var(--white);
+        font-size: 22px;
+        text-decoration: none; transition: 0.3s;
+    }
+    .social-icons a:hover { color: var(--daraz-orange); transform: scale(1.1); }
+
+    /* লিঙ্ক লিস্ট */
+    .footer-col ul { list-style: none; padding: 0; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul li a { color: var(--text-gray); text-decoration: none; font-size: 13px; transition: 0.2s; display: block; }
+    .footer-col ul li a:hover { color: var(--daraz-orange); padding-left: 5px; }
+
+    /* কন্টাক্ট ইনফো */
+    .contact-info div { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; font-size: 13px; color: var(--text-gray); }
+    .contact-info i { color: var(--daraz-orange); font-size: 16px; }
+
+    /* পেমেন্ট পার্টনার্স */
+    .payment-methods { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; align-items: center;}
+    .payment-methods img { height: 20px; filter: grayscale(100%); opacity: 0.7; transition: 0.3s; }
+    .payment-methods img:hover { filter: grayscale(0%); opacity: 1; }
+
+    /* ফুটার বটম */
+    .footer-bottom {
+        border-top: 1px solid #444;
+        padding-top: 25px; display: flex; justify-content: space-between; align-items: center;
+        font-size: 12px; color: var(--text-gray);
+    }
+
+    /* ডেভেলপার এবং কপিরাইট লিঙ্ক */
+    .copyright-link { color: inherit; text-decoration: none; transition: 0.3s; font-weight: bold; }
+    .copyright-link:hover { color: var(--daraz-orange); }
+
+    /* --- মোবাইল বটম নেভিগেশন বার --- */
+    .mobile-nav-bar {
+        display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+        background: #ffffff; height: 60px; z-index: 10001;
+        justify-content: space-around; align-items: center;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        border-top: 1px solid #eee;
+    }
+    .mobile-nav-item { text-decoration: none; color: #757575; display: flex; flex-direction: column; align-items: center; font-size: 10px; width: 20%; }
+    .mobile-nav-item i { font-size: 18px; margin-bottom: 3px; }
+    .mobile-nav-item.active { color: var(--daraz-orange); }
+
+    .mobile-cart-circle {
+        width: 55px; height: 55px; background: var(--daraz-orange); border-radius: 50%;
+        display: flex; justify-content: center; align-items: center;
+        border: 4px solid #fff; position: relative; top: -15px; box-shadow: 0 4px 12px rgba(248, 86, 6, 0.3);
+        text-decoration: none;
+    }
+    .mobile-cart-circle i { color: #fff; font-size: 22px; }
+
+    @media (max-width: 992px) { .footer-container { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 768px) {
+        .footer-container { grid-template-columns: 1fr; gap: 30px; text-align: center; }
+        .main-footer { padding: 50px 5% 90px 5%; }
+        .footer-about { margin: 0 auto 20px auto; }
+        .social-icons, .contact-info div, .payment-methods { justify-content: center; }
+        .mobile-nav-bar { display: flex; }
+        .footer-bottom { flex-direction: column; gap: 10px; }
+    }
+</style>
+
+<footer class="main-footer">
+    <div class="footer-container">
+        <!-- কলাম ১: লোগো ও সোশ্যাল -->
+        <div class="footer-col">
+            <a href="index.php">
+                                    <img src="admin/uploads/business/logo_1777616159_ffffff.png" class="footer-logo" alt="Logo">
+                            </a>
+            <p class="footer-about">
+                            </p>
+            <div class="social-icons">
+                 <a href="https://www.facebook.com/verusmart" target="_blank"><i class="fab fa-facebook"></i></a>                  <a href="https://www.facebook.com/verusmart" target="_blank"><i class="fab fa-tiktok"></i></a>                  <a href="https://www.facebook.com/verusmart" target="_blank"><i class="fab fa-instagram"></i></a>                  <a href="https://www.facebook.com/verusmart" target="_blank"><i class="fab fa-youtube"></i></a>                  <a href="https://www.facebook.com/verusmart" target="_blank"><i class="fab fa-twitter"></i></a>             </div>
+        </div>
+
+        <!-- কলাম ২: হেল্প ও সাপোর্ট -->
+        <div class="footer-col">
+            <h3>Customer Care</h3>
+            <ul>
+                <li><a href="page.php?slug=faq">Help Center</a></li>
+                <li><a href="contact.php">Contact Us</a></li>
+                <li><a href="page.php?slug=how-to-buy">How to Buy</a></li>
+                <li><a href="page.php?slug=returns-policy">Returns & Refunds</a></li>
+            </ul>
+        </div>
+
+        <!-- কলাম ৩: কোম্পানি -->
+        <div class="footer-col">
+            <h3>Company</h3>
+            <ul>
+                <li><a href="about.php">About Us</a></li>
+                <li><a href="page.php?slug=privacy-policy">Privacy Policy</a></li>
+                <li><a href="page.php?slug=terms">Terms & Conditions</a></li>
+                <li><a href="admin/login.php">Merchant Login</a></li>
+            </ul>
+        </div>
+
+        <!-- কলাম ৪: কন্টাক্ট ডিটেইলস -->
+        <div class="footer-col">
+            <h3>Contact Info</h3>
+            <div class="contact-info">
+                <div><i class="fas fa-map-marker-alt"></i> <span>Kawla, Dhaka - 1229</span></div>
+                <div><i class="fas fa-phone-alt"></i> <span>+880 1628083370</span></div>
+                <div><i class="fas fa-envelope"></i> <span>verusmart4@gmail.com</span></div>
+            </div>
+            
+            <div class="payment-methods">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+                <span style="font-size: 10px; color: var(--daraz-orange); border: 1px solid var(--daraz-orange); padding: 1px 5px; border-radius: 3px;">Bkash/Nagad</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ফুটার বটম -->
+    <div class="footer-bottom">
+        <div>
+            <a href="https://wa.me/8801912855989" target="_blank" class="copyright-link">
+                &copy; 2026 VerusMart. All rights reserved.
+            </a>
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <a href="page.php?slug=privacy-policy" style="color:var(--text-gray); text-decoration:none;">Privacy</a>
+            <a href="page.php?slug=terms" style="color:var(--text-gray); text-decoration:none;">Terms</a>
+        </div>
+    </div>
+</footer>
+
+<!-- মোবাইল বটম নেভিগেশন বার -->
+<div class="mobile-nav-bar">
+    <a href="index.php" class="mobile-nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="products.php" class="mobile-nav-item"><i class="fas fa-th-large"></i><span>Shop</span></a>
+    <a href="cart.php" class="mobile-cart-circle"><i class="fas fa-shopping-cart"></i></a>
+    <a href="wishlist.php" class="mobile-nav-item"><i class="fas fa-heart"></i><span>Wishlist</span></a>
+    <a href="profile.php" class="mobile-nav-item"><i class="fas fa-user"></i><span>Profile</span></a>
+</div></body>
+</html>

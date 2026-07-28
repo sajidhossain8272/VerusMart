@@ -12,7 +12,7 @@ export default async function Footer() {
         
         {/* Section 1 */}
         <div>
-          {biz?.logo && <img src={`/admin_uploads/business/${biz.logo}`} alt="Logo" className="h-[45px] w-auto object-contain mb-[20px]" />}
+          <img src="/admin_uploads/logo.png" alt="VerusMart Logo" className="h-[30px] w-auto object-contain mb-[20px] filter brightness-0 invert" />
           <p className="text-[13px] leading-[1.6] text-[#ababab] max-w-[300px]">
             {biz?.footer_about || "Verus Mart is your ultimate online shopping destination. Discover the best products with top-notch service and quick delivery."}
           </p>
@@ -22,9 +22,9 @@ export default async function Footer() {
         <div>
           <h4 className="text-[16px] font-semibold text-white uppercase mb-[20px]">Customer Care</h4>
           <ul className="list-none flex flex-col gap-[10px]">
-            <li><Link href="#" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Help Center</Link></li>
-            <li><Link href="#" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">How to Buy</Link></li>
-            <li><Link href="#" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Returns & Refunds</Link></li>
+            <li><Link href="/help-center" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Help Center</Link></li>
+            <li><Link href="/how-to-buy" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">How to Buy</Link></li>
+            <li><Link href="/returns-refunds" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Returns & Refunds</Link></li>
             <li><Link href="/contact" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Contact Us</Link></li>
           </ul>
         </div>
@@ -34,8 +34,8 @@ export default async function Footer() {
           <h4 className="text-[16px] font-semibold text-white uppercase mb-[20px]">Verus Mart</h4>
           <ul className="list-none flex flex-col gap-[10px]">
             <li><Link href="/about" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">About Us</Link></li>
-            <li><Link href="#" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Privacy Policy</Link></li>
-            <li><Link href="#" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Terms & Conditions</Link></li>
+            <li><Link href="/privacy-policy" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Privacy Policy</Link></li>
+            <li><Link href="/terms-conditions" className="text-[13px] text-[#ababab] hover:text-[#f85606] transition-colors">Terms & Conditions</Link></li>
           </ul>
         </div>
 

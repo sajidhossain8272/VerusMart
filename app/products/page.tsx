@@ -50,41 +50,104 @@ export default async function ProductsPage({
     return `/products?${p.toString()}`
   }
 
-  return (
-    <div className="w-[92%] max-w-[1200px] mx-auto py-[20px]">
+  const formatTk = (num: number) => {
+    return `৳${num.toLocaleString('en-BD')}`
+  }
 
-      {/* Breadcrumb */}
-      <div className="text-[13px] text-[#757575] mb-[15px] font-medium">
-        <Link href="/" className="text-[#1a9cb7] hover:underline">Home</Link>
-        {' '}&gt;{' '}
+  return (
+    <div className="w-[92%] max-w-[1240px] mx-auto py-6 sm:py-8 font-sans">
+
+      {/* Breadcrumb Navigation */}
+      <nav className="text-xs sm:text-sm text-gray-500 mb-6 flex items-center gap-2 font-medium overflow-x-auto whitespace-nowrap">
+        <Link href="/" className="text-gray-600 hover:text-[#f85606] transition-colors flex items-center gap-1">
+          <i className="fa-solid fa-house text-[11px]"></i> Home
+        </Link>
+        <span className="text-gray-300">/</span>
         {selectedCat ? (
-          <><Link href="/categories" className="text-[#1a9cb7] hover:underline">Categories</Link> &gt; <span className="text-[#212121]">{selectedCat.name}</span></>
+          <>
+            <Link href="/products" className="text-gray-600 hover:text-[#f85606] transition-colors">Categories</Link>
+            <span className="text-gray-300">/</span>
+            <span className="text-[#002b5b] font-bold">{selectedCat.name}</span>
+          </>
         ) : (
-          <span className="text-[#212121]">All Products</span>
+          <span className="text-[#002b5b] font-bold">All Products</span>
         )}
+      </nav>
+
+      {/* Mobile Horizontal Scrollable Category Selector */}
+      <div className="lg:hidden mb-6">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-bold uppercase tracking-wider text-gray-500">Categories</span>
+          {categoryId && (
+            <Link href="/products" className="text-[11px] font-bold text-[#f85606] underline">Clear Filter</Link>
+          )}
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+          <Link
+            href="/products"
+            className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shadow-sm ${
+              !categoryId
+                ? 'bg-[#f85606] text-white shadow-orange-100'
+                : 'bg-white text-gray-700 border border-gray-200 hover:border-[#f85606]'
+            }`}
+          >
+            All Products ({total})
+          </Link>
+          {categories.map((cat) => (
+            <Link
+              key={cat.id}
+              href={buildUrl({ category: cat.id.toString(), page: '1' })}
+              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all shadow-sm ${
+                categoryId === cat.id
+                  ? 'bg-[#f85606] text-white shadow-orange-100'
+                  : 'bg-white text-gray-700 border border-gray-200 hover:border-[#f85606]'
+              }`}
+            >
+              {cat.name}
+            </Link>
+          ))}
+        </div>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-[20px] items-start">
+      <div className="flex flex-col lg:flex-row gap-8 items-start">
 
-        {/* Sidebar */}
-        <aside className="w-full md:w-[220px] shrink-0">
-          <div className="bg-white rounded-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
-            <div className="bg-[#f85606] text-white font-bold text-[14px] px-[15px] py-[12px] uppercase tracking-[1px]">
-              <i className="fa-solid fa-list-ul mr-[8px]"></i>Categories
+        {/* Desktop Sidebar Navigation */}
+        <aside className="hidden lg:block w-[250px] shrink-0 sticky top-[100px]">
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-200/80 overflow-hidden">
+            <div className="bg-[#002b5b] text-white font-bold text-xs uppercase tracking-wider px-5 py-4 flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <i className="fa-solid fa-layer-group text-sm text-[#f85606]"></i> Categories
+              </span>
+              <span className="bg-[#001c3d] text-blue-200 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                {categories.length}
+              </span>
             </div>
-            <ul className="list-none">
+            <ul className="divide-y divide-gray-100 max-h-[500px] overflow-y-auto">
               <li>
-                <Link href="/products" className={`block px-[15px] py-[10px] text-[13px] border-b border-[#f5f5f5] transition-colors hover:bg-[#fff6f2] hover:text-[#f85606] ${!categoryId ? 'text-[#f85606] font-bold bg-[#fff6f2]' : 'text-[#333]'}`}>
-                  All Products
+                <Link
+                  href="/products"
+                  className={`flex items-center justify-between px-5 py-3 text-xs font-bold transition-all ${
+                    !categoryId
+                      ? 'bg-[#fff6f2] text-[#f85606] border-l-4 border-[#f85606]'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-[#f85606]'
+                  }`}
+                >
+                  <span>All Products</span>
+                  <i className="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
                 </Link>
               </li>
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <li key={cat.id}>
                   <Link
                     href={buildUrl({ category: cat.id.toString(), page: '1' })}
-                    className={`block px-[15px] py-[10px] text-[13px] border-b border-[#f5f5f5] transition-colors hover:bg-[#fff6f2] hover:text-[#f85606] ${categoryId === cat.id ? 'text-[#f85606] font-bold bg-[#fff6f2]' : 'text-[#333]'}`}
+                    className={`flex items-center justify-between px-5 py-3 text-xs font-bold transition-all ${
+                      categoryId === cat.id
+                        ? 'bg-[#fff6f2] text-[#f85606] border-l-4 border-[#f85606]'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-[#f85606]'
+                    }`}
                   >
-                    {cat.name}
+                    <span>{cat.name}</span>
+                    <i className="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
                   </Link>
                 </li>
               ))}
@@ -92,76 +155,128 @@ export default async function ProductsPage({
           </div>
         </aside>
 
-        {/* Main content */}
-        <div className="flex-1 min-w-0">
+        {/* Main Content Area */}
+        <div className="flex-1 min-w-0 w-full">
 
-          {/* Top bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-[10px] mb-[15px]">
-            <div className="text-[14px] text-[#555]">
-              {search && <span>Results for <strong>&ldquo;{search}&rdquo;</strong> — </span>}
-              <strong>{total}</strong> product{total !== 1 ? 's' : ''} found
-              {selectedCat && <span> in <strong>{selectedCat.name}</strong></span>}
+          {/* Top Bar Header & Controls */}
+          <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200/80 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 className="text-base sm:text-lg font-black text-[#002b5b] uppercase tracking-wide">
+                {selectedCat ? selectedCat.name : 'ALL PRODUCTS'}
+              </h1>
+              <p className="text-xs text-gray-500 mt-0.5 font-medium">
+                {search && <span>Showing results for &ldquo;<strong className="text-gray-800">{search}</strong>&rdquo; — </span>}
+                <strong className="text-[#f85606] font-extrabold">{total}</strong> items available in store
+              </p>
             </div>
-            <div className="flex items-center gap-[10px]">
-              <label className="text-[13px] text-[#555] font-medium">Sort by:</label>
-              <form method="GET" action="/products">
+
+            {/* Sorting Dropdown */}
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:inline">Sort By:</span>
+              <form method="GET" action="/products" className="flex items-center">
                 {categoryId && <input type="hidden" name="category" value={categoryId} />}
                 {search && <input type="hidden" name="search" value={search} />}
                 {type && <input type="hidden" name="type" value={type} />}
                 <select
                   name="sort"
                   defaultValue={sort}
-                  onChange={undefined}
-                  className="border border-[#ddd] rounded-[6px] px-[10px] py-[7px] text-[13px] bg-white outline-none cursor-pointer"
-                  id="sort-select"
-                  onChangeCapture={undefined}
+                  className="bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-[#f85606] cursor-pointer shadow-sm"
                 >
-                  <option value="newest">Newest</option>
+                  <option value="newest">Newest Arrivals</option>
                   <option value="price_asc">Price: Low to High</option>
                   <option value="price_desc">Price: High to Low</option>
                 </select>
-                <noscript><button type="submit" className="ml-2 text-sm underline">Apply</button></noscript>
               </form>
             </div>
           </div>
 
-          {/* Product grid */}
+          {/* Empty State */}
           {products.length === 0 ? (
-            <div className="bg-white rounded-[12px] p-[60px] text-center shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-              <div className="text-[48px] mb-[15px]">🔍</div>
-              <h2 className="text-[20px] font-bold text-[#333] mb-[10px]">No products found</h2>
-              <p className="text-[#888] mb-[20px]">Try a different search or browse all categories.</p>
-              <Link href="/products" className="bg-[#f85606] text-white px-[25px] py-[10px] rounded-[6px] font-bold inline-block">Browse All</Link>
+            <div className="bg-white rounded-2xl p-12 text-center shadow-sm border border-gray-200/80 my-8">
+              <div className="w-16 h-16 bg-orange-50 text-[#f85606] rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                <i className="fa-solid fa-magnifying-glass"></i>
+              </div>
+              <h2 className="text-lg font-bold text-gray-900 mb-2">No matching products found</h2>
+              <p className="text-xs text-gray-500 max-w-sm mx-auto mb-6">
+                We couldn't find any products matching your criteria. Try adjusting your filters or search keywords.
+              </p>
+              <Link
+                href="/products"
+                className="bg-[#002b5b] hover:bg-[#f85606] text-white text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-xl transition-all shadow-md inline-block"
+              >
+                Browse Full Catalog
+              </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-[12px]">
-              {products.map(p => {
+            /* Product Grid */
+            <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {products.map((p) => {
                 const price = Number(p.price ?? 0)
                 const oldPrice = Number(p.old_price ?? 0)
                 const discount = oldPrice > price && oldPrice > 0 ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0
+
                 return (
-                  <div key={p.id} className="bg-white rounded-[10px] overflow-hidden border border-[#f0f0f0] shadow-[0_2px_6px_rgba(0,0,0,0.04)] hover:shadow-[0_6px_18px_rgba(0,0,0,0.1)] transition-shadow group flex flex-col">
+                  <div
+                    key={p.id}
+                    className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group flex flex-col justify-between relative"
+                  >
+                    {/* Top Discount Badge */}
                     {discount > 0 && (
-                      <span className="absolute z-10 top-[8px] left-[8px] bg-[#f85606] text-white text-[10px] font-bold px-[6px] py-[2px] rounded">-{discount}%</span>
+                      <div className="absolute top-3 left-3 z-10 bg-[#f85606] text-white text-[10px] sm:text-xs font-black px-2.5 py-1 rounded-full shadow-md tracking-wider">
+                        -{discount}% OFF
+                      </div>
                     )}
-                    <Link href={`/product/${p.id}`} className="block relative">
-                      <div className="h-[170px] flex items-center justify-center p-[10px] bg-white">
+
+                    {/* Image Area - Bigger display container */}
+                    <Link href={`/product/${p.id}`} className="block relative bg-gradient-to-b from-[#f9fafb] to-[#f1f5f9] overflow-hidden">
+                      <div className="h-[210px] sm:h-[250px] md:h-[270px] w-full p-4 flex items-center justify-center">
                         <img
                           src={p.image ? `/admin_uploads/products/${p.image}` : 'https://placehold.jp/300x300.png'}
                           alt={p.name}
-                          className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+                          className="max-h-full max-w-full object-contain filter drop-shadow-md group-hover:scale-108 transition-transform duration-500 ease-out"
                         />
                       </div>
                     </Link>
-                    <div className="px-[12px] pt-[8px] pb-[4px] flex flex-col flex-1">
-                      <Link href={`/product/${p.id}`} className="text-[12px] text-[#212121] line-clamp-2 leading-[1.4] mb-[6px] hover:text-[#f85606] transition-colors">
-                        {p.name}
-                      </Link>
-                      <div className="mt-auto">
-                        <div className="flex items-baseline gap-[6px] mb-[8px]">
-                          <span className="text-[16px] text-[#f85606] font-bold">${price.toFixed(2)}</span>
-                          {discount > 0 && <span className="text-[11px] text-[#999] line-through">${oldPrice.toFixed(2)}</span>}
+
+                    {/* Card Details Body */}
+                    <div className="p-4 flex flex-col flex-1 justify-between bg-white">
+                      <div>
+                        {/* Rating Stars */}
+                        <div className="flex items-center gap-1 mb-1.5">
+                          <div className="flex text-amber-400 text-[10px] sm:text-xs">
+                            <i className="fa-solid fa-star"></i>
+                            <i className="fa-solid fa-star"></i>
+                            <i className="fa-solid fa-star"></i>
+                            <i className="fa-solid fa-star"></i>
+                            <i className="fa-solid fa-star"></i>
+                          </div>
+                          <span className="text-[10px] text-gray-400 font-bold">(4.9)</span>
                         </div>
+
+                        {/* Title */}
+                        <Link
+                          href={`/product/${p.id}`}
+                          className="text-xs sm:text-sm font-bold text-gray-900 group-hover:text-[#f85606] transition-colors line-clamp-2 leading-snug mb-3 block"
+                          title={p.name}
+                        >
+                          {p.name}
+                        </Link>
+                      </div>
+
+                      {/* Price & Buying Action */}
+                      <div className="mt-2 pt-2 border-t border-gray-100">
+                        <div className="flex items-baseline gap-2 mb-3">
+                          <span className="text-base sm:text-lg font-black text-[#f85606]">
+                            {formatTk(price)}
+                          </span>
+                          {discount > 0 && (
+                            <span className="text-xs text-gray-400 line-through font-semibold">
+                              {formatTk(oldPrice)}
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Add To Cart CTA Button */}
                         <AddToCartBtn
                           product={{
                             id: p.id,
@@ -178,16 +293,20 @@ export default async function ProductsPage({
             </div>
           )}
 
-          {/* Pagination */}
+          {/* Pagination Controls */}
           {totalPages > 1 && (
-            <div className="flex justify-center gap-[8px] mt-[30px] flex-wrap">
+            <div className="flex justify-center items-center gap-2 mt-10 flex-wrap">
               {page > 1 && (
-                <Link href={buildUrl({ page: String(page - 1) })} className="px-[14px] py-[8px] rounded-[6px] border border-[#ddd] text-[13px] font-medium hover:border-[#f85606] hover:text-[#f85606] transition-colors bg-white">
-                  ← Prev
+                <Link
+                  href={buildUrl({ page: String(page - 1) })}
+                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-700 hover:border-[#f85606] hover:text-[#f85606] transition-colors shadow-sm"
+                >
+                  <i className="fa-solid fa-arrow-left mr-1"></i> Prev
                 </Link>
               )}
+
               {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .filter(n => n === 1 || n === totalPages || Math.abs(n - page) <= 2)
+                .filter((n) => n === 1 || n === totalPages || Math.abs(n - page) <= 2)
                 .reduce<(number | '...')[]>((acc, n, idx, arr) => {
                   if (idx > 0 && n - (arr[idx - 1] as number) > 1) acc.push('...')
                   acc.push(n)
@@ -195,20 +314,35 @@ export default async function ProductsPage({
                 }, [])
                 .map((n, i) =>
                   n === '...' ? (
-                    <span key={`ellipsis-${i}`} className="px-[14px] py-[8px] text-[13px] text-[#999]">…</span>
+                    <span key={`ellipsis-${i}`} className="px-3 py-2 text-xs text-gray-400 font-bold">
+                      …
+                    </span>
                   ) : (
-                    <Link key={n} href={buildUrl({ page: String(n) })} className={`px-[14px] py-[8px] rounded-[6px] text-[13px] font-medium transition-colors ${page === n ? 'bg-[#f85606] text-white border border-[#f85606]' : 'bg-white border border-[#ddd] hover:border-[#f85606] hover:text-[#f85606]'}`}>
+                    <Link
+                      key={n}
+                      href={buildUrl({ page: String(n) })}
+                      className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+                        page === n
+                          ? 'bg-[#f85606] text-white shadow-md shadow-orange-100'
+                          : 'bg-white border border-gray-200 text-gray-700 hover:border-[#f85606] hover:text-[#f85606]'
+                      }`}
+                    >
                       {n}
                     </Link>
                   )
                 )}
+
               {page < totalPages && (
-                <Link href={buildUrl({ page: String(page + 1) })} className="px-[14px] py-[8px] rounded-[6px] border border-[#ddd] text-[13px] font-medium hover:border-[#f85606] hover:text-[#f85606] transition-colors bg-white">
-                  Next →
+                <Link
+                  href={buildUrl({ page: String(page + 1) })}
+                  className="px-4 py-2 rounded-xl border border-gray-200 bg-white text-xs font-bold text-gray-700 hover:border-[#f85606] hover:text-[#f85606] transition-colors shadow-sm"
+                >
+                  Next <i className="fa-solid fa-arrow-right ml-1"></i>
                 </Link>
               )}
             </div>
           )}
+
         </div>
       </div>
     </div>

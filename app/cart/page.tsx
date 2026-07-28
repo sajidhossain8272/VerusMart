@@ -25,9 +25,9 @@ export default function CartPage() {
           </div>
           <div className="bg-white rounded-[8px] p-[20px] shadow-[0_2px_10px_rgba(0,0,0,0.05)] sticky top-[80px]">
             <h3 className="text-[18px] mb-[15px] pb-[10px] border-b border-[#eee] font-bold">Order Summary</h3>
-            <div className="flex justify-between mb-[10px] text-[#444] text-[14px]"><span>Subtotal (0 items)</span><span>$0.00</span></div>
+            <div className="flex justify-between mb-[10px] text-[#444] text-[14px]"><span>Subtotal (0 items)</span><span>৳0</span></div>
             <div className="flex justify-between mb-[15px] text-[#444] text-[14px]"><span>Delivery Fee</span><span className="text-[#10b981] font-bold">—</span></div>
-            <div className="flex justify-between items-center py-[15px] border-t border-[#eee]"><span className="font-bold text-[#212121]">Total Amount</span><span className="text-[22px] font-bold text-[#f85606]">$0.00</span></div>
+            <div className="flex justify-between items-center py-[15px] border-t border-[#eee]"><span className="font-bold text-[#212121]">Total Amount</span><span className="text-[22px] font-bold text-[#f85606]">৳0</span></div>
             <Link href="/products" className="block w-full bg-[#f0f0f0] text-[#888] text-center no-underline p-[14px] rounded-[4px] font-bold mt-[20px] cursor-not-allowed">PROCEED TO CHECKOUT</Link>
           </div>
         </div>
@@ -67,7 +67,7 @@ export default function CartPage() {
                 {item.variantName && item.variantName !== 'Regular' && (
                   <div className="text-[12px] text-[#888] mb-[8px]">Variant: <span className="text-[#555] font-medium">{item.variantName}</span></div>
                 )}
-                <div className="text-[16px] text-[#f85606] font-bold">${item.price.toFixed(2)}</div>
+                <div className="text-[16px] text-[#f85606] font-bold">৳{item.price.toLocaleString('en-BD')}</div>
               </div>
 
               <div className="flex flex-col items-end gap-[10px] shrink-0">
@@ -89,7 +89,7 @@ export default function CartPage() {
                 </div>
 
                 <div className="text-[14px] font-bold text-[#333]">
-                  ${(item.price * item.quantity).toFixed(2)}
+                  ৳{(item.price * item.quantity).toLocaleString('en-BD')}
                 </div>
 
                 <button
@@ -113,26 +113,26 @@ export default function CartPage() {
 
           <div className="flex justify-between mb-[10px] text-[#444] text-[14px]">
             <span>Subtotal ({cartCount} item{cartCount !== 1 ? 's' : ''})</span>
-            <span className="font-medium">${cartTotal.toFixed(2)}</span>
+            <span className="font-medium">৳{cartTotal.toLocaleString('en-BD')}</span>
           </div>
           <div className="flex justify-between mb-[15px] text-[#444] text-[14px]">
             <span>Delivery Fee</span>
             {deliveryFee === 0 ? (
               <span className="text-[#10b981] font-bold">Free 🎉</span>
             ) : (
-              <span className="font-medium">${deliveryFee.toFixed(2)}</span>
+              <span className="font-medium">৳{deliveryFee.toLocaleString('en-BD')}</span>
             )}
           </div>
 
           {deliveryFee > 0 && (
             <div className="text-[12px] text-[#888] mb-[10px] bg-[#f9f9f9] p-[8px] rounded-[6px]">
-              Add ${(100 - cartTotal).toFixed(2)} more to get <strong className="text-[#10b981]">FREE delivery</strong>!
+              Add ৳{(100 - cartTotal).toLocaleString('en-BD')} more to get <strong className="text-[#10b981]">FREE delivery</strong>!
             </div>
           )}
 
           <div className="flex justify-between items-center py-[15px] border-t border-[#eee] mt-[10px]">
             <span className="font-bold text-[#212121]">Total Amount</span>
-            <span className="text-[22px] font-bold text-[#f85606]">${grandTotal.toFixed(2)}</span>
+            <span className="text-[22px] font-bold text-[#f85606]">৳{grandTotal.toLocaleString('en-BD')}</span>
           </div>
 
           <Link href="/checkout" className="block w-full bg-[#f85606] text-white text-center no-underline p-[14px] rounded-[4px] font-bold mt-[20px] transition-all hover:bg-[#d04000]">

@@ -28,9 +28,21 @@ export default function AddToCartBtn({ product }: Props) {
   return (
     <button
       onClick={handleClick}
-      className={`w-full py-[8px] text-[11px] font-bold cursor-pointer rounded-[4px] border-none transition-all duration-200 ${added ? 'bg-[#10b981] text-white' : 'bg-[#ffe1d2] text-[#f85606] hover:bg-[#f85606] hover:text-white'}`}
+      className={`w-full py-2.5 px-3 text-xs font-bold uppercase tracking-wider cursor-pointer rounded-xl border-none transition-all duration-300 flex items-center justify-center gap-1.5 shadow-sm active:scale-95 ${
+        added
+          ? 'bg-[#10b981] text-white shadow-green-200'
+          : 'bg-[#f85606] hover:bg-[#d04300] text-white shadow-orange-100 hover:shadow-md'
+      }`}
     >
-      {added ? '✓ ADDED' : 'ADD TO CART'}
+      {added ? (
+        <>
+          <i className="fa-solid fa-check text-xs"></i> ADDED TO BAG
+        </>
+      ) : (
+        <>
+          <i className="fa-solid fa-bag-shopping text-xs"></i> ADD TO CART
+        </>
+      )}
     </button>
   )
 }
