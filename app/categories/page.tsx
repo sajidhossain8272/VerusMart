@@ -1,10 +1,14 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 
+export const dynamic = 'force-dynamic'
+
 export default async function CategoriesPage() {
-  const categories = await prisma.categories.findMany({
-    orderBy: { name: 'asc' }
-  })
+  const rawCats = await prisma.categories.findMany({
+    orderBy: { priority: 'asc' }
+  }).catch(() => [])
+
+  const categories = rawCats.filter(c => !c.status || String(c.status) === 'active')
 
   return (
     <div className="w-[92%] max-w-[1200px] mx-auto mt-[40px] pb-[100px]">

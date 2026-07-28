@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import HomeSlider from '@/app/components/HomeSlider'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HomePage() {
   const rawSlides = await prisma.banners.findMany({
     orderBy: { id: 'desc' }

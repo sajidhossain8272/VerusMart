@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import AddToCartBtn from './AddToCartBtn'
 
+export const dynamic = 'force-dynamic'
 const PAGE_SIZE = 24
 
 export default async function ProductsPage({
