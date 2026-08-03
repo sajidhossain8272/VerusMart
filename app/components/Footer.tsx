@@ -1,16 +1,11 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 
-let cachedBiz: any = null
-
 async function getBizSettings() {
-  if (cachedBiz) return cachedBiz
   try {
-    const res = await prisma.business_settings.findFirst({ where: { id: 1 } })
-    if (res) cachedBiz = res
-    return res
+    return await prisma.business_settings.findFirst({ where: { id: 1 } })
   } catch {
-    return cachedBiz || null
+    return null
   }
 }
 

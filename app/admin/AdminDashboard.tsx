@@ -84,6 +84,14 @@ interface Settings {
   shipping_outside: number
 }
 
+interface Variant {
+  id: number
+  product_id: number
+  variant_name: string
+  price: number
+  old_price: number
+}
+
 interface AdminDashboardProps {
   isAuthenticated: boolean
   initialProducts: Product[]
@@ -91,6 +99,7 @@ interface AdminDashboardProps {
   initialOrders: Order[]
   initialSettings: Settings | null
   initialBanners: Banner[]
+  initialVariants?: Variant[]
 }
 
 export default function AdminDashboard({
@@ -99,7 +108,8 @@ export default function AdminDashboard({
   initialCategories,
   initialOrders,
   initialSettings,
-  initialBanners
+  initialBanners,
+  initialVariants = []
 }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'add-product' | 'categories' | 'marketing' | 'settings'>('dashboard')
   const [products, setProducts] = useState<Product[]>(initialProducts)
@@ -108,6 +118,8 @@ export default function AdminDashboard({
   const [orders, setOrders] = useState<Order[]>(initialOrders)
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
+  const [variants, setVariants] = useState<Variant[]>(initialVariants)
+  const [variantInputs, setVariantInputs] = useState<{ variant_name: string; price: string; old_price: string }[]>([])
   
   // Transition states
   const [isPending, startTransition] = useTransition()
@@ -624,7 +636,16 @@ export default function AdminDashboard({
                             <td className="p-4 text-right">
                               <div className="flex gap-2 justify-end">
                                 <button 
-                                  onClick={() => setEditingProduct(p)} 
+                                  onClick={() => {
+                                    setEditingProduct(p)
+                                    // Pre-populate variant inputs with existing variants for this product
+                                    const productVariants = variants.filter(v => v.product_id === p.id)
+                                    setVariantInputs(productVariants.map(v => ({
+                                      variant_name: v.variant_name,
+                                      price: String(v.price),
+                                      old_price: String(v.old_price || ''),
+                                    })))
+                                  }} 
                                   className="bg-white hover:bg-neutral-50 border border-gray-300 text-neutral-700 font-bold text-[10px] py-1 px-3 rounded-lg uppercase transition-all cursor-pointer shadow-xs"
                                 >
                                   Edit
@@ -793,6 +814,78 @@ export default function AdminDashboard({
                     />
                   </div>
 
+                  {/* Product Variants / Sizes Management */}
+                  <div className="border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Product Variants / Sizes (Optional)</span>
+                      <button
+                        type="button"
+                        onClick={() => setVariantInputs(prev => [...prev, { variant_name: '', price: '', old_price: '' }])}
+                        className="bg-[#002b5b] hover:bg-[#f85606] text-white font-bold text-[10px] uppercase px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                      >
+                        + Add Variant
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-neutral-500 mb-3">Add size/option variants (e.g. Small, Medium, Large) with their own prices. Leave empty to use the base product price.</p>
+                    
+                    <input type="hidden" name="variants" value={JSON.stringify(variantInputs.filter(v => v.variant_name.trim()))} />
+                    
+                    {variantInputs.length === 0 ? (
+                      <div className="text-[10px] text-neutral-400 uppercase font-bold text-center py-3 border border-dashed border-gray-300 rounded-lg">
+                        No variants added. Product will use base price only.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {variantInputs.map((v, idx) => (
+                          <div key={idx} className="grid grid-cols-1 sm:grid-cols-[1fr_120px_120px_40px] gap-2 items-center">
+                            <input
+                              type="text"
+                              placeholder="Variant name (e.g. Small)"
+                              value={v.variant_name}
+                              onChange={(e) => {
+                                const next = [...variantInputs]
+                                next[idx] = { ...next[idx], variant_name: e.target.value }
+                                setVariantInputs(next)
+                              }}
+                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
+                            />
+                            <input
+                              type="number"
+                              step="0.01"
+                              placeholder="Price"
+                              value={v.price}
+                              onChange={(e) => {
+                                const next = [...variantInputs]
+                                next[idx] = { ...next[idx], price: e.target.value }
+                                setVariantInputs(next)
+                              }}
+                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
+                            />
+                            <input
+                              type="number"
+                              step="0.01"
+                              placeholder="Old Price"
+                              value={v.old_price}
+                              onChange={(e) => {
+                                const next = [...variantInputs]
+                                next[idx] = { ...next[idx], old_price: e.target.value }
+                                setVariantInputs(next)
+                              }}
+                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setVariantInputs(prev => prev.filter((_, i) => i !== idx))}
+                              className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs w-8 h-8 rounded-lg transition-colors cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   <div className="border border-gray-200 rounded-xl p-4">
                     <span className="text-[10px] font-bold uppercase tracking-wider block mb-3 text-gray-700">Promotional Badges Configuration</span>
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
@@ -958,6 +1051,78 @@ export default function AdminDashboard({
                       accept="image/*"
                       className="border border-gray-300 rounded-lg p-2 text-xs bg-white font-mono"
                     />
+                  </div>
+
+                  {/* Product Variants / Sizes Management */}
+                  <div className="border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Product Variants / Sizes (Optional)</span>
+                      <button
+                        type="button"
+                        onClick={() => setVariantInputs(prev => [...prev, { variant_name: '', price: '', old_price: '' }])}
+                        className="bg-[#002b5b] hover:bg-[#f85606] text-white font-bold text-[10px] uppercase px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
+                      >
+                        + Add Variant
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-neutral-500 mb-3">Add size/option variants (e.g. Small, Medium, Large) with their own prices. Leave empty to use the base product price.</p>
+                    
+                    <input type="hidden" name="variants" value={JSON.stringify(variantInputs.filter(v => v.variant_name.trim()))} />
+                    
+                    {variantInputs.length === 0 ? (
+                      <div className="text-[10px] text-neutral-400 uppercase font-bold text-center py-3 border border-dashed border-gray-300 rounded-lg">
+                        No variants added. Product will use base price only.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {variantInputs.map((v, idx) => (
+                          <div key={idx} className="grid grid-cols-1 sm:grid-cols-[1fr_120px_120px_40px] gap-2 items-center">
+                            <input
+                              type="text"
+                              placeholder="Variant name (e.g. Small)"
+                              value={v.variant_name}
+                              onChange={(e) => {
+                                const next = [...variantInputs]
+                                next[idx] = { ...next[idx], variant_name: e.target.value }
+                                setVariantInputs(next)
+                              }}
+                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
+                            />
+                            <input
+                              type="number"
+                              step="0.01"
+                              placeholder="Price"
+                              value={v.price}
+                              onChange={(e) => {
+                                const next = [...variantInputs]
+                                next[idx] = { ...next[idx], price: e.target.value }
+                                setVariantInputs(next)
+                              }}
+                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
+                            />
+                            <input
+                              type="number"
+                              step="0.01"
+                              placeholder="Old Price"
+                              value={v.old_price}
+                              onChange={(e) => {
+                                const next = [...variantInputs]
+                                next[idx] = { ...next[idx], old_price: e.target.value }
+                                setVariantInputs(next)
+                              }}
+                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setVariantInputs(prev => prev.filter((_, i) => i !== idx))}
+                              className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs w-8 h-8 rounded-lg transition-colors cursor-pointer"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="border border-gray-200 rounded-xl p-4">

@@ -3,28 +3,19 @@ import { prisma } from '@/lib/prisma'
 import CartCountBadge from './CartCountBadge'
 import MobileMenuClient from './MobileMenuClient'
 
-let cachedSettings: any = null
-let cachedCategories: any[] = []
-
 async function getSettings() {
-  if (cachedSettings) return cachedSettings
   try {
-    const res = await prisma.business_settings.findFirst({ where: { id: 1 } })
-    if (res) cachedSettings = res
-    return res
+    return await prisma.business_settings.findFirst({ where: { id: 1 } })
   } catch {
-    return cachedSettings || null
+    return null
   }
 }
 
 async function getCategories() {
-  if (cachedCategories.length > 0) return cachedCategories
   try {
-    const res = await prisma.categories.findMany({ orderBy: { priority: 'asc' } })
-    if (res.length > 0) cachedCategories = res
-    return res
+    return await prisma.categories.findMany({ orderBy: { priority: 'asc' } })
   } catch {
-    return cachedCategories || []
+    return []
   }
 }
 

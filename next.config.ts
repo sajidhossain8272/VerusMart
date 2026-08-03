@@ -1,11 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: {
-    cpus: 1,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "placehold.jp",
+      },
+      {
+        protocol: "https",
+        hostname: "verusmart.com",
+      },
+    ],
   },
 };
 

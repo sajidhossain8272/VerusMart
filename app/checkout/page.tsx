@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import CheckoutCartSummary from './CheckoutCartSummary'
 import CheckoutForm from './CheckoutForm'

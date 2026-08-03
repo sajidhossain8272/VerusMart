@@ -38,6 +38,8 @@ export default async function AdminPage() {
     where: { id: 1 }
   })
 
+  const variants = await prisma.product_variants.findMany({})
+
   const banners = await prisma.banners.findMany({
     orderBy: { id: 'desc' }
   })
@@ -64,6 +66,12 @@ export default async function AdminPage() {
 
   const serializedBanners = JSON.parse(JSON.stringify(banners))
 
+  const serializedVariants = JSON.parse(JSON.stringify(variants.map(v => ({
+    ...v,
+    price: Number(v.price),
+    old_price: Number(v.old_price)
+  }))))
+
   const serializedSettings = siteSettings ? JSON.parse(JSON.stringify({
     ...siteSettings,
     shipping_inside: Number(siteSettings.shipping_inside),
@@ -78,6 +86,7 @@ export default async function AdminPage() {
       initialOrders={ordersWithItems}
       initialSettings={serializedSettings}
       initialBanners={serializedBanners}
+      initialVariants={serializedVariants}
     />
   )
 }

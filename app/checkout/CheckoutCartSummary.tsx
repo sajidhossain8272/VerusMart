@@ -1,26 +1,11 @@
 'use client'
 
 import { useCart } from '@/app/context/CartContext'
-import { useEffect } from 'react'
 
-interface Props {
-  onCartLoaded?: (cartJson: string, total: string) => void
-}
-
-export default function CheckoutCartSummary({ onCartLoaded }: Props) {
+export default function CheckoutCartSummary() {
   const { cartItems, cartCount, cartTotal } = useCart()
   const deliveryFee = cartTotal >= 100 ? 0 : 9.99
   const grandTotal = cartTotal + deliveryFee
-
-  // Expose cart data via hidden inputs (forms can't read context directly)
-  useEffect(() => {
-    const cartInput = document.getElementById('cart_items_input') as HTMLInputElement | null
-    const totalInput = document.getElementById('total_amount_input') as HTMLInputElement | null
-    const deliveryInput = document.getElementById('delivery_fee_input') as HTMLInputElement | null
-    if (cartInput) cartInput.value = JSON.stringify(cartItems)
-    if (totalInput) totalInput.value = grandTotal.toFixed(2)
-    if (deliveryInput) deliveryInput.value = deliveryFee.toFixed(2)
-  }, [cartItems, grandTotal, deliveryFee])
 
   return (
     <>

@@ -1,4 +1,8 @@
+'use client'
+
 import Link from 'next/link'
+import { useCart } from '@/app/context/CartContext'
+import { useEffect, useState } from 'react'
 
 interface ServingArea {
   id: number
@@ -17,11 +21,21 @@ interface Props {
 }
 
 export default function CheckoutForm({ servingAreas, paymentMethods }: Props) {
+  const { cartItems, cartTotal } = useCart()
+  const [deliveryFee, setDeliveryFee] = useState(0)
+  const [grandTotal, setGrandTotal] = useState(0)
+
+  useEffect(() => {
+    const fee = cartTotal >= 100 ? 0 : 9.99
+    setDeliveryFee(fee)
+    setGrandTotal(cartTotal + fee)
+  }, [cartTotal])
+
   return (
     <form action="/api/checkout" method="post" className="flex-1 bg-white p-[25px] rounded-[8px] shadow-[0_2px_15px_rgba(0,0,0,0.08)] border border-[#f0f0f0]">
-      <input type="hidden" id="cart_items_input" name="cart_items" value="[]" />
-      <input type="hidden" id="total_amount_input" name="total_amount" value="0" />
-      <input type="hidden" id="delivery_fee_input" name="delivery_fee" value="0" />
+      <input type="hidden" name="cart_items" value={JSON.stringify(cartItems)} />
+      <input type="hidden" name="total_amount" value={grandTotal.toFixed(2)} />
+      <input type="hidden" name="delivery_fee" value={deliveryFee.toFixed(2)} />
 
       <div className="grid gap-[20px]">
         <div>

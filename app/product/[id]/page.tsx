@@ -81,9 +81,14 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
   const defaultOldPrice = Number(product.old_price || variants[0]?.old_price || 0)
   const defaultVName = variants[0]?.variant_name || 'Regular'
 
-  // Clean script tags if present
+  // Clean script tags and event handlers if present
   const cleanDescription = (product.description || '')
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, '')
+    .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, '')
+    .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
+    .replace(/javascript:/gi, '')
 
   // Serialize variants for client component
   const serializedVariants = variants.map(v => ({

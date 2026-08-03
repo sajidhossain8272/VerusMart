@@ -60,6 +60,9 @@ model categories {
   image    String?            @db.VarChar(255)
   status   categories_status? @default(active)
   banner   String?            @db.VarChar(255)
+
+  @@index([status])
+  @@index([priority])
 }
 
 model colors {
@@ -97,6 +100,8 @@ model order_items {
   price        Decimal? @db.Decimal(10, 2)
   quantity     Int?
   image        String?  @db.VarChar(255)
+
+  @@index([order_id])
 }
 
 model orders {
@@ -110,6 +115,10 @@ model orders {
   total_amount  Decimal   @db.Decimal(10, 2)
   status        String?   @default("pending") @db.VarChar(50)
   order_date    DateTime? @default(now())
+
+  @@index([status])
+  @@index([order_date])
+  @@index([email])
 }
 
 model pages {
@@ -148,12 +157,16 @@ model phone_sell_requests {
   created_at      DateTime @default(now()) 
   otp_code        String?  @db.VarChar(4)
   is_verified     Boolean? @default(false)
+
+  @@index([status])
 }
 
 model product_colors {
   id         Int @id @default(autoincrement())
   product_id Int
   color_id   Int
+
+  @@index([product_id])
 }
 
 model product_gallery {
@@ -161,12 +174,16 @@ model product_gallery {
   product_id Int
   image      String    @db.VarChar(255)
   created_at DateTime? @default(now()) 
+
+  @@index([product_id])
 }
 
 model product_sizes {
   id         Int @id @default(autoincrement())
   product_id Int
   size_id    Int
+
+  @@index([product_id])
 }
 
 model product_variants {
@@ -175,6 +192,8 @@ model product_variants {
   variant_name String   @db.VarChar(100)
   price        Decimal  @db.Decimal(10, 2)
   old_price    Decimal? @default(0.00) @db.Decimal(10, 2)
+
+  @@index([product_id])
 }
 
 model products {
@@ -202,6 +221,15 @@ model products {
   is_weekday_deal  Boolean?  @default(false)
   meta_title       String?   @db.VarChar(255)
   meta_description String?   @db.Text
+
+  @@index([category_id])
+  @@index([status])
+  @@index([is_recommended])
+  @@index([is_featured])
+  @@index([is_trending])
+  @@index([is_best_seller])
+  @@index([is_weekday_deal])
+  @@index([created_at])
 }
 
 model refund_requests {
@@ -229,6 +257,8 @@ model serving_areas {
   delivery_charge     String? @db.VarChar(50)
   free_delivery_limit Int?
   status              String? @default("active") @db.VarChar(20)
+
+  @@index([status])
 }
 
 model sizes {
@@ -243,6 +273,8 @@ model sub_categories {
   priority    Int?     @default(1)
   status      String?  @default("active") @db.VarChar(50)
   created_at  DateTime @default(now()) 
+
+  @@index([category_id])
 }
 
 model users {
@@ -270,6 +302,9 @@ model wishlist {
   user_id    Int
   product_id Int
   created_at DateTime? @default(now()) 
+
+  @@index([user_id])
+  @@index([product_id])
 }
 
 enum banners_position {

@@ -43,12 +43,38 @@ export default async function RegisterPage() {
           </div>
 
           <div className="flex flex-col gap-[8px]">
+            <label className="text-[13px] font-semibold text-[#1e293b]">Phone Number</label>
+            <input 
+              type="tel" 
+              name="phone" 
+              placeholder="01XXXXXXXXX" 
+              required 
+              pattern="^(\+?880|0)1[3-9]\d{8}$"
+              title="Please enter a valid Bangladesh phone number (e.g. 01712345678)"
+              className="w-full p-[12px_16px] rounded-xl border border-gray-200 outline-none text-[14px] transition-all focus:border-[#00bcd4] focus:ring-2 focus:ring-[#00bcd4]/20"
+            />
+          </div>
+
+          <div className="flex flex-col gap-[8px]">
             <label className="text-[13px] font-semibold text-[#1e293b]">Password</label>
             <input 
               type="password" 
               name="password" 
-              placeholder="••••••••" 
+              placeholder="Min 8 characters" 
               required 
+              minLength={8}
+              className="w-full p-[12px_16px] rounded-xl border border-gray-200 outline-none text-[14px] transition-all focus:border-[#00bcd4] focus:ring-2 focus:ring-[#00bcd4]/20"
+            />
+          </div>
+
+          <div className="flex flex-col gap-[8px]">
+            <label className="text-[13px] font-semibold text-[#1e293b]">Confirm Password</label>
+            <input 
+              type="password" 
+              name="confirm_password" 
+              placeholder="Re-enter password" 
+              required 
+              minLength={8}
               className="w-full p-[12px_16px] rounded-xl border border-gray-200 outline-none text-[14px] transition-all focus:border-[#00bcd4] focus:ring-2 focus:ring-[#00bcd4]/20"
             />
           </div>
