@@ -1,23 +1,20 @@
 import nodemailer from 'nodemailer'
 
-const SMTP_HOST = process.env.SMTP_HOST || 'smtp.gmail.com'
-const SMTP_PORT = parseInt(process.env.SMTP_PORT || '465')
-const SMTP_USER = process.env.SMTP_USER || ''
-const SMTP_PASS = process.env.SMTP_PASS || ''
-const ADMIN_EMAIL = process.env.ADMIN_NOTIFY_EMAIL || 'verusmart4@gmail.com'
-
 function getTransporter() {
-  if (!SMTP_USER || !SMTP_PASS) {
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com'
+  const port = parseInt(process.env.SMTP_PORT || '465')
+  const user = (process.env.SMTP_USER || '').trim()
+  const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '')
+
+  if (!user || !pass) {
     return null
   }
+
   return nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: SMTP_PORT,
-    secure: SMTP_PORT === 465,
-    auth: {
-      user: SMTP_USER,
-      pass: SMTP_PASS,
-    },
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
   })
 }
 
@@ -29,6 +26,8 @@ export async function sendOTPEmail(toEmail: string, otpCode: string, name?: stri
     console.warn('[AUTH] SMTP_USER or SMTP_PASS not configured in .env. Logging OTP code for dev testing.')
     return { success: true, simulated: true }
   }
+
+  const user = (process.env.SMTP_USER || '').trim()
 
   const htmlContent = `
     <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 520px; margin: 0 auto; padding: 30px; background-color: #ffffff; border-radius: 20px; border: 1px solid #eaeaea; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
@@ -63,7 +62,7 @@ export async function sendOTPEmail(toEmail: string, otpCode: string, name?: stri
   `
 
   await transporter.sendMail({
-    from: `"Verus Mart Security" <${SMTP_USER}>`,
+    from: `"Verus Mart Security" <${user}>`,
     to: toEmail,
     subject: `${otpCode} is your Verus Mart Password Reset Code`,
     html: htmlContent,
@@ -94,11 +93,14 @@ export async function sendOrderNotificationEmail(order: {
   price: number
   subtotal: number
 }>) {
-  console.log(`[ORDER EMAIL] Sending Order Notification for Order #${order.id} to ${ADMIN_EMAIL}`)
+  const adminEmail = process.env.ADMIN_NOTIFY_EMAIL || 'verusmart4@gmail.com'
+  const user = (process.env.SMTP_USER || '').trim()
+
+  console.log(`[ORDER EMAIL] Sending Order Notification for Order #${order.id} to ${adminEmail}`)
 
   const transporter = getTransporter()
   if (!transporter) {
-    console.warn('[ORDER EMAIL] SMTP_USER or SMTP_PASS not configured in .env. Skipping live email dispatch.')
+    console.warn('[ORDER EMAIL] SMTP_USER or SMTP_PASS not configured in process.env. Skipping live email dispatch.')
     return { success: false, simulated: true }
   }
 
@@ -106,7 +108,7 @@ export async function sendOrderNotificationEmail(order: {
 
   const itemsHtml = items.map(item => `
     <tr style="border-bottom: 1px solid #f0f0f0;">
-      <td style="padding: 10px; font-[#212121]; font-size: 13px; font-weight: 700;">
+      <td style="padding: 10px; color: #212121; font-size: 13px; font-weight: 700;">
         ${item.product_name} ${item.variant_name && item.variant_name !== 'Regular' ? `<br/><span style="color: #888; font-size: 11px; font-weight: normal;">Variant: ${item.variant_name}</span>` : ''}
       </td>
       <td style="padding: 10px; font-size: 13px; text-align: center; font-weight: 600; color: #555;">${item.quantity}</td>
@@ -179,15 +181,14 @@ export async function sendOrderNotificationEmail(order: {
     </div>
   `
 
-  // Send to both admin (verusmart4@gmail.com) and customer (if customer email is provided)
-  const recipients = [ADMIN_EMAIL]
+  const recipients = [adminEmail]
   if (order.email && order.email.includes('@') && !recipients.includes(order.email)) {
     recipients.push(order.email)
   }
 
   try {
     await transporter.sendMail({
-      from: `"Verus Mart Store" <${SMTP_USER}>`,
+      from: `"Verus Mart Store" <${user}>`,
       to: recipients.join(', '),
       subject: `🛒 New Order #${order.id} Received - ${order.customer_name} (${formatTk(order.total_amount)})`,
       html: htmlContent,
