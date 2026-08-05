@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { getUserSession } from '@/lib/auth'
 import CartCountBadge from './CartCountBadge'
 import MobileMenuClient from './MobileMenuClient'
+import SearchInput from './SearchInput'
 
 async function getSettings() {
   try {
@@ -59,23 +60,8 @@ export default async function Header() {
           <img src="/admin_uploads/logo.png" alt="VerusMart" className="h-[36px] w-auto object-contain" />
         </Link>
 
-        <div className="flex-1 relative flex">
-          <form action="/products" method="GET" className="w-full flex">
-            <input
-              type="text"
-              name="search"
-              placeholder="Search in Verus Mart..."
-              required
-              className="w-full py-[12px] px-[20px] bg-[#eff0f5] border-none rounded-lg outline-none text-[14px]"
-            />
-            <button
-              type="submit"
-              className="absolute right-0 top-0 h-full w-[50px] bg-[#ffe1d2] border-none rounded-r-lg text-[#f85606] cursor-pointer"
-            >
-              <i className="fa fa-search"></i>
-            </button>
-          </form>
-        </div>
+        {/* Interactive Live Search */}
+        <SearchInput />
 
         <div className="flex items-center gap-[20px]">
           <Link href="/wishlist" className="text-[#444] text-[22px] relative hover:text-[#f85606] transition-colors" title="Wishlist">

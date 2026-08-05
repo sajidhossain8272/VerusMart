@@ -68,7 +68,16 @@ export default async function ProductsPage({
   // Build where clause
   const where: Record<string, unknown> = {}
   if (categoryId && !isNaN(categoryId)) where.category_id = categoryId
-  if (search) where.name = { contains: search, mode: 'insensitive' }
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: 'insensitive' } },
+      { description: { contains: search, mode: 'insensitive' } },
+      { meta_title: { contains: search, mode: 'insensitive' } },
+      { meta_description: { contains: search, mode: 'insensitive' } },
+      { unit: { contains: search, mode: 'insensitive' } },
+      { category: { is: { name: { contains: search, mode: 'insensitive' } } } },
+    ]
+  }
   if (type === 'hot') where.is_featured = true
   if (type === 'weekly') where.is_weekday_deal = true
   if (type === 'trending') where.is_trending = true
