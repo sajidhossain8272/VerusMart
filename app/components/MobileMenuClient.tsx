@@ -1,12 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
 interface Cat { id: number; name: string }
 
 export default function MobileMenuClient({ categories }: { categories: Cat[] }) {
   const [open, setOpen] = useState(false)
+  const [user, setUser] = useState<{ full_name?: string; email?: string } | null>(null)
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.authenticated && data.user) {
+          setUser(data.user)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   return (
     <>
@@ -66,6 +78,8 @@ export default function MobileMenuClient({ categories }: { categories: Cat[] }) 
               { href: '/products', icon: 'fa-border-all', label: 'All Products' },
               { href: '/products?type=hot', icon: 'fa-fire', label: 'Hot Deals' },
               { href: '/products?type=weekly', icon: 'fa-bolt', label: 'Weekly Deals' },
+              { href: '/account', icon: 'fa-user-gear', label: 'My Account' },
+              { href: '/track-order', icon: 'fa-truck-fast', label: 'Track Order' },
               { href: '/serving-area', icon: 'fa-location-dot', label: 'Serving Area' },
             ].map(l => (
               <Link
@@ -100,20 +114,32 @@ export default function MobileMenuClient({ categories }: { categories: Cat[] }) 
 
         {/* Footer actions */}
         <div className="shrink-0 border-t border-gray-100 px-4 py-4 flex gap-3">
-          <Link
-            href="/login"
-            onClick={() => setOpen(false)}
-            className="flex-1 text-center py-2.5 rounded-xl border-2 border-[#002b5b] text-[#002b5b] text-xs font-black uppercase tracking-wider hover:bg-[#002b5b] hover:text-white transition-all"
-          >
-            Login
-          </Link>
-          <Link
-            href="/register"
-            onClick={() => setOpen(false)}
-            className="flex-1 text-center py-2.5 rounded-xl bg-[#f85606] text-white text-xs font-black uppercase tracking-wider hover:bg-[#d04300] transition-all"
-          >
-            Sign Up
-          </Link>
+          {user ? (
+            <Link
+              href="/account"
+              onClick={() => setOpen(false)}
+              className="w-full text-center py-3 rounded-xl bg-[#002b5b] text-white text-xs font-black uppercase tracking-wider hover:bg-[#f85606] transition-all flex items-center justify-center gap-2"
+            >
+              <i className="fa-solid fa-user-check"></i> My Account ({user.full_name?.split(' ')[0]})
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="flex-1 text-center py-2.5 rounded-xl border-2 border-[#002b5b] text-[#002b5b] text-xs font-black uppercase tracking-wider hover:bg-[#002b5b] hover:text-white transition-all"
+              >
+                Login
+              </Link>
+              <Link
+                href="/register"
+                onClick={() => setOpen(false)}
+                className="flex-1 text-center py-2.5 rounded-xl bg-[#f85606] text-white text-xs font-black uppercase tracking-wider hover:bg-[#d04300] transition-all"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </aside>
     </>
