@@ -28,7 +28,7 @@ export default async function RegisterPage({ searchParams }: Props) {
   const errorMessage = errorMessages[errorParam] || ''
 
   return (
-    <div className="bg-gradient-to-br from-[#002b5b] via-[#001c3d] to-[#0a1128] min-h-screen flex items-center justify-center font-sans p-4 sm:p-6 relative overflow-hidden py-12">
+    <div className="-mt-0 -mb-16 lg:mb-0 bg-gradient-to-br from-[#002b5b] via-[#001c3d] to-[#0a1128] min-h-[calc(100vh-140px)] flex items-center justify-center font-sans p-4 sm:p-6 relative overflow-hidden py-12">
       
       {/* Background Ambient Glows */}
       <div className="absolute top-10 right-10 w-72 h-72 bg-[#f85606]/15 rounded-full blur-3xl pointer-events-none" />
