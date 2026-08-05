@@ -8,13 +8,13 @@ datasource db {
 }
 
 model admins {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(100)
-  email      String   @unique @db.VarChar(150)
-  password   String   @db.VarChar(255)
-  image      String?  @db.VarChar(255)
-  role       String?  @default("admin") @db.VarChar(50)
-  created_at DateTime @default(now()) 
+  id         Int       @id @default(autoincrement())
+  name       String    @db.VarChar(100)
+  email      String    @unique @db.VarChar(150)
+  password   String    @db.VarChar(255)
+  image      String?   @db.VarChar(255)
+  role       String?   @default("admin") @db.VarChar(50)
+  created_at DateTime? @default(now())
 }
 
 model banners {
@@ -23,7 +23,7 @@ model banners {
   image      String            @db.VarChar(255)
   position   banners_position? @default(main)
   status     banners_status?   @default(active)
-  created_at DateTime?         @default(now()) 
+  created_at DateTime?         @default(now())
 }
 
 model brands {
@@ -32,7 +32,7 @@ model brands {
   logo       String?        @db.VarChar(255)
   priority   Int?           @default(1)
   status     brands_status? @default(active)
-  created_at DateTime?      @default(now()) 
+  created_at DateTime?      @default(now())
 }
 
 model business_settings {
@@ -47,7 +47,7 @@ model business_settings {
   instagram        String?  @db.VarChar(255)
   twitter          String?  @db.VarChar(255)
   youtube          String?  @db.VarChar(255)
-  currency         String?  @default("$") @db.VarChar(10)
+  currency         String?  @default("৳") @db.VarChar(10)
   tiktok           String?  @db.VarChar(255)
   shipping_inside  Decimal? @default(60.00) @db.Decimal(10, 2)
   shipping_outside Decimal? @default(120.00) @db.Decimal(10, 2)
@@ -60,6 +60,7 @@ model categories {
   image    String?            @db.VarChar(255)
   status   categories_status? @default(active)
   banner   String?            @db.VarChar(255)
+  products products[]
 
   @@index([status])
   @@index([priority])
@@ -77,14 +78,14 @@ model contact_messages {
   email      String    @db.VarChar(255)
   subject    String?   @db.VarChar(255)
   message    String    @db.Text
-  created_at DateTime? @default(now()) 
+  created_at DateTime? @default(now())
 }
 
 model customers {
   id         Int       @id @default(autoincrement())
   name       String?   @db.VarChar(255)
   email      String?   @db.VarChar(255)
-  created_at DateTime? @default(now()) 
+  created_at DateTime? @default(now())
 }
 
 model faqs {
@@ -94,31 +95,50 @@ model faqs {
 }
 
 model order_items {
-  id           Int      @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   order_id     Int?
-  product_name String?  @db.VarChar(255)
-  price        Decimal? @db.Decimal(10, 2)
+  order        orders?   @relation(fields: [order_id], references: [id], onDelete: Cascade)
+  product_id   Int?
+  product      products? @relation(fields: [product_id], references: [id], onDelete: SetNull)
+  product_name String?   @db.VarChar(255)
+  variant_name String?   @db.VarChar(100)
+  price        Decimal?  @db.Decimal(10, 2)
   quantity     Int?
-  image        String?  @db.VarChar(255)
+  subtotal     Decimal?  @db.Decimal(10, 2)
+  image        String?   @db.VarChar(255)
 
   @@index([order_id])
+  @@index([product_id])
 }
 
 model orders {
-  id            Int       @id @default(autoincrement())
-  user_id       Int?
-  customer_name String    @db.VarChar(255)
-  email         String?   @db.VarChar(100)
-  phone         String?   @db.VarChar(20)
-  address       String?   @db.Text
-  order_note    String?   @db.Text
-  total_amount  Decimal   @db.Decimal(10, 2)
-  status        String?   @default("pending") @db.VarChar(50)
-  order_date    DateTime? @default(now())
+  id              Int           @id @default(autoincrement())
+  user_id         Int?
+  user            users?        @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  customer_name   String        @db.VarChar(255)
+  email           String?       @db.VarChar(100)
+  phone           String?       @db.VarChar(20)
+  address         String?       @db.Text
+  city            String?       @db.VarChar(100)
+  area            String?       @db.VarChar(100)
+  order_note      String?       @db.Text
+  subtotal        Decimal?      @default(0.00) @db.Decimal(10, 2)
+  shipping_fee    Decimal?      @default(0.00) @db.Decimal(10, 2)
+  discount_amount Decimal?      @default(0.00) @db.Decimal(10, 2)
+  coupon_code     String?       @db.VarChar(50)
+  total_amount    Decimal       @db.Decimal(10, 2)
+  payment_method  String?       @default("cod") @db.VarChar(50)
+  payment_status  String?       @default("unpaid") @db.VarChar(50)
+  tracking_number String?       @db.VarChar(100)
+  status          String?       @default("pending") @db.VarChar(50)
+  order_date      DateTime?     @default(now())
+  order_items     order_items[]
+  audit_logs      audit_logs[]
 
   @@index([status])
   @@index([order_date])
   @@index([email])
+  @@index([user_id])
 }
 
 model pages {
@@ -126,7 +146,7 @@ model pages {
   slug       String    @unique @db.VarChar(100)
   title      String    @db.VarChar(255)
   content    String    @db.Text
-  updated_at DateTime? @default(now()) 
+  updated_at DateTime? @default(now())
   status     String?   @default("active") @db.VarChar(20)
 }
 
@@ -136,7 +156,7 @@ model payment_methods {
   logo            String?                 @db.VarChar(255)
   account_details String?                 @db.Text
   status          payment_methods_status? @default(active)
-  created_at      DateTime?               @default(now()) 
+  created_at      DateTime?               @default(now())
 }
 
 model phone_sell_requests {
@@ -154,7 +174,7 @@ model phone_sell_requests {
   image_2         String?  @db.VarChar(255)
   image_3         String?  @db.VarChar(255)
   status          String?  @default("pending") @db.VarChar(50)
-  created_at      DateTime @default(now()) 
+  created_at      DateTime @default(now())
   otp_code        String?  @db.VarChar(4)
   is_verified     Boolean? @default(false)
 
@@ -173,7 +193,7 @@ model product_gallery {
   id         Int       @id @default(autoincrement())
   product_id Int
   image      String    @db.VarChar(255)
-  created_at DateTime? @default(now()) 
+  created_at DateTime? @default(now())
 
   @@index([product_id])
 }
@@ -189,6 +209,7 @@ model product_sizes {
 model product_variants {
   id           Int      @id @default(autoincrement())
   product_id   Int
+  product      products @relation(fields: [product_id], references: [id], onDelete: Cascade)
   variant_name String   @db.VarChar(100)
   price        Decimal  @db.Decimal(10, 2)
   old_price    Decimal? @default(0.00) @db.Decimal(10, 2)
@@ -197,30 +218,35 @@ model product_variants {
 }
 
 model products {
-  id               Int       @id @default(autoincrement())
-  name             String    @db.VarChar(255)
-  description      String?   @db.Text
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(255)
+  description      String?            @db.Text
   category_id      Int?
-  brand_id         Int?      @default(0)
-  price            Decimal?  @db.Decimal(10, 2)
-  stock            Int?      @default(0)
-  created_at       DateTime? @default(now()) 
-  status           String?   @default("active") @db.VarChar(20)
-  is_recommended   Boolean?  @default(false)
-  is_featured      Boolean?  @default(false)
-  image            String?   @db.VarChar(255)
-  image_2          String?   @db.VarChar(255)
-  image_3          String?   @db.VarChar(255)
-  old_price        Decimal?  @default(0.00) @db.Decimal(10, 2)
-  discount_percent Int?      @default(0)
-  rating           Int?      @default(5)
-  unit             String?   @default("per lb") @db.VarChar(50)
-  total_reviews    Int?      @default(0)
-  is_trending      Boolean?  @default(false)
-  is_best_seller   Boolean?  @default(false)
-  is_weekday_deal  Boolean?  @default(false)
-  meta_title       String?   @db.VarChar(255)
-  meta_description String?   @db.Text
+  category         categories?        @relation(fields: [category_id], references: [id], onDelete: SetNull)
+  brand_id         Int?               @default(0)
+  price            Decimal?           @db.Decimal(10, 2)
+  stock            Int?               @default(0)
+  created_at       DateTime?          @default(now())
+  status           String?            @default("active") @db.VarChar(20)
+  is_recommended   Boolean?           @default(false)
+  is_featured      Boolean?           @default(false)
+  image            String?            @db.VarChar(255)
+  image_2          String?            @db.VarChar(255)
+  image_3          String?            @db.VarChar(255)
+  old_price        Decimal?           @default(0.00) @db.Decimal(10, 2)
+  discount_percent Int?               @default(0)
+  rating           Int?               @default(5)
+  unit             String?            @default("per lb") @db.VarChar(50)
+  total_reviews    Int?               @default(0)
+  is_trending      Boolean?           @default(false)
+  is_best_seller   Boolean?           @default(false)
+  is_weekday_deal  Boolean?           @default(false)
+  meta_title       String?            @db.VarChar(255)
+  meta_description String?            @db.Text
+  product_variants product_variants[]
+  order_items      order_items[]
+  reviews          reviews[]
+  wishlist         wishlist[]
 
   @@index([category_id])
   @@index([status])
@@ -239,7 +265,7 @@ model refund_requests {
   amount        Decimal?                @db.Decimal(10, 2)
   reason        String?                 @db.Text
   status        refund_requests_status? @default(pending)
-  created_at    DateTime?               @default(now()) 
+  created_at    DateTime?               @default(now())
 }
 
 model section_labels {
@@ -272,19 +298,23 @@ model sub_categories {
   name        String   @db.VarChar(255)
   priority    Int?     @default(1)
   status      String?  @default("active") @db.VarChar(50)
-  created_at  DateTime @default(now()) 
+  created_at  DateTime @default(now())
 
   @@index([category_id])
 }
 
 model users {
-  id         Int       @id @default(autoincrement())
-  full_name  String    @db.VarChar(100)
-  email      String    @unique @db.VarChar(100)
-  phone      String    @unique @db.VarChar(20)
-  password   String    @db.VarChar(255)
-  status     String?   @default("active") @db.VarChar(20)
-  created_at DateTime? @default(now()) 
+  id         Int         @id @default(autoincrement())
+  full_name  String      @db.VarChar(100)
+  email      String      @unique @db.VarChar(100)
+  phone      String      @unique @db.VarChar(20)
+  password   String      @db.VarChar(255)
+  status     String?     @default("active") @db.VarChar(20)
+  created_at DateTime?   @default(now())
+  orders     orders[]
+  addresses  addresses[]
+  reviews    reviews[]
+  wishlist   wishlist[]
 }
 
 model vendors {
@@ -294,17 +324,81 @@ model vendors {
   email      String          @unique @db.VarChar(100)
   phone      String          @db.VarChar(20)
   status     vendors_status? @default(active)
-  created_at DateTime?       @default(now()) 
+  created_at DateTime?       @default(now())
 }
 
 model wishlist {
   id         Int       @id @default(autoincrement())
   user_id    Int
+  user       users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   product_id Int
-  created_at DateTime? @default(now()) 
+  product    products  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  created_at DateTime? @default(now())
 
   @@index([user_id])
   @@index([product_id])
+}
+
+model coupons {
+  id               Int       @id @default(autoincrement())
+  code             String    @unique @db.VarChar(50)
+  discount_type    String    @default("percentage") @db.VarChar(20)
+  discount_amount  Decimal   @db.Decimal(10, 2)
+  min_order_amount Decimal?  @default(0.00) @db.Decimal(10, 2)
+  max_discount     Decimal?  @db.Decimal(10, 2)
+  usage_limit      Int?      @default(100)
+  used_count       Int?      @default(0)
+  expires_at       DateTime?
+  status           String?   @default("active") @db.VarChar(20)
+  created_at       DateTime? @default(now())
+
+  @@index([code])
+  @@index([status])
+}
+
+model reviews {
+  id         Int       @id @default(autoincrement())
+  product_id Int
+  product    products  @relation(fields: [product_id], references: [id], onDelete: Cascade)
+  user_id    Int?
+  user       users?    @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  rating     Int       @default(5)
+  comment    String?   @db.Text
+  status     String?   @default("approved") @db.VarChar(20)
+  created_at DateTime? @default(now())
+
+  @@index([product_id])
+  @@index([user_id])
+  @@index([status])
+}
+
+model addresses {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  user       users     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  title      String?   @default("Home") @db.VarChar(50)
+  full_name  String    @db.VarChar(255)
+  phone      String    @db.VarChar(20)
+  address    String    @db.Text
+  city       String?   @db.VarChar(100)
+  area       String?   @db.VarChar(100)
+  is_default Boolean?  @default(false)
+  created_at DateTime? @default(now())
+
+  @@index([user_id])
+}
+
+model audit_logs {
+  id         Int       @id @default(autoincrement())
+  admin_id   Int?
+  action     String    @db.VarChar(100)
+  details    String?   @db.Text
+  order_id   Int?
+  order      orders?   @relation(fields: [order_id], references: [id], onDelete: SetNull)
+  created_at DateTime? @default(now())
+
+  @@index([admin_id])
+  @@index([order_id])
 }
 
 enum banners_position {

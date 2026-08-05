@@ -16,45 +16,51 @@ export default async function AdminPage() {
         initialOrders={[]}
         initialSettings={null}
         initialBanners={[]}
+        initialCoupons={[]}
+        initialCustomers={[]}
+        initialReviews={[]}
       />
     )
   }
 
-  const categories = await prisma.categories.findMany({
-    orderBy: { priority: 'asc' }
-  })
+  const [
+    categories,
+    products,
+    orders,
+    orderItems,
+    siteSettings,
+    variants,
+    banners,
+    coupons,
+    customers,
+    reviews
+  ] = await Promise.all([
+    prisma.categories.findMany({ orderBy: { priority: 'asc' } }),
+    prisma.products.findMany({ orderBy: { id: 'desc' } }),
+    prisma.orders.findMany({ orderBy: { id: 'desc' } }),
+    prisma.order_items.findMany({}),
+    prisma.business_settings.findFirst({ where: { id: 1 } }),
+    prisma.product_variants.findMany({}),
+    prisma.banners.findMany({ orderBy: { id: 'desc' } }),
+    prisma.coupons.findMany({ orderBy: { id: 'desc' } }).catch(() => []),
+    prisma.users.findMany({ select: { id: true, full_name: true, email: true, phone: true, created_at: true }, orderBy: { id: 'desc' } }).catch(() => []),
+    prisma.reviews.findMany({ include: { product: true, user: true }, orderBy: { id: 'desc' } }).catch(() => [])
+  ])
 
-  const products = await prisma.products.findMany({
-    orderBy: { id: 'desc' }
-  })
-
-  const orders = await prisma.orders.findMany({
-    orderBy: { id: 'desc' }
-  })
-
-  const orderItems = await prisma.order_items.findMany({})
-
-  const siteSettings = await prisma.business_settings.findFirst({
-    where: { id: 1 }
-  })
-
-  const variants = await prisma.product_variants.findMany({})
-
-  const banners = await prisma.banners.findMany({
-    orderBy: { id: 'desc' }
-  })
-
-  // Deep JSON serialization ensures zero non-plain objects, dates or Prisma symbols pass into Client Components
   const serializedCategories = JSON.parse(JSON.stringify(categories))
 
   const ordersWithItems = JSON.parse(JSON.stringify(orders.map(order => ({
     ...order,
     total_amount: Number(order.total_amount),
+    subtotal: Number(order.subtotal || 0),
+    shipping_fee: Number(order.shipping_fee || 0),
+    discount_amount: Number(order.discount_amount || 0),
     items: orderItems
       .filter(item => item.order_id === order.id)
       .map(item => ({
         ...item,
-        price: Number(item.price)
+        price: Number(item.price),
+        subtotal: Number(item.subtotal || 0)
       }))
   }))))
 
@@ -72,6 +78,16 @@ export default async function AdminPage() {
     old_price: Number(v.old_price)
   }))))
 
+  const serializedCoupons = JSON.parse(JSON.stringify(coupons.map(c => ({
+    ...c,
+    discount_amount: Number(c.discount_amount),
+    min_order_amount: Number(c.min_order_amount || 0),
+    max_discount: Number(c.max_discount || 0)
+  }))))
+
+  const serializedCustomers = JSON.parse(JSON.stringify(customers))
+  const serializedReviews = JSON.parse(JSON.stringify(reviews))
+
   const serializedSettings = siteSettings ? JSON.parse(JSON.stringify({
     ...siteSettings,
     shipping_inside: Number(siteSettings.shipping_inside),
@@ -87,6 +103,9 @@ export default async function AdminPage() {
       initialSettings={serializedSettings}
       initialBanners={serializedBanners}
       initialVariants={serializedVariants}
+      initialCoupons={serializedCoupons}
+      initialCustomers={serializedCustomers}
+      initialReviews={serializedReviews}
     />
   )
 }

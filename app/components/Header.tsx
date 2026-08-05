@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import { getUserSession } from '@/lib/auth'
 import CartCountBadge from './CartCountBadge'
 import MobileMenuClient from './MobileMenuClient'
 
@@ -22,6 +23,7 @@ async function getCategories() {
 export default async function Header() {
   const siteSettings = await getSettings()
   const rawCats = await getCategories()
+  const user = await getUserSession()
 
   const headerCats = rawCats.filter(c => !c.status || String(c.status) === 'active')
   const serializedCats = headerCats.map(c => ({ id: c.id, name: c.name }))
@@ -29,9 +31,26 @@ export default async function Header() {
   return (
     <>
       {/* Desktop Top Nav */}
-      <div className="hidden lg:flex bg-[#f5f5f5] text-[12px] px-[8%] py-[5px] justify-end gap-[20px] text-[#555]">
-        <Link href="#" className="hover:text-[#f85606]">CUSTOMER CARE</Link>
-        <Link href="/track-order" className="hover:text-[#f85606]">TRACK MY ORDER</Link>
+      <div className="hidden lg:flex bg-[#f5f5f5] text-[12px] px-[8%] py-[6px] justify-between items-center text-[#555] font-medium border-b border-gray-100">
+        <div className="flex items-center gap-4 text-xs text-gray-500">
+          <span>📞 {siteSettings?.phone || '+880 1700-000000'}</span>
+          <span>✉️ {siteSettings?.email || 'support@verusmart.com'}</span>
+        </div>
+        <div className="flex items-center gap-[20px]">
+          <Link href="/help-center" className="hover:text-[#f85606] transition-colors">CUSTOMER CARE</Link>
+          <Link href="/track-order" className="hover:text-[#f85606] transition-colors">TRACK MY ORDER</Link>
+          {user ? (
+            <Link href="/account" className="text-[#f85606] font-bold flex items-center gap-1.5 hover:underline">
+              <i className="fa-solid fa-user-check"></i> {user.full_name.split(' ')[0]}
+            </Link>
+          ) : (
+            <div className="flex items-center gap-2">
+              <Link href="/login" className="hover:text-[#f85606]">LOGIN</Link>
+              <span>/</span>
+              <Link href="/register" className="hover:text-[#f85606]">REGISTER</Link>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Main Header Desktop */}
@@ -42,14 +61,30 @@ export default async function Header() {
 
         <div className="flex-1 relative flex">
           <form action="/products" method="GET" className="w-full flex">
-            <input type="text" name="search" placeholder="Search in Verus Mart..." required className="w-full py-[12px] px-[20px] bg-[#eff0f5] border-none rounded-lg outline-none text-[14px]" />
-            <button type="submit" className="absolute right-0 top-0 h-full w-[50px] bg-[#ffe1d2] border-none rounded-r-lg text-[#f85606] cursor-pointer"><i className="fa fa-search"></i></button>
+            <input
+              type="text"
+              name="search"
+              placeholder="Search in Verus Mart..."
+              required
+              className="w-full py-[12px] px-[20px] bg-[#eff0f5] border-none rounded-lg outline-none text-[14px]"
+            />
+            <button
+              type="submit"
+              className="absolute right-0 top-0 h-full w-[50px] bg-[#ffe1d2] border-none rounded-r-lg text-[#f85606] cursor-pointer"
+            >
+              <i className="fa fa-search"></i>
+            </button>
           </form>
         </div>
 
         <div className="flex items-center gap-[20px]">
-          <Link href="/wishlist" className="text-[#444] text-[22px] relative"><i className="fa-regular fa-heart"></i></Link>
-          <Link href="/cart" className="text-[#444] text-[22px] relative">
+          <Link href="/wishlist" className="text-[#444] text-[22px] relative hover:text-[#f85606] transition-colors" title="Wishlist">
+            <i className="fa-regular fa-heart"></i>
+          </Link>
+          <Link href="/account" className="text-[#444] text-[22px] relative hover:text-[#f85606] transition-colors" title="My Account">
+            <i className="fa-regular fa-user"></i>
+          </Link>
+          <Link href="/cart" className="text-[#444] text-[22px] relative hover:text-[#f85606] transition-colors" title="Shopping Cart">
             <i className="fa-solid fa-cart-shopping"></i>
             <CartCountBadge />
           </Link>
@@ -62,7 +97,11 @@ export default async function Header() {
           <i className="fa-solid fa-list-ul"></i> Categories <i className="fa-solid fa-chevron-down text-[10px] text-[#888]"></i>
           <ul className="absolute top-[100%] left-0 w-[240px] bg-white shadow-[0_5px_15px_rgba(0,0,0,0.1)] hidden group-hover:block list-none z-[999] rounded-b-lg">
             {headerCats.map(cat => (
-              <li key={cat.id}><Link href={`/products?category=${cat.id}`} className="block py-[12px] px-[20px] text-[#333] text-[13px] border-b border-[#f5f5f5] hover:bg-[#fafafa] hover:text-[#f85606]">{cat.name}</Link></li>
+              <li key={cat.id}>
+                <Link href={`/products?category=${cat.id}`} className="block py-[12px] px-[20px] text-[#333] text-[13px] border-b border-[#f5f5f5] hover:bg-[#fafafa] hover:text-[#f85606]">
+                  {cat.name}
+                </Link>
+              </li>
             ))}
           </ul>
         </div>
@@ -77,7 +116,6 @@ export default async function Header() {
 
       {/* Mobile Header */}
       <div className="flex lg:hidden bg-white items-center justify-between border-b border-[#eee] sticky top-0 z-[1001] shadow-sm">
-        {/* Logo center, menu left, cart right */}
         <MobileMenuClient categories={serializedCats} />
         <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex items-center">
           <img src="/admin_uploads/logo.png" alt="VerusMart" className="h-[28px] w-auto object-contain" />

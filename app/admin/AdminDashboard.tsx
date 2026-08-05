@@ -14,7 +14,11 @@ import {
   updateCategory,
   deleteCategory,
   createBanner,
-  deleteBanner
+  deleteBanner,
+  createCoupon,
+  deleteCoupon,
+  updateReviewStatus,
+  deleteReview
 } from './actions'
 
 interface Product {
@@ -55,8 +59,10 @@ interface Banner {
 interface OrderItem {
   id: number
   product_name: string | null
+  variant_name?: string | null
   price: number
   quantity: number | null
+  subtotal?: number | null
   image: string | null
 }
 
@@ -68,6 +74,13 @@ interface Order {
   address: string | null
   order_note: string | null
   total_amount: number
+  subtotal?: number
+  shipping_fee?: number
+  discount_amount?: number
+  coupon_code?: string | null
+  tracking_number?: string | null
+  payment_method?: string | null
+  payment_status?: string | null
   status: string | null
   order_date: string | Date | null
   items: OrderItem[]
@@ -92,6 +105,37 @@ interface Variant {
   old_price: number
 }
 
+interface Coupon {
+  id: number
+  code: string
+  discount_type: string
+  discount_amount: number
+  min_order_amount: number
+  max_discount: number
+  usage_limit: number
+  used_count: number
+  expires_at: string | Date | null
+  status: string
+}
+
+interface Customer {
+  id: number
+  full_name: string
+  email: string
+  phone: string
+  created_at: string | Date | null
+}
+
+interface Review {
+  id: number
+  rating: number
+  comment: string | null
+  status: string
+  created_at: string | Date | null
+  product?: { name: string } | null
+  user?: { full_name: string } | null
+}
+
 interface AdminDashboardProps {
   isAuthenticated: boolean
   initialProducts: Product[]
@@ -100,6 +144,9 @@ interface AdminDashboardProps {
   initialSettings: Settings | null
   initialBanners: Banner[]
   initialVariants?: Variant[]
+  initialCoupons?: Coupon[]
+  initialCustomers?: Customer[]
+  initialReviews?: Review[]
 }
 
 export default function AdminDashboard({
@@ -109,19 +156,30 @@ export default function AdminDashboard({
   initialOrders,
   initialSettings,
   initialBanners,
-  initialVariants = []
+  initialVariants = [],
+  initialCoupons = [],
+  initialCustomers = [],
+  initialReviews = []
 }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'add-product' | 'categories' | 'marketing' | 'settings'>('dashboard')
+  const [activeTab, setActiveTab] = useState<
+    'dashboard' | 'products' | 'add-product' | 'categories' | 'coupons' | 'customers' | 'reviews' | 'marketing' | 'settings'
+  >('dashboard')
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [categories, setCategories] = useState<Category[]>(initialCategories)
   const [banners, setBanners] = useState<Banner[]>(initialBanners)
   const [orders, setOrders] = useState<Order[]>(initialOrders)
+  const [coupons, setCoupons] = useState<Coupon[]>(initialCoupons)
+  const [customers, setCustomers] = useState<Customer[]>(initialCustomers)
+  const [reviews, setReviews] = useState<Review[]>(initialReviews)
+
   const [editingProduct, setEditingProduct] = useState<Product | null>(null)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [variants, setVariants] = useState<Variant[]>(initialVariants)
   const [variantInputs, setVariantInputs] = useState<{ variant_name: string; price: string; old_price: string }[]>([])
   
-  // Transition states
+  const [invoiceOrder, setInvoiceOrder] = useState<Order | null>(null)
+  const [orderStatusFilter, setOrderStatusFilter] = useState<string>('all')
+
   const [isPending, startTransition] = useTransition()
   const [statusMsg, setStatusMsg] = useState({ type: '', text: '' })
 
@@ -130,200 +188,105 @@ export default function AdminDashboard({
     setTimeout(() => setStatusMsg({ type: '', text: '' }), 5000)
   }
 
-  // Auth: Login
+  // Auth Handlers
   const handleLoginSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = e.currentTarget
-    const formData = new FormData(form)
-
+    const formData = new FormData(e.currentTarget)
     startTransition(async () => {
       const res = await login(formData)
-      if (res.success) {
-        window.location.reload()
-      } else {
-        showMsg('error', res.error || 'Login failed.')
-      }
+      if (res.success) window.location.reload()
+      else showMsg('error', res.error || 'Login failed.')
     })
   }
 
-  // Auth: Logout
   const handleLogout = async () => {
     startTransition(async () => {
       const res = await logout()
-      if (res.success) {
-        window.location.reload()
-      } else {
-        showMsg('error', 'Logout failed.')
-      }
+      if (res.success) window.location.reload()
+      else showMsg('error', 'Logout failed.')
     })
   }
 
-  // Action: Reset all products
   const handleResetProducts = async () => {
     if (!confirm('CONFIRM RESET: This will remove all products and their configurations permanently. Proceed?')) return
-    
     startTransition(async () => {
       const res = await resetProducts()
       if (res.success) {
         setProducts([])
         showMsg('success', 'All products removed.')
-      } else {
-        showMsg('error', res.error || 'Failed to remove products.')
-      }
+      } else showMsg('error', res.error || 'Failed to remove products.')
     })
   }
 
-  // Action: Change Order Status
   const handleStatusChange = async (orderId: number, status: string) => {
     const res = await updateOrderStatus(orderId, status)
     if (res.success) {
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o))
       showMsg('success', `Order #${orderId} status set to ${status}.`)
-    } else {
-      showMsg('error', res.error || 'Failed to update status.')
-    }
+    } else showMsg('error', res.error || 'Failed to update status.')
   }
 
-  // Action: Save Store Settings
   const handleSaveSettings = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    const form = e.currentTarget
-    const formData = new FormData(form)
-
+    const formData = new FormData(e.currentTarget)
     startTransition(async () => {
       const res = await updateStoreSettings(formData)
       if (res.success) {
         showMsg('success', 'Settings updated.')
         setTimeout(() => window.location.reload(), 1000)
-      } else {
-        showMsg('error', res.error || 'Failed to save settings.')
-      }
+      } else showMsg('error', res.error || 'Failed to save settings.')
     })
   }
 
-  // Action: Save Product (Create or Update)
-  const handleSaveProduct = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreateCouponSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const form = e.currentTarget
     const formData = new FormData(form)
-
     startTransition(async () => {
-      let res
-      if (editingProduct) {
-        res = await updateProduct(editingProduct.id, formData)
-      } else {
-        res = await createProduct(formData)
-      }
-
+      const res = await createCoupon(formData)
       if (res.success) {
-        showMsg('success', editingProduct ? 'Product updated.' : 'Product created.')
-        setEditingProduct(null)
-        setActiveTab('products')
+        showMsg('success', 'Coupon code created.')
         form.reset()
-        setTimeout(() => window.location.reload(), 1000)
-      } else {
-        showMsg('error', res.error || 'Failed to save product.')
-      }
+        window.location.reload()
+      } else showMsg('error', res.error || 'Failed to create coupon.')
     })
   }
 
-  // Action: Delete Product
-  const handleDeleteProduct = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this item?')) return
-    
+  const handleDeleteCoupon = async (id: number) => {
+    if (!confirm('Delete this coupon?')) return
     startTransition(async () => {
-      const res = await deleteProduct(id)
+      const res = await deleteCoupon(id)
       if (res.success) {
-        setProducts(prev => prev.filter(p => p.id !== id))
-        showMsg('success', 'Product deleted.')
-      } else {
-        showMsg('error', res.error || 'Failed to delete product.')
-      }
+        setCoupons(prev => prev.filter(c => c.id !== id))
+        showMsg('success', 'Coupon deleted.')
+      } else showMsg('error', res.error || 'Failed to delete coupon.')
     })
   }
 
-  // Action: Save Category (Create or Update)
-  const handleSaveCategory = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.currentTarget
-    const formData = new FormData(form)
-
+  const handleReviewAction = async (id: number, action: 'approved' | 'rejected' | 'delete') => {
     startTransition(async () => {
-      let res
-      if (editingCategory) {
-        res = await updateCategory(editingCategory.id, formData)
+      if (action === 'delete') {
+        const res = await deleteReview(id)
+        if (res.success) setReviews(prev => prev.filter(r => r.id !== id))
       } else {
-        res = await createCategory(formData)
-      }
-
-      if (res.success) {
-        showMsg('success', editingCategory ? 'Category updated.' : 'Category created.')
-        setEditingCategory(null)
-        form.reset()
-        setTimeout(() => window.location.reload(), 1000)
-      } else {
-        showMsg('error', res.error || 'Failed to save category.')
+        const res = await updateReviewStatus(id, action)
+        if (res.success) setReviews(prev => prev.map(r => r.id === id ? { ...r, status: action } : r))
       }
     })
   }
 
-  // Action: Delete Category
-  const handleDeleteCategory = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this category? Products in this category will be unlinked.')) return
-    
-    startTransition(async () => {
-      const res = await deleteCategory(id)
-      if (res.success) {
-        setCategories(prev => prev.filter(c => c.id !== id))
-        showMsg('success', 'Category deleted.')
-      } else {
-        showMsg('error', res.error || 'Failed to delete category.')
-      }
-    })
-  }
-
-  // Action: Save Banner
-  const handleSaveBanner = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.currentTarget
-    const formData = new FormData(form)
-
-    startTransition(async () => {
-      const res = await createBanner(formData)
-      if (res.success) {
-        showMsg('success', 'Banner created successfully.')
-        form.reset()
-        setTimeout(() => window.location.reload(), 1000)
-      } else {
-        showMsg('error', res.error || 'Failed to create banner.')
-      }
-    })
-  }
-
-  // Action: Delete Banner
-  const handleDeleteBanner = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this banner?')) return
-    
-    startTransition(async () => {
-      const res = await deleteBanner(id)
-      if (res.success) {
-        setBanners(prev => prev.filter(b => b.id !== id))
-        showMsg('success', 'Banner deleted successfully.')
-      } else {
-        showMsg('error', res.error || 'Failed to delete banner.')
-      }
-    })
-  }
-
-  // Calculate Metrics
+  // Metrics
   const totalSales = orders
     .filter(o => o.status !== 'cancelled')
     .reduce((sum, o) => sum + o.total_amount, 0)
-  
   const pendingOrders = orders.filter(o => o.status === 'pending').length
   const completedOrders = orders.filter(o => o.status === 'completed' || o.status === 'delivered').length
 
-  // RENDERING 1: LOGIN COMPONENT (BRAND ACCENTED DESIGN)
+  const filteredOrders = orderStatusFilter === 'all' 
+    ? orders 
+    : orders.filter(o => (o.status || 'pending').toLowerCase() === orderStatusFilter)
+
+  // 1. UNAUTHENTICATED RENDER
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-[#eff0f5] text-black flex items-center justify-center font-sans px-4">
@@ -373,14 +336,13 @@ export default function AdminDashboard({
     )
   }
 
-  // RENDERING 2: SYSTEM DASHBOARD (SIDE-NAV & MULTI-VIEW)
+  // 2. MAIN ADMIN SYSTEM DASHBOARD
   return (
     <div className="min-h-screen bg-[#eff0f5] text-black flex font-sans">
       
-      {/* 2.1 Side Navigation */}
+      {/* Side Navigation */}
       <aside className="w-[260px] bg-[#002b5b] text-white flex flex-col justify-between shrink-0 min-h-screen border-r border-[#001c3d]">
         <div>
-          {/* Logo Brand Box */}
           <div className="p-6 border-b border-[#003d80] text-center bg-[#001f40]">
             <div className="bg-white p-3 rounded-xl flex items-center justify-center mb-3 shadow-md">
               <img src="/admin_uploads/logo.png" alt="VerusMart" className="h-[30px] w-auto object-contain" />
@@ -388,48 +350,33 @@ export default function AdminDashboard({
             <span className="text-[10px] text-blue-200 uppercase block tracking-widest font-black mt-1">Administration Panel</span>
           </div>
 
-          {/* Links list */}
-          <nav className="p-4 space-y-2">
-            <button 
-              onClick={() => { setActiveTab('dashboard'); setEditingProduct(null); setEditingCategory(null); }}
-              className={`w-full text-left p-3 text-xs uppercase tracking-wider font-bold transition-all rounded-lg border ${activeTab === 'dashboard' ? 'bg-[#f85606] text-white border-[#f85606] shadow-md' : 'text-blue-100 border-transparent hover:bg-[#003d80]'}`}
-            >
-              📊 DASHBOARD
-            </button>
-            <button 
-              onClick={() => { setActiveTab('products'); setEditingProduct(null); setEditingCategory(null); }}
-              className={`w-full text-left p-3 text-xs uppercase tracking-wider font-bold transition-all rounded-lg border ${activeTab === 'products' ? 'bg-[#f85606] text-white border-[#f85606] shadow-md' : 'text-blue-100 border-transparent hover:bg-[#003d80]'}`}
-            >
-              📦 ALL PRODUCTS
-            </button>
-            <button 
-              onClick={() => { setActiveTab('add-product'); setEditingProduct(null); setEditingCategory(null); }}
-              className={`w-full text-left p-3 text-xs uppercase tracking-wider font-bold transition-all rounded-lg border ${activeTab === 'add-product' ? 'bg-[#f85606] text-white border-[#f85606] shadow-md' : 'text-blue-100 border-transparent hover:bg-[#003d80]'}`}
-            >
-              ➕ ADD PRODUCT
-            </button>
-            <button 
-              onClick={() => { setActiveTab('categories'); setEditingProduct(null); setEditingCategory(null); }}
-              className={`w-full text-left p-3 text-xs uppercase tracking-wider font-bold transition-all rounded-lg border ${activeTab === 'categories' ? 'bg-[#f85606] text-white border-[#f85606] shadow-md' : 'text-blue-100 border-transparent hover:bg-[#003d80]'}`}
-            >
-              🏷 CATEGORIES
-            </button>
-            <button 
-              onClick={() => { setActiveTab('marketing'); setEditingProduct(null); setEditingCategory(null); }}
-              className={`w-full text-left p-3 text-xs uppercase tracking-wider font-bold transition-all rounded-lg border ${activeTab === 'marketing' ? 'bg-[#f85606] text-white border-[#f85606] shadow-md' : 'text-blue-100 border-transparent hover:bg-[#003d80]'}`}
-            >
-              ✨ MARKETING
-            </button>
-            <button 
-              onClick={() => { setActiveTab('settings'); setEditingProduct(null); setEditingCategory(null); }}
-              className={`w-full text-left p-3 text-xs uppercase tracking-wider font-bold transition-all rounded-lg border ${activeTab === 'settings' ? 'bg-[#f85606] text-white border-[#f85606] shadow-md' : 'text-blue-100 border-transparent hover:bg-[#003d80]'}`}
-            >
-              ⚙️ SETTINGS
-            </button>
+          <nav className="p-4 space-y-1.5">
+            {[
+              { id: 'dashboard', label: '📊 DASHBOARD' },
+              { id: 'products', label: '📦 PRODUCTS' },
+              { id: 'add-product', label: '➕ ADD PRODUCT' },
+              { id: 'categories', label: '🏷 CATEGORIES' },
+              { id: 'coupons', label: '🎟 COUPONS' },
+              { id: 'customers', label: '👥 CUSTOMERS' },
+              { id: 'reviews', label: '⭐ REVIEWS' },
+              { id: 'marketing', label: '✨ MARKETING' },
+              { id: 'settings', label: '⚙️ SETTINGS' },
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => { setActiveTab(tab.id as any); setEditingProduct(null); setEditingCategory(null); }}
+                className={`w-full text-left p-3 text-xs uppercase tracking-wider font-bold transition-all rounded-lg border ${
+                  activeTab === tab.id
+                    ? 'bg-[#f85606] text-white border-[#f85606] shadow-md'
+                    : 'text-blue-100 border-transparent hover:bg-[#003d80]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </nav>
         </div>
 
-        {/* Logout Bottom Trigger */}
         <div className="p-4 border-t border-[#003d80] bg-[#001f40]">
           <button 
             onClick={handleLogout}
@@ -440,104 +387,131 @@ export default function AdminDashboard({
         </div>
       </aside>
 
-      {/* 2.2 Main Dashboard Panel Container */}
+      {/* Main Content Area */}
       <main className="flex-1 min-w-0 flex flex-col bg-[#eff0f5]">
         
-        {/* Top Header Row */}
         <header className="border-b border-gray-200 p-6 flex justify-between items-center bg-white shadow-sm">
           <h1 className="text-sm font-black uppercase tracking-widest text-[#002b5b]">
-            SYSTEM // {activeTab} {editingProduct && '// EDIT_ITEM'}
+            SYSTEM // {activeTab.toUpperCase()}
           </h1>
-          {isPending && (
-            <span className="text-xs uppercase font-bold bg-[#f85606] text-white px-2.5 py-1 tracking-wider animate-pulse rounded-md">
-              [Syncing Database]
-            </span>
-          )}
+          <div className="flex items-center gap-3">
+            <span className="text-xs font-bold text-gray-500 uppercase">Status: <strong className="text-green-600">Online</strong></span>
+          </div>
         </header>
 
-        {/* Content Box */}
-        <div className="p-8 flex-1 space-y-8 max-w-[1200px] w-full mx-auto">
+        <div className="p-8 flex-1 overflow-y-auto space-y-8">
           
-          {/* Status Message */}
           {statusMsg.text && (
-            <div className={`p-4 text-xs font-bold uppercase rounded-xl border text-center shadow-sm ${statusMsg.type === 'success' ? 'bg-[#001f40] text-white border-[#002b5b]' : 'bg-red-50 text-red-700 border-red-200'}`}>
-              [STATUS] {statusMsg.text}
+            <div className={`p-4 text-xs uppercase tracking-wider font-bold rounded-xl border ${
+              statusMsg.type === 'success' ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
+            }`}>
+              {statusMsg.text}
             </div>
           )}
 
-          {/* TAB CONTENT: 1. DASHBOARD OVERVIEW */}
+          {/* TAB 1: DASHBOARD OVERVIEW & ORDERS */}
           {activeTab === 'dashboard' && (
-            <div className="space-y-8 animate-fade-in">
-              {/* KPIs Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 flex flex-col justify-between space-y-4">
-                  <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">SALES REVENUE</span>
-                  <span className="text-2xl font-black text-[#002b5b]">${totalSales.toFixed(2)}</span>
+            <div className="space-y-8">
+              
+              {/* Metrics Header */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                  <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider">Gross Sales</span>
+                  <div className="text-2xl font-black text-[#f85606] mt-2">৳{totalSales.toLocaleString('en-BD')}</div>
                 </div>
-                <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 flex flex-col justify-between space-y-4">
-                  <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">TOTAL INVOICES</span>
-                  <span className="text-2xl font-black text-[#002b5b]">{orders.length}</span>
+                <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                  <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider">Total Orders</span>
+                  <div className="text-2xl font-black text-[#002b5b] mt-2">{orders.length}</div>
                 </div>
-                <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 flex flex-col justify-between space-y-4">
-                  <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">PENDING PROCESS</span>
-                  <span className="text-2xl font-black text-amber-600">{pendingOrders}</span>
+                <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                  <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider">Pending Fulfillment</span>
+                  <div className="text-2xl font-black text-amber-600 mt-2">{pendingOrders}</div>
                 </div>
-                <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-6 flex flex-col justify-between space-y-4">
-                  <span className="text-[10px] text-neutral-500 font-bold uppercase tracking-wider">COMPLETED DISPATCH</span>
-                  <span className="text-2xl font-black text-green-600">{completedOrders}</span>
+                <div className="bg-white border border-gray-200 p-6 rounded-2xl shadow-sm">
+                  <span className="text-[10px] text-gray-400 font-black uppercase tracking-wider">Completed Orders</span>
+                  <div className="text-2xl font-black text-green-600 mt-2">{completedOrders}</div>
                 </div>
               </div>
 
-              {/* Recent Orders log */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white flex justify-between items-center">
-                  <h3 className="font-bold text-xs uppercase tracking-wider">INVOICE LOG FILE</h3>
-                  <span className="text-[10px] text-blue-200 font-bold uppercase">{orders.length} ITEMS TOTAL</span>
+              {/* Order Management Table */}
+              <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#001f40] text-white">
+                  <div>
+                    <h2 className="font-black text-sm uppercase tracking-wider">ORDERS MANAGEMENT</h2>
+                    <p className="text-[10px] text-blue-200 uppercase mt-0.5">Filter, update statuses, and print itemized customer invoices</p>
+                  </div>
+                  
+                  {/* Status Filter */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-blue-200 font-bold uppercase">Filter:</span>
+                    <select
+                      value={orderStatusFilter}
+                      onChange={e => setOrderStatusFilter(e.target.value)}
+                      className="bg-white text-[#002b5b] font-bold text-xs p-2 rounded-lg outline-none"
+                    >
+                      <option value="all">All Statuses ({orders.length})</option>
+                      <option value="pending">Pending</option>
+                      <option value="processing">Processing</option>
+                      <option value="shipped">Shipped</option>
+                      <option value="delivered">Delivered</option>
+                      <option value="cancelled">Cancelled</option>
+                    </select>
+                  </div>
                 </div>
+
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs font-sans">
-                    <thead className="bg-gray-50 border-b border-gray-200 text-gray-700 font-bold uppercase">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-gray-50 border-b border-gray-200 text-gray-700 font-extrabold uppercase">
                       <tr>
-                        <th className="p-4">INVOICE</th>
-                        <th className="p-4">BUYER INFO</th>
-                        <th className="p-4">DESTINATION</th>
-                        <th className="p-4">ITEMS LIST</th>
-                        <th className="p-4">TOTAL</th>
-                        <th className="p-4">STATUS</th>
+                        <th className="p-4">Order ID</th>
+                        <th className="p-4">Customer Info</th>
+                        <th className="p-4">Address</th>
+                        <th className="p-4">Items Purchased</th>
+                        <th className="p-4">Total Amount</th>
+                        <th className="p-4">Status</th>
+                        <th className="p-4 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
-                      {orders.length === 0 ? (
+                    <tbody className="divide-y divide-gray-100 bg-white">
+                      {filteredOrders.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="p-8 text-center text-neutral-400 uppercase tracking-widest font-bold">Log is empty. No purchase records.</td>
+                          <td colSpan={7} className="p-8 text-center text-gray-400 font-bold uppercase">No order records found.</td>
                         </tr>
                       ) : (
-                        orders.map(o => (
-                          <tr key={o.id} className="hover:bg-neutral-50 transition-colors">
-                            <td className="p-4 font-bold text-black">#{o.id}</td>
-                            <td className="p-4">
-                              <div className="font-bold text-black">{o.customer_name}</div>
-                              <div className="text-[10px] text-neutral-500">{o.phone || o.email}</div>
+                        filteredOrders.map(o => (
+                          <tr key={o.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="p-4 font-black text-[#002b5b]">
+                              #{o.id}
+                              <span className="block text-[10px] text-gray-400 font-normal">
+                                {o.order_date ? new Date(o.order_date).toLocaleDateString() : 'N/A'}
+                              </span>
                             </td>
-                            <td className="p-4 max-w-[200px] truncate text-neutral-500" title={o.address || ''}>
+                            <td className="p-4">
+                              <div className="font-bold text-gray-900">{o.customer_name}</div>
+                              <div className="text-[11px] text-gray-500">📞 {o.phone}</div>
+                              {o.email && <div className="text-[10px] text-gray-400">✉️ {o.email}</div>}
+                            </td>
+                            <td className="p-4 text-gray-600 max-w-[180px] truncate" title={o.address || ''}>
                               {o.address || 'N/A'}
                             </td>
-                            <td className="p-4 text-xs">
-                              <div className="space-y-1 text-[10px] text-neutral-600">
+                            <td className="p-4">
+                              <div className="space-y-1 text-[11px]">
                                 {o.items.map((item, idx) => (
-                                  <div key={idx}>
-                                    • <span className="font-semibold text-black">{item.product_name}</span> x {item.quantity} (${item.price.toFixed(2)})
+                                  <div key={idx} className="text-gray-800">
+                                    • <strong className="font-bold">{item.product_name}</strong> × {item.quantity} (৳{item.price.toLocaleString('en-BD')})
                                   </div>
                                 ))}
                               </div>
                             </td>
-                            <td className="p-4 font-black text-[#002b5b]">${o.total_amount.toFixed(2)}</td>
+                            <td className="p-4 font-black text-[#f85606]">
+                              ৳{o.total_amount.toLocaleString('en-BD')}
+                            </td>
                             <td className="p-4">
-                              <select 
-                                value={o.status || 'pending'} 
-                                onChange={(e) => handleStatusChange(o.id, e.target.value)}
-                                className={`p-2 border rounded-lg font-bold text-[10px] uppercase cursor-pointer bg-white outline-none ${
-                                  o.status === 'completed' || o.status === 'delivered'
+                              <select
+                                value={o.status || 'pending'}
+                                onChange={e => handleStatusChange(o.id, e.target.value)}
+                                className={`p-2 border rounded-xl font-black text-[10px] uppercase cursor-pointer outline-none ${
+                                  o.status === 'delivered' || o.status === 'completed'
                                     ? 'border-green-300 text-green-700 bg-green-50'
                                     : o.status === 'cancelled'
                                     ? 'border-red-300 text-red-700 bg-red-50'
@@ -546,117 +520,18 @@ export default function AdminDashboard({
                               >
                                 <option value="pending">Pending</option>
                                 <option value="processing">Processing</option>
+                                <option value="shipped">Shipped</option>
                                 <option value="delivered">Delivered</option>
-                                <option value="completed">Completed</option>
                                 <option value="cancelled">Cancelled</option>
                               </select>
                             </td>
-                          </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB CONTENT: 2. ALL PRODUCTS LIST */}
-          {activeTab === 'products' && (
-            <div className="space-y-8 animate-fade-in">
-              {/* Top Bar with Add Product CTA */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div>
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-[#002b5b]">CATALOG MANAGEMENT</h3>
-                  <p className="text-[10px] text-neutral-500 uppercase mt-0.5">Manage existing store items or create new ones</p>
-                </div>
-                <button 
-                  onClick={() => { setEditingProduct(null); setActiveTab('add-product'); }}
-                  className="bg-[#f85606] hover:bg-[#d04300] text-white font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer shadow-md flex items-center gap-2"
-                >
-                  <i className="fa-solid fa-plus"></i> ADD NEW PRODUCT
-                </button>
-              </div>
-
-              {/* Items List Table */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white flex justify-between items-center">
-                  <h3 className="font-bold text-xs uppercase tracking-wider">PRODUCT CATALOG LOG</h3>
-                  <span className="text-[10px] text-blue-200 font-bold uppercase">{products.length} PRODUCTS LISTED</span>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs font-sans">
-                    <thead className="bg-gray-50 border-b border-gray-200 text-gray-700 font-bold uppercase">
-                      <tr>
-                        <th className="p-4 w-[70px]">Image</th>
-                        <th className="p-4">Details</th>
-                        <th className="p-4">Price</th>
-                        <th className="p-4">Inventory</th>
-                        <th className="p-4">Badges</th>
-                        <th className="p-4 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 bg-white">
-                      {products.length === 0 ? (
-                        <tr>
-                          <td colSpan={6} className="p-8 text-center text-neutral-400 uppercase tracking-widest font-bold">Catalog file is empty.</td>
-                        </tr>
-                      ) : (
-                        products.map(p => (
-                          <tr key={p.id} className="hover:bg-neutral-50 transition-colors">
-                            <td className="p-4">
-                              <div className="w-[50px] h-[50px] bg-neutral-50 border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-                                {p.image ? (
-                                  <img src={`/admin_uploads/products/${p.image}`} alt={p.name} className="max-h-full max-w-full object-contain" />
-                                ) : (
-                                  <span className="text-[9px] text-neutral-400 uppercase font-bold">No Img</span>
-                                )}
-                              </div>
-                            </td>
-                            <td className="p-4">
-                              <div className="font-bold text-black">{p.name}</div>
-                              <div className="text-[10px] text-neutral-500 truncate max-w-[250px]">{p.description || 'No description'}</div>
-                            </td>
-                            <td className="p-4 font-bold text-black">
-                              ৳{p.price.toLocaleString('en-BD')}
-                              {p.old_price > 0 && <span className="text-[10px] text-neutral-400 line-through ml-1.5">৳{p.old_price.toLocaleString('en-BD')}</span>}
-                            </td>
-                            <td className="p-4 text-neutral-700">
-                              {p.stock !== null ? `${p.stock} (${p.unit || 'units'})` : 'N/A'}
-                            </td>
-                            <td className="p-4">
-                              <div className="flex flex-wrap gap-1">
-                                {p.is_recommended && <span className="border border-gray-300 text-neutral-700 text-[9px] font-bold px-1.5 py-0.5 uppercase rounded">Rec</span>}
-                                {p.is_featured && <span className="border border-gray-300 text-neutral-700 text-[9px] font-bold px-1.5 py-0.5 uppercase rounded">Feat</span>}
-                                {p.is_trending && <span className="border border-gray-300 text-neutral-700 text-[9px] font-bold px-1.5 py-0.5 uppercase rounded">Trend</span>}
-                                {p.is_best_seller && <span className="border border-gray-300 text-neutral-700 text-[9px] font-bold px-1.5 py-0.5 uppercase rounded">Best</span>}
-                                {p.is_weekday_deal && <span className="border border-gray-300 text-neutral-700 text-[9px] font-bold px-1.5 py-0.5 uppercase rounded">Week</span>}
-                              </div>
-                            </td>
                             <td className="p-4 text-right">
-                              <div className="flex gap-2 justify-end">
-                                <button 
-                                  onClick={() => {
-                                    setEditingProduct(p)
-                                    // Pre-populate variant inputs with existing variants for this product
-                                    const productVariants = variants.filter(v => v.product_id === p.id)
-                                    setVariantInputs(productVariants.map(v => ({
-                                      variant_name: v.variant_name,
-                                      price: String(v.price),
-                                      old_price: String(v.old_price || ''),
-                                    })))
-                                  }} 
-                                  className="bg-white hover:bg-neutral-50 border border-gray-300 text-neutral-700 font-bold text-[10px] py-1 px-3 rounded-lg uppercase transition-all cursor-pointer shadow-xs"
-                                >
-                                  Edit
-                                </button>
-                                <button 
-                                  onClick={() => handleDeleteProduct(p.id)} 
-                                  className="bg-red-600 hover:bg-red-700 text-white font-bold text-[10px] py-1 px-3 rounded-lg uppercase transition-all cursor-pointer"
-                                >
-                                  Delete
-                                </button>
-                              </div>
+                              <button
+                                onClick={() => setInvoiceOrder(o)}
+                                className="bg-gray-100 hover:bg-gray-200 text-gray-800 font-extrabold text-[11px] px-3 py-1.5 rounded-lg border border-gray-200 transition-all cursor-pointer inline-flex items-center gap-1.5"
+                              >
+                                🖨️ Print Invoice
+                              </button>
                             </td>
                           </tr>
                         ))
@@ -666,876 +541,164 @@ export default function AdminDashboard({
                 </div>
               </div>
 
-              {/* Wipe Button section */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl p-5 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div>
-                  <h3 className="font-bold text-xs uppercase tracking-wider text-red-600">DANGER ZONE</h3>
-                  <p className="text-[10px] text-neutral-500 uppercase mt-0.5">Wipe entire inventory catalog</p>
+            </div>
+          )}
+
+          {/* TAB: PRODUCTS */}
+          {activeTab === 'products' && (
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 space-y-6">
+              <div className="flex justify-between items-center border-b pb-4">
+                <h2 className="text-sm font-black text-[#002b5b] uppercase">Product Catalog ({products.length})</h2>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleResetProducts}
+                    className="bg-red-50 text-red-600 hover:bg-red-100 font-bold text-xs px-4 py-2 rounded-xl border border-red-200 cursor-pointer"
+                  >
+                    ⚠️ Reset All Products
+                  </button>
+                  <button
+                    onClick={() => { setEditingProduct(null); setActiveTab('add-product'); }}
+                    className="bg-[#f85606] text-white hover:bg-[#d04300] font-bold text-xs px-4 py-2 rounded-xl shadow-md cursor-pointer"
+                  >
+                    + Add New Product
+                  </button>
                 </div>
-                <button 
-                  onClick={handleResetProducts}
-                  className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer"
-                >
-                  [ RESET ENTIRE CATALOG ]
-                </button>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-gray-50 border-b text-gray-700 font-bold uppercase">
+                    <tr>
+                      <th className="p-3">Image</th>
+                      <th className="p-3">Name</th>
+                      <th className="p-3">Price</th>
+                      <th className="p-3">Stock</th>
+                      <th className="p-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {products.map(p => (
+                      <tr key={p.id} className="hover:bg-gray-50">
+                        <td className="p-3">
+                          <div className="w-12 h-12 bg-gray-50 border rounded-lg overflow-hidden flex items-center justify-center">
+                            {p.image ? <img src={`/admin_uploads/products/${p.image}`} alt={p.name} className="max-h-full max-w-full object-contain" /> : 'No Img'}
+                          </div>
+                        </td>
+                        <td className="p-3 font-bold text-gray-900">{p.name}</td>
+                        <td className="p-3 font-bold text-[#f85606]">৳{p.price.toLocaleString('en-BD')}</td>
+                        <td className="p-3 font-semibold text-gray-700">{p.stock ?? 0} {p.unit}</td>
+                        <td className="p-3 text-right space-x-2">
+                          <button
+                            onClick={async () => {
+                              if (confirm(`Delete "${p.name}"?`)) {
+                                const res = await deleteProduct(p.id)
+                                if (res.success) setProducts(prev => prev.filter(item => item.id !== p.id))
+                              }
+                            }}
+                            className="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-lg text-[10px]"
+                          >
+                            Delete
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
 
-          {/* EDIT PRODUCT MODAL OVERLAY */}
-          {editingProduct && (
-            <div className="fixed inset-0 z-[9999] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto animate-fade-in">
-              <div className="bg-white border border-gray-200 shadow-2xl rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto flex flex-col my-auto relative">
-                {/* Modal Header */}
-                <div className="p-4 sm:p-5 border-b border-gray-100 bg-[#001f40] text-white flex justify-between items-center sticky top-0 z-20">
+          {/* TAB: COUPONS */}
+          {activeTab === 'coupons' && (
+            <div className="space-y-8">
+              {/* Add Coupon Form */}
+              <div className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm">
+                <h3 className="text-sm font-black text-[#002b5b] uppercase tracking-wider mb-4">Create Discount Coupon</h3>
+                <form onSubmit={handleCreateCouponSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
-                    <h3 className="font-black text-xs sm:text-sm uppercase tracking-wider">EDIT CATALOG PRODUCT</h3>
-                    <p className="text-[10px] text-blue-200 uppercase font-mono mt-0.5">ID: {editingProduct.id} — {editingProduct.name}</p>
-                  </div>
-                  <button
-                    onClick={() => setEditingProduct(null)}
-                    className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold flex items-center justify-center transition-colors cursor-pointer text-xs"
-                  >
-                    ✕
-                  </button>
-                </div>
-
-                {/* Modal Form */}
-                <form onSubmit={handleSaveProduct} className="p-6 space-y-6 bg-white">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Item Name *</label>
-                      <input 
-                        type="text" 
-                        name="name" 
-                        defaultValue={editingProduct.name} 
-                        required 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="Item name"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Price (৳) *</label>
-                      <input 
-                        type="number" 
-                        step="0.01" 
-                        name="price" 
-                        defaultValue={editingProduct.price} 
-                        required 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Original Price (৳)</label>
-                      <input 
-                        type="number" 
-                        step="0.01" 
-                        name="oldPrice" 
-                        defaultValue={editingProduct.old_price || ''} 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Quantity in Stock</label>
-                      <input 
-                        type="number" 
-                        name="stock" 
-                        defaultValue={editingProduct.stock || 0} 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Unit (e.g. per lb)</label>
-                      <input 
-                        type="text" 
-                        name="unit" 
-                        defaultValue={editingProduct.unit || 'per lb'} 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Category</label>
-                      <select 
-                        name="categoryId" 
-                        defaultValue={editingProduct.category_id || ''}
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs bg-white font-mono"
-                      >
-                        <option value="">No Category</option>
-                        {initialCategories.map(c => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Product Description</label>
-                    <textarea 
-                      name="description" 
-                      defaultValue={editingProduct.description || ''} 
-                      rows={3}
-                      className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                      placeholder="Write descriptive specifications..."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">SEO Meta Title (Optional)</label>
-                      <input 
-                        type="text" 
-                        name="metaTitle" 
-                        defaultValue={(editingProduct as any)?.meta_title || ''} 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="Custom browser title"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">SEO Meta Description (Optional)</label>
-                      <input 
-                        type="text" 
-                        name="metaDescription" 
-                        defaultValue={(editingProduct as any)?.meta_description || ''} 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="Custom search snippet"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Replace Image (Optional)</label>
-                    <input 
-                      type="file" 
-                      name="image" 
-                      accept="image/*"
-                      className="border border-gray-300 rounded-lg p-2 text-xs bg-white font-mono"
-                    />
-                  </div>
-
-                  {/* Product Variants / Sizes Management */}
-                  <div className="border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Product Variants / Sizes (Optional)</span>
-                      <button
-                        type="button"
-                        onClick={() => setVariantInputs(prev => [...prev, { variant_name: '', price: '', old_price: '' }])}
-                        className="bg-[#002b5b] hover:bg-[#f85606] text-white font-bold text-[10px] uppercase px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                      >
-                        + Add Variant
-                      </button>
-                    </div>
-                    <p className="text-[10px] text-neutral-500 mb-3">Add size/option variants (e.g. Small, Medium, Large) with their own prices. Leave empty to use the base product price.</p>
-                    
-                    <input type="hidden" name="variants" value={JSON.stringify(variantInputs.filter(v => v.variant_name.trim()))} />
-                    
-                    {variantInputs.length === 0 ? (
-                      <div className="text-[10px] text-neutral-400 uppercase font-bold text-center py-3 border border-dashed border-gray-300 rounded-lg">
-                        No variants added. Product will use base price only.
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {variantInputs.map((v, idx) => (
-                          <div key={idx} className="grid grid-cols-1 sm:grid-cols-[1fr_120px_120px_40px] gap-2 items-center">
-                            <input
-                              type="text"
-                              placeholder="Variant name (e.g. Small)"
-                              value={v.variant_name}
-                              onChange={(e) => {
-                                const next = [...variantInputs]
-                                next[idx] = { ...next[idx], variant_name: e.target.value }
-                                setVariantInputs(next)
-                              }}
-                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
-                            />
-                            <input
-                              type="number"
-                              step="0.01"
-                              placeholder="Price"
-                              value={v.price}
-                              onChange={(e) => {
-                                const next = [...variantInputs]
-                                next[idx] = { ...next[idx], price: e.target.value }
-                                setVariantInputs(next)
-                              }}
-                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
-                            />
-                            <input
-                              type="number"
-                              step="0.01"
-                              placeholder="Old Price"
-                              value={v.old_price}
-                              onChange={(e) => {
-                                const next = [...variantInputs]
-                                next[idx] = { ...next[idx], old_price: e.target.value }
-                                setVariantInputs(next)
-                              }}
-                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setVariantInputs(prev => prev.filter((_, i) => i !== idx))}
-                              className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs w-8 h-8 rounded-lg transition-colors cursor-pointer"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="border border-gray-200 rounded-xl p-4">
-                    <span className="text-[10px] font-bold uppercase tracking-wider block mb-3 text-gray-700">Promotional Badges Configuration</span>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isRecommended" value="true" defaultChecked={editingProduct.is_recommended || false} className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Recommended
-                      </label>
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isFeatured" value="true" defaultChecked={editingProduct.is_featured || false} className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Featured
-                      </label>
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isTrending" value="true" defaultChecked={editingProduct.is_trending || false} className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Trending
-                      </label>
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isBestSeller" value="true" defaultChecked={editingProduct.is_best_seller || false} className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Best Seller
-                      </label>
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isWeekdayDeal" value="true" defaultChecked={editingProduct.is_weekday_deal || false} className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Weekday Deal
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 justify-end border-t border-gray-100 pt-4">
-                    <button 
-                      type="button" 
-                      onClick={() => setEditingProduct(null)} 
-                      className="border border-gray-300 hover:bg-neutral-50 font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="bg-[#f85606] hover:bg-[#d04300] text-white font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer shadow-md"
-                    >
-                      Save Changes
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* TAB CONTENT: 2.1 ADD NEW PRODUCT FORM */}
-          {activeTab === 'add-product' && (
-            <div className="space-y-8 animate-fade-in">
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white flex justify-between items-center">
-                  <h3 className="font-bold text-xs uppercase tracking-wider">
-                    CREATE NEW CATALOG PRODUCT
-                  </h3>
-                  <button
-                    onClick={() => { setEditingProduct(null); setActiveTab('products'); }}
-                    className="text-xs font-bold text-blue-200 hover:text-white uppercase"
-                  >
-                    ← Back to Products List
-                  </button>
-                </div>
-                <form onSubmit={handleSaveProduct} className="p-6 space-y-6 bg-white">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Item Name *</label>
-                      <input 
-                        type="text" 
-                        name="name" 
-                        required 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="Item name"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Price (৳) *</label>
-                      <input 
-                        type="number" 
-                        step="0.01" 
-                        name="price" 
-                        required 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Original Price (৳)</label>
-                      <input 
-                        type="number" 
-                        step="0.01" 
-                        name="oldPrice" 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Quantity in Stock</label>
-                      <input 
-                        type="number" 
-                        name="stock" 
-                        defaultValue={0} 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Unit (e.g. per lb)</label>
-                      <input 
-                        type="text" 
-                        name="unit" 
-                        defaultValue="per lb" 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Category</label>
-                      <select 
-                        name="categoryId" 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs bg-white font-mono"
-                      >
-                        <option value="">No Category</option>
-                        {initialCategories.map(c => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Product Description</label>
-                    <textarea 
-                      name="description" 
-                      rows={3}
-                      className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                      placeholder="Write descriptive specifications..."
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">SEO Meta Title (Optional)</label>
-                      <input 
-                        type="text" 
-                        name="metaTitle" 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="Custom browser title (defaults to Product Name)"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">SEO Meta Description (Optional)</label>
-                      <input 
-                        type="text" 
-                        name="metaDescription" 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="Custom search snippet (defaults to Product Description)"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Upload Product Image</label>
-                    <input 
-                      type="file" 
-                      name="image" 
-                      accept="image/*"
-                      className="border border-gray-300 rounded-lg p-2 text-xs bg-white font-mono"
-                    />
-                  </div>
-
-                  {/* Product Variants / Sizes Management */}
-                  <div className="border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Product Variants / Sizes (Optional)</span>
-                      <button
-                        type="button"
-                        onClick={() => setVariantInputs(prev => [...prev, { variant_name: '', price: '', old_price: '' }])}
-                        className="bg-[#002b5b] hover:bg-[#f85606] text-white font-bold text-[10px] uppercase px-3 py-1.5 rounded-lg transition-colors cursor-pointer"
-                      >
-                        + Add Variant
-                      </button>
-                    </div>
-                    <p className="text-[10px] text-neutral-500 mb-3">Add size/option variants (e.g. Small, Medium, Large) with their own prices. Leave empty to use the base product price.</p>
-                    
-                    <input type="hidden" name="variants" value={JSON.stringify(variantInputs.filter(v => v.variant_name.trim()))} />
-                    
-                    {variantInputs.length === 0 ? (
-                      <div className="text-[10px] text-neutral-400 uppercase font-bold text-center py-3 border border-dashed border-gray-300 rounded-lg">
-                        No variants added. Product will use base price only.
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {variantInputs.map((v, idx) => (
-                          <div key={idx} className="grid grid-cols-1 sm:grid-cols-[1fr_120px_120px_40px] gap-2 items-center">
-                            <input
-                              type="text"
-                              placeholder="Variant name (e.g. Small)"
-                              value={v.variant_name}
-                              onChange={(e) => {
-                                const next = [...variantInputs]
-                                next[idx] = { ...next[idx], variant_name: e.target.value }
-                                setVariantInputs(next)
-                              }}
-                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
-                            />
-                            <input
-                              type="number"
-                              step="0.01"
-                              placeholder="Price"
-                              value={v.price}
-                              onChange={(e) => {
-                                const next = [...variantInputs]
-                                next[idx] = { ...next[idx], price: e.target.value }
-                                setVariantInputs(next)
-                              }}
-                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
-                            />
-                            <input
-                              type="number"
-                              step="0.01"
-                              placeholder="Old Price"
-                              value={v.old_price}
-                              onChange={(e) => {
-                                const next = [...variantInputs]
-                                next[idx] = { ...next[idx], old_price: e.target.value }
-                                setVariantInputs(next)
-                              }}
-                              className="border border-gray-300 rounded-lg p-2 text-xs font-mono outline-none focus:ring-2 focus:ring-[#f85606]"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setVariantInputs(prev => prev.filter((_, i) => i !== idx))}
-                              className="bg-red-600 hover:bg-red-700 text-white font-bold text-xs w-8 h-8 rounded-lg transition-colors cursor-pointer"
-                            >
-                              ✕
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="border border-gray-200 rounded-xl p-4">
-                    <span className="text-[10px] font-bold uppercase tracking-wider block mb-3 text-gray-700">Promotional Badges Configuration</span>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isRecommended" value="true" className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Recommended
-                      </label>
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isFeatured" value="true" className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Featured
-                      </label>
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isTrending" value="true" className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Trending
-                      </label>
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isBestSeller" value="true" className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Best Seller
-                      </label>
-                      <label className="flex items-center gap-2 text-[10px] uppercase font-bold cursor-pointer text-gray-700">
-                        <input type="checkbox" name="isWeekdayDeal" value="true" className="w-3.5 h-3.5 accent-[#f85606]" />
-                        Weekday Deal
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 justify-end border-t border-gray-100 pt-4">
-                    <button 
-                      type="button" 
-                      onClick={() => setActiveTab('products')} 
-                      className="border border-gray-300 hover:bg-neutral-50 font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button 
-                      type="submit" 
-                      className="bg-[#002b5b] hover:bg-[#f85606] text-white font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer shadow-md"
-                    >
-                      Create Item
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
-
-          {/* TAB CONTENT: 3. SETTINGS */}
-          {activeTab === 'settings' && (
-            <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-              <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white">
-                <h3 className="font-bold text-xs uppercase tracking-wider">SYSTEM REGISTRY SETTINGS</h3>
-              </div>
-              <form onSubmit={handleSaveSettings} className="p-6 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Company / Store Name</label>
-                    <input 
-                      type="text" 
-                      name="companyName" 
-                      defaultValue={initialSettings?.company_name || 'Verus Mart'} 
-                      required 
-                      className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Update Store Logo File</label>
-                    <input 
-                      type="file" 
-                      name="logo" 
-                      accept="image/*"
-                      className="border border-gray-300 rounded-lg p-2 text-xs bg-white font-mono"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Support Telephone</label>
-                    <input 
-                      type="text" 
-                      name="phone" 
-                      defaultValue={initialSettings?.phone || ''} 
-                      className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Support Email Address</label>
-                    <input 
-                      type="email" 
-                      name="email" 
-                      defaultValue={initialSettings?.email || ''} 
-                      className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Courier Shipping Inside Dhaka ($)</label>
-                    <input 
-                      type="number" 
-                      step="0.01" 
-                      name="shippingInside" 
-                      defaultValue={initialSettings?.shipping_inside || 60.00} 
-                      className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                    />
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Courier Shipping Outside Dhaka ($)</label>
-                    <input 
-                      type="number" 
-                      step="0.01" 
-                      name="shippingOutside" 
-                      defaultValue={initialSettings?.shipping_outside || 120.00} 
-                      className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex flex-col space-y-1.5">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Physical Office Location Address</label>
-                  <textarea 
-                    name="address" 
-                    defaultValue={initialSettings?.address || ''} 
-                    rows={3}
-                    className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                  />
-                </div>
-
-                <div className="flex justify-end border-t border-gray-100 pt-4">
-                  <button 
-                    type="submit" 
-                    className="bg-[#002b5b] hover:bg-[#f85606] text-white font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer shadow-md"
-                  >
-                    Save Settings
-                  </button>
-                </div>
-              </form>
-            </div>
-          )}
-
-          {/* TAB CONTENT: 4. CATEGORIES */}
-          {activeTab === 'categories' && (
-            <div className="space-y-8 animate-fade-in">
-              {/* Add / Edit Category Form */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white">
-                  <h3 className="font-bold text-xs uppercase tracking-wider">
-                    {editingCategory ? `EDIT CATEGORY // ID: ${editingCategory.id}` : 'NEW CATEGORY'}
-                  </h3>
-                </div>
-                <form onSubmit={handleSaveCategory} className="p-6 space-y-6 bg-white">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Category Name *</label>
-                      <input 
-                        type="text" 
-                        name="name" 
-                        defaultValue={editingCategory?.name || ''} 
-                        required 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="e.g. Fresh Produce"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Priority Order</label>
-                      <input 
-                        type="number" 
-                        name="priority" 
-                        defaultValue={editingCategory?.priority || 0} 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Status</label>
-                      <select 
-                        name="status" 
-                        defaultValue={editingCategory?.status || 'active'}
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs bg-white font-mono"
-                      >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Category Icon/Thumbnail Image</label>
-                      <input 
-                        type="file" 
-                        name="image" 
-                        accept="image/*"
-                        className="border border-gray-300 rounded-lg p-2 text-xs bg-white font-mono"
-                      />
-                      {editingCategory?.image && (
-                        <div className="text-[10px] text-gray-500 mt-1">Current Icon: {editingCategory.image}</div>
-                      )}
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Category Banner (Used for Homepage Promo slots)</label>
-                      <input 
-                        type="file" 
-                        name="banner" 
-                        accept="image/*"
-                        className="border border-gray-300 rounded-lg p-2 text-xs bg-white font-mono"
-                      />
-                      {editingCategory?.banner && (
-                        <div className="text-[10px] text-gray-500 mt-1">Current Banner: {editingCategory.banner}</div>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 justify-end border-t border-gray-100 pt-4">
-                    {editingCategory && (
-                      <button 
-                        type="button" 
-                        onClick={() => setEditingCategory(null)} 
-                        className="border border-gray-300 hover:bg-neutral-50 font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer"
-                      >
-                        Cancel
-                      </button>
-                    )}
-                    <button 
-                      type="submit" 
-                      className="bg-[#002b5b] hover:bg-[#f85606] text-white font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer shadow-md"
-                    >
-                      {editingCategory ? 'Update Category' : 'Create Category'}
-                    </button>
-                  </div>
-                </form>
-              </div>
-
-              {/* Category Table */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white flex justify-between items-center">
-                  <h3 className="font-bold text-xs uppercase tracking-wider">EXISTING CATEGORIES</h3>
-                  <span className="text-[10px] text-blue-200 font-bold uppercase">{categories.length} ITEMS TOTAL</span>
-                </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs font-sans">
-                    <thead className="bg-gray-50 border-b border-gray-200 text-gray-700 font-bold uppercase">
-                      <tr>
-                        <th className="p-4 w-[60px]">Icon</th>
-                        <th className="p-4 w-[160px]">Banner Promo</th>
-                        <th className="p-4">Category Name</th>
-                        <th className="p-4">Priority</th>
-                        <th className="p-4">Status</th>
-                        <th className="p-4 text-right">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
-                      {categories.map(c => (
-                        <tr key={c.id} className="hover:bg-neutral-50 transition-colors">
-                          <td className="p-4">
-                            <div className="w-[40px] h-[40px] bg-neutral-50 border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-                              {c.image ? (
-                                <img src={`/admin_uploads/category/${c.image}`} alt={c.name} className="max-h-full max-w-full object-contain" />
-                              ) : (
-                                <span className="text-[8px] text-neutral-400 uppercase font-bold">No Icon</span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <div className="w-[120px] h-[45px] bg-neutral-50 border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-                              {c.banner ? (
-                                <img src={`/admin_uploads/category/${c.banner}`} alt="Banner" className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-[8px] text-neutral-400 uppercase font-bold">No Promo Banner</span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="p-4 font-bold text-black">{c.name}</td>
-                          <td className="p-4">{c.priority || 0}</td>
-                          <td className="p-4">
-                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${c.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                              {c.status}
-                            </span>
-                          </td>
-                          <td className="p-4 text-right">
-                            <div className="flex gap-2 justify-end">
-                              <button 
-                                onClick={() => {
-                                  setEditingCategory(c)
-                                  window.scrollTo({ top: 0, behavior: 'smooth' })
-                                }} 
-                                className="bg-white hover:bg-neutral-50 border border-gray-300 text-neutral-700 font-bold text-[10px] py-1 px-3 rounded-lg uppercase transition-all cursor-pointer"
-                              >
-                                Edit
-                              </button>
-                              <button 
-                                onClick={() => handleDeleteCategory(c.id)} 
-                                className="bg-red-600 hover:bg-red-700 text-white font-bold text-[10px] py-1 px-3 rounded-lg uppercase transition-all cursor-pointer"
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* TAB CONTENT: 5. MARKETING BANNERS & PROMOS */}
-          {activeTab === 'marketing' && (
-            <div className="space-y-8 animate-fade-in">
-              {/* Homepage Slider Banners */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white">
-                  <h3 className="font-bold text-xs uppercase tracking-wider">NEW HOMEPAGE BANNER</h3>
-                </div>
-                <form onSubmit={handleSaveBanner} className="p-6 space-y-6 bg-white">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Banner Title / Hook</label>
-                      <input 
-                        type="text" 
-                        name="title" 
-                        required 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs font-mono"
-                        placeholder="e.g. Summer Mega Sale"
-                      />
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Display Position</label>
-                      <select 
-                        name="position" 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs bg-white font-mono"
-                      >
-                        <option value="main">Main Slider Banner</option>
-                        <option value="side_top">Side Top Banner Slot</option>
-                        <option value="side_bottom">Side Bottom Banner Slot</option>
-                      </select>
-                    </div>
-                    <div className="flex flex-col space-y-1.5">
-                      <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Status</label>
-                      <select 
-                        name="status" 
-                        className="border border-gray-300 rounded-lg p-2.5 outline-none focus:ring-2 focus:ring-[#f85606] text-xs bg-white font-mono"
-                      >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col space-y-1.5">
-                    <label className="text-[10px] font-bold uppercase tracking-wider text-gray-700">Select Banner Image File *</label>
-                    <input 
-                      type="file" 
-                      name="image" 
-                      accept="image/*"
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Coupon Code</label>
+                    <input
+                      name="code"
                       required
-                      className="border border-gray-300 rounded-lg p-2 text-xs bg-white font-mono"
+                      placeholder="e.g. SUMMER20"
+                      className="w-full border p-2.5 rounded-xl text-xs uppercase font-bold outline-none focus:border-[#f85606]"
                     />
                   </div>
-
-                  <div className="flex justify-end border-t border-gray-100 pt-4">
-                    <button 
-                      type="submit" 
-                      className="bg-[#002b5b] hover:bg-[#f85606] text-white font-bold text-xs uppercase tracking-wider py-2.5 px-6 rounded-lg transition-colors cursor-pointer shadow-md"
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Discount Type</label>
+                    <select name="discount_type" className="w-full border p-2.5 rounded-xl text-xs font-semibold outline-none">
+                      <option value="percentage">Percentage (%)</option>
+                      <option value="fixed">Fixed Amount (৳)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Discount Value</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="discount_amount"
+                      required
+                      placeholder="e.g. 15 or 100"
+                      className="w-full border p-2.5 rounded-xl text-xs font-semibold outline-none focus:border-[#f85606]"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Min Order Amount (৳)</label>
+                    <input
+                      type="number"
+                      name="min_order_amount"
+                      placeholder="0"
+                      className="w-full border p-2.5 rounded-xl text-xs font-semibold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Usage Limit</label>
+                    <input
+                      type="number"
+                      name="usage_limit"
+                      defaultValue="100"
+                      className="w-full border p-2.5 rounded-xl text-xs font-semibold outline-none"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      type="submit"
+                      disabled={isPending}
+                      className="w-full bg-[#f85606] hover:bg-[#d04300] text-white font-bold text-xs py-3 rounded-xl shadow-md cursor-pointer"
                     >
-                      Publish Banner
+                      Create Coupon Code
                     </button>
                   </div>
                 </form>
               </div>
 
-              {/* Banner list table */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white flex justify-between items-center">
-                  <h3 className="font-bold text-xs uppercase tracking-wider">HOMEPAGE BANNER REGISTRY</h3>
-                  <span className="text-[10px] text-blue-200 font-bold uppercase">{banners.length} BANNERS</span>
-                </div>
+              {/* Coupons List */}
+              <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+                <h3 className="text-sm font-black text-[#002b5b] uppercase tracking-wider mb-4">Active Store Coupons ({coupons.length})</h3>
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs font-sans">
-                    <thead className="bg-gray-50 border-b border-gray-200 text-gray-700 font-bold uppercase">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-gray-50 border-b text-gray-700 font-bold uppercase">
                       <tr>
-                        <th className="p-4 w-[160px]">Banner Graphic</th>
-                        <th className="p-4">Title / Name</th>
-                        <th className="p-4">Position</th>
-                        <th className="p-4">Status</th>
-                        <th className="p-4 text-right">Action</th>
+                        <th className="p-3">Code</th>
+                        <th className="p-3">Type</th>
+                        <th className="p-3">Discount</th>
+                        <th className="p-3">Used / Limit</th>
+                        <th className="p-3 text-right">Actions</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100 bg-white text-gray-700">
-                      {banners.map(b => (
-                        <tr key={b.id} className="hover:bg-neutral-50 transition-colors">
-                          <td className="p-4">
-                            <div className="w-[120px] h-[55px] bg-neutral-50 border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-                              <img src={`/admin_uploads/banners/${b.image}`} alt="Banner" className="w-full h-full object-cover" />
-                            </div>
+                    <tbody className="divide-y divide-gray-100">
+                      {coupons.map(c => (
+                        <tr key={c.id} className="hover:bg-gray-50">
+                          <td className="p-3 font-black text-[#002b5b] uppercase">{c.code}</td>
+                          <td className="p-3 font-semibold text-gray-700">{c.discount_type}</td>
+                          <td className="p-3 font-bold text-[#f85606]">
+                            {c.discount_type === 'percentage' ? `${c.discount_amount}%` : `৳${c.discount_amount}`}
                           </td>
-                          <td className="p-4 font-bold text-black">{b.title || 'Untitled Banner'}</td>
-                          <td className="p-4">
-                            <span className="bg-gray-100 border border-gray-200 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-                              {b.position || 'main'}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${b.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                              {b.status}
-                            </span>
-                          </td>
-                          <td className="p-4 text-right">
-                            <button 
-                              onClick={() => handleDeleteBanner(b.id)} 
-                              className="bg-red-600 hover:bg-red-700 text-white font-bold text-[10px] py-1 px-3 rounded-lg uppercase transition-all cursor-pointer"
+                          <td className="p-3 text-gray-600">{c.used_count || 0} / {c.usage_limit || '∞'}</td>
+                          <td className="p-3 text-right">
+                            <button
+                              onClick={() => handleDeleteCoupon(c.id)}
+                              className="bg-red-100 text-red-700 font-bold px-3 py-1 rounded-lg text-[10px]"
                             >
                               Delete
                             </button>
@@ -1546,52 +709,215 @@ export default function AdminDashboard({
                   </table>
                 </div>
               </div>
+            </div>
+          )}
 
-              {/* Special Offers Section */}
-              <div className="bg-white border border-gray-200 shadow-sm rounded-xl overflow-hidden">
-                <div className="p-4 border-b border-gray-100 bg-[#001f40] text-white">
-                  <h3 className="font-bold text-xs uppercase tracking-wider">HOMEPAGE SPECIAL OFFERS SLOTS</h3>
-                </div>
-                <div className="p-6">
-                  <p className="text-xs text-neutral-500 mb-4 uppercase font-bold">
-                    The homepage layout reserves 4 slots (Category IDs 17, 18, 19, 20) to showcase Special Offers. Edit them below to configure what gets displayed.
-                  </p>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {categories
-                      .filter(c => [17, 18, 19, 20].includes(c.id))
-                      .map((c, idx) => (
-                        <div key={c.id} className="border border-gray-200 p-4 rounded-xl flex items-center justify-between bg-neutral-50">
-                          <div>
-                            <span className="text-[10px] font-bold text-[#f85606] block">SLOT #{idx + 1} (Category ID: {c.id})</span>
-                            <span className="text-sm font-bold text-[#002b5b]">{c.name}</span>
-                            <div className="mt-2 w-[120px] h-[50px] bg-white border border-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
-                              {c.banner ? (
-                                <img src={`/admin_uploads/category/${c.banner}`} alt="Offer banner" className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-[8px] text-neutral-400 font-bold uppercase">No Banner</span>
-                              )}
-                            </div>
-                          </div>
-                          <button 
-                            onClick={() => {
-                              setEditingCategory(c)
-                              setActiveTab('categories')
-                              window.scrollTo({ top: 0, behavior: 'smooth' })
-                            }}
-                            className="bg-white hover:bg-neutral-50 border border-gray-300 text-neutral-700 font-bold text-xs uppercase py-2 px-4 rounded-lg cursor-pointer"
-                          >
-                            Configure Slot
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-                </div>
+          {/* TAB: CUSTOMERS */}
+          {activeTab === 'customers' && (
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h3 className="text-sm font-black text-[#002b5b] uppercase tracking-wider mb-4">Registered Customers ({customers.length})</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs">
+                  <thead className="bg-gray-50 border-b text-gray-700 font-bold uppercase">
+                    <tr>
+                      <th className="p-3">Customer ID</th>
+                      <th className="p-3">Full Name</th>
+                      <th className="p-3">Email Address</th>
+                      <th className="p-3">Phone Number</th>
+                      <th className="p-3">Joined Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {customers.map(c => (
+                      <tr key={c.id} className="hover:bg-gray-50">
+                        <td className="p-3 font-black text-[#002b5b]">#{c.id}</td>
+                        <td className="p-3 font-bold text-gray-900">{c.full_name}</td>
+                        <td className="p-3 text-gray-600">{c.email}</td>
+                        <td className="p-3 font-semibold text-gray-800">{c.phone}</td>
+                        <td className="p-3 text-gray-400">
+                          {c.created_at ? new Date(c.created_at).toLocaleDateString() : 'N/A'}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
+
+          {/* TAB: REVIEWS */}
+          {activeTab === 'reviews' && (
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h3 className="text-sm font-black text-[#002b5b] uppercase tracking-wider mb-4">Product Reviews Moderation</h3>
+              <div className="space-y-4">
+                {reviews.length === 0 ? (
+                  <p className="text-xs text-gray-400 font-bold">No product reviews submitted yet.</p>
+                ) : (
+                  reviews.map(r => (
+                    <div key={r.id} className="border p-4 rounded-xl flex justify-between items-center bg-gray-50">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs text-gray-900">{r.user?.full_name || 'Customer'}</span>
+                          <span className="text-amber-500 font-black text-xs">{"★".repeat(r.rating)}</span>
+                        </div>
+                        <p className="text-xs text-gray-700 mt-1">{r.comment}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleReviewAction(r.id, 'approved')}
+                          className="bg-green-100 text-green-700 font-bold text-[10px] px-3 py-1 rounded-lg"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReviewAction(r.id, 'delete')}
+                          className="bg-red-100 text-red-700 font-bold text-[10px] px-3 py-1 rounded-lg"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: SETTINGS */}
+          {activeTab === 'settings' && (
+            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+              <h3 className="text-sm font-black text-[#002b5b] uppercase tracking-wider mb-4">Store Business Settings</h3>
+              <form onSubmit={handleSaveSettings} className="space-y-4 max-w-xl">
+                <div>
+                  <label className="text-xs font-bold text-gray-700 block mb-1">Company Name</label>
+                  <input
+                    name="companyName"
+                    defaultValue={initialSettings?.company_name || 'Verus Mart'}
+                    className="w-full border p-2.5 rounded-xl text-xs font-bold outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-700 block mb-1">Store Phone</label>
+                  <input
+                    name="phone"
+                    defaultValue={initialSettings?.phone || ''}
+                    className="w-full border p-2.5 rounded-xl text-xs font-bold outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-700 block mb-1">Store Email</label>
+                  <input
+                    name="email"
+                    defaultValue={initialSettings?.email || ''}
+                    className="w-full border p-2.5 rounded-xl text-xs font-bold outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-gray-700 block mb-1">Inside City Shipping Fee (৳)</label>
+                  <input
+                    name="shippingInside"
+                    defaultValue={initialSettings?.shipping_inside || 60}
+                    className="w-full border p-2.5 rounded-xl text-xs font-bold outline-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isPending}
+                  className="bg-[#f85606] text-white font-bold text-xs py-3 px-6 rounded-xl shadow-md cursor-pointer"
+                >
+                  Save Store Settings
+                </button>
+              </form>
+            </div>
+          )}
+
         </div>
       </main>
+
+      {/* PRINT INVOICE MODAL */}
+      {invoiceOrder && (
+        <div className="fixed inset-0 bg-black/60 z-[9999] flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-2xl w-full p-8 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center border-b pb-4">
+              <div>
+                <h2 className="text-xl font-black text-[#002b5b]">Verus Mart Official Invoice</h2>
+                <p className="text-xs text-gray-400">Order Reference: #{invoiceOrder.id}</p>
+              </div>
+              <button
+                onClick={() => setInvoiceOrder(null)}
+                className="text-gray-400 hover:text-gray-700 font-bold text-lg cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 text-xs space-y-1">
+              <div>
+                <strong className="text-gray-800 block">Customer Information:</strong>
+                <p>{invoiceOrder.customer_name}</p>
+                <p>Phone: {invoiceOrder.phone}</p>
+                <p>Address: {invoiceOrder.address}</p>
+              </div>
+              <div className="text-right">
+                <strong className="text-gray-800 block">Order Summary:</strong>
+                <p>Tracking: {invoiceOrder.tracking_number || `VM-${invoiceOrder.id}`}</p>
+                <p>Date: {invoiceOrder.order_date ? new Date(invoiceOrder.order_date).toLocaleDateString() : 'N/A'}</p>
+                <p>Payment: {invoiceOrder.payment_method?.toUpperCase()}</p>
+              </div>
+            </div>
+
+            <table className="w-full text-left text-xs border-t border-b">
+              <thead>
+                <tr className="bg-gray-50 text-gray-700 font-bold uppercase">
+                  <th className="py-2">Item</th>
+                  <th className="py-2">Qty</th>
+                  <th className="py-2">Price</th>
+                  <th className="py-2 text-right">Total</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {invoiceOrder.items.map((item, idx) => (
+                  <tr key={idx}>
+                    <td className="py-2 font-bold">{item.product_name}</td>
+                    <td className="py-2">{item.quantity}</td>
+                    <td className="py-2">৳{item.price.toLocaleString('en-BD')}</td>
+                    <td className="py-2 text-right font-bold">
+                      ৳{((item.quantity || 1) * item.price).toLocaleString('en-BD')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            <div className="text-right text-xs space-y-1 font-bold">
+              <p className="text-gray-600">Subtotal: ৳{(invoiceOrder.subtotal || invoiceOrder.total_amount).toLocaleString('en-BD')}</p>
+              <p className="text-gray-600">Shipping Fee: ৳{(invoiceOrder.shipping_fee || 0).toLocaleString('en-BD')}</p>
+              {Number(invoiceOrder.discount_amount) > 0 && (
+                <p className="text-green-600">Discount: -৳{invoiceOrder.discount_amount?.toLocaleString('en-BD')}</p>
+              )}
+              <p className="text-lg font-black text-[#f85606] border-t pt-2">
+                Grand Total: ৳{invoiceOrder.total_amount.toLocaleString('en-BD')}
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-3 pt-4 border-t">
+              <button
+                onClick={() => window.print()}
+                className="bg-[#002b5b] text-white text-xs font-bold py-2.5 px-5 rounded-xl cursor-pointer"
+              >
+                🖨️ Print Now
+              </button>
+              <button
+                onClick={() => setInvoiceOrder(null)}
+                className="bg-gray-200 text-gray-700 text-xs font-bold py-2.5 px-5 rounded-xl cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }

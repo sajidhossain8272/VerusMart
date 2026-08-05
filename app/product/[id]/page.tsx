@@ -4,6 +4,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import ProductActions from './ProductActions'
 import AddToCartBtn from '@/app/products/AddToCartBtn'
+import ReviewSection from './ReviewSection'
 
 export const dynamic = 'force-dynamic'
 
@@ -60,28 +61,17 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
     return notFound()
   }
 
-  const cat = product.category_id ? await prisma.categories.findUnique({
-    where: { id: product.category_id }
-  }) : null
-
-  const variants = await prisma.product_variants.findMany({
-    where: { product_id: productId },
-    orderBy: { id: 'asc' }
-  })
-
-  const related = await prisma.products.findMany({
-    where: { 
-      category_id: product.category_id ?? undefined, 
-      id: { not: productId } 
-    },
-    take: 4
-  })
+  const [cat, variants, related, reviews] = await Promise.all([
+    product.category_id ? prisma.categories.findUnique({ where: { id: product.category_id } }).catch(() => null) : Promise.resolve(null),
+    prisma.product_variants.findMany({ where: { product_id: productId }, orderBy: { id: 'asc' } }).catch(() => []),
+    prisma.products.findMany({ where: { category_id: product.category_id ?? undefined, id: { not: productId } }, take: 4 }).catch(() => []),
+    prisma.reviews.findMany({ where: { product_id: productId, status: 'approved' }, include: { user: true }, orderBy: { id: 'desc' } }).catch(() => [])
+  ])
 
   const defaultPrice = Number(product.price || variants[0]?.price || 0)
   const defaultOldPrice = Number(product.old_price || variants[0]?.old_price || 0)
   const defaultVName = variants[0]?.variant_name || 'Regular'
 
-  // Clean script tags and event handlers if present
   const cleanDescription = (product.description || '')
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
@@ -90,7 +80,6 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
     .replace(/on\w+\s*=\s*["'][^"']*["']/gi, '')
     .replace(/javascript:/gi, '')
 
-  // Serialize variants for client component
   const serializedVariants = variants.map(v => ({
     id: v.id,
     variant_name: v.variant_name,
@@ -150,6 +139,9 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
         <div className="text-gray-700 leading-relaxed text-sm prose max-w-none" dangerouslySetInnerHTML={{ __html: cleanDescription }}></div>
       </div>
 
+      {/* Reviews Section */}
+      <ReviewSection productId={productId} initialReviews={JSON.parse(JSON.stringify(reviews))} />
+
       {/* Enhanced Recommended Products */}
       {related.length > 0 && (
         <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-gray-200/80">
@@ -173,14 +165,12 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
                   key={p.id}
                   className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group flex flex-col justify-between relative"
                 >
-                  {/* Top Discount Badge */}
                   {discount > 0 && (
                     <div className="absolute top-3 left-3 z-10 bg-[#f85606] text-white text-[10px] sm:text-xs font-black px-2.5 py-1 rounded-full shadow-md">
                       -{discount}% OFF
                     </div>
                   )}
 
-                  {/* Image Container */}
                   <Link href={`/product/${p.id}`} className="block relative bg-gradient-to-b from-[#f9fafb] to-[#f1f5f9] overflow-hidden">
                     <div className="h-[200px] sm:h-[230px] w-full p-4 flex items-center justify-center">
                       <img
@@ -191,7 +181,6 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
                     </div>
                   </Link>
 
-                  {/* Card Content */}
                   <div className="p-4 flex flex-col flex-1 justify-between bg-white">
                     <div>
                       <div className="flex items-center gap-1 mb-1.5 text-amber-400 text-[10px]">

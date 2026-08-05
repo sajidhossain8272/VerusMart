@@ -6,6 +6,7 @@ import { cookies } from 'next/headers'
 import fs from 'fs/promises'
 import path from 'path'
 import crypto from 'crypto'
+import { getAdminSession, setAdminSession, clearAdminSession } from '@/lib/auth'
 
 // Validate required env vars in production
 function getAdminCredentials() {
@@ -79,20 +80,11 @@ function parseVariants(formData: FormData): { variant_name: string; price: numbe
   }
 }
 
-// Generate a random session token (not a deterministic hash)
-function generateSessionToken() {
-  return crypto.randomBytes(32).toString('hex')
-}
-
-// Store active sessions in memory (single-instance). For multi-instance, use Redis/DB.
-const activeAdminSessions = new Set<string>()
-
 // Authentication verification
 export async function checkAuth() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('admin_token')?.value
-    return !!token && activeAdminSessions.has(token)
+    const session = await getAdminSession()
+    return !!session
   } catch (e) {
     return false
   }
@@ -123,16 +115,7 @@ export async function login(formData: FormData) {
     const pwdMatch = safeEqual(password, expectedPassword)
 
     if (emailMatch && pwdMatch) {
-      const sessionToken = generateSessionToken()
-      activeAdminSessions.add(sessionToken)
-      const cookieStore = await cookies()
-      cookieStore.set('admin_token', sessionToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        path: '/',
-        maxAge: 60 * 60 * 24 // 1 day
-      })
+      await setAdminSession({ email })
       return { success: true }
     }
 
@@ -146,12 +129,7 @@ export async function login(formData: FormData) {
 // Logout action
 export async function logout() {
   try {
-    const cookieStore = await cookies()
-    const token = cookieStore.get('admin_token')?.value
-    if (token) {
-      activeAdminSessions.delete(token)
-    }
-    cookieStore.delete('admin_token')
+    await clearAdminSession()
     return { success: true }
   } catch (error: any) {
     return { success: false, error: error.message }
@@ -640,6 +618,83 @@ export async function deleteBanner(id: number) {
     return { success: true }
   } catch (error: any) {
     console.error('Delete banner error:', error)
+    return { success: false, error: error.message }
+  }
+}
+
+// Create Coupon
+export async function createCoupon(formData: FormData) {
+  await enforceAuth()
+  try {
+    const code = (formData.get('code') as string || '').trim().toUpperCase()
+    const discount_type = (formData.get('discount_type') as string || 'percentage')
+    const discount_amount = parseFloat(formData.get('discount_amount') as string || '0')
+    const min_order_amount = parseFloat(formData.get('min_order_amount') as string || '0')
+    const max_discount = parseFloat(formData.get('max_discount') as string || '0') || null
+    const usage_limit = parseInt(formData.get('usage_limit') as string || '100')
+    const expires_at_raw = formData.get('expires_at') as string
+
+    if (!code || discount_amount <= 0) {
+      return { success: false, error: 'Coupon code and discount amount are required.' }
+    }
+
+    const expires_at = expires_at_raw ? new Date(expires_at_raw) : null
+
+    await prisma.coupons.create({
+      data: {
+        code,
+        discount_type,
+        discount_amount,
+        min_order_amount,
+        max_discount,
+        usage_limit,
+        expires_at,
+        status: 'active'
+      }
+    })
+
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message || 'Failed to create coupon' }
+  }
+}
+
+// Delete Coupon
+export async function deleteCoupon(id: number) {
+  await enforceAuth()
+  try {
+    await prisma.coupons.delete({ where: { id } })
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+// Moderate Review
+export async function updateReviewStatus(id: number, status: 'approved' | 'rejected') {
+  await enforceAuth()
+  try {
+    await prisma.reviews.update({
+      where: { id },
+      data: { status }
+    })
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (error: any) {
+    return { success: false, error: error.message }
+  }
+}
+
+// Delete Review
+export async function deleteReview(id: number) {
+  await enforceAuth()
+  try {
+    await prisma.reviews.delete({ where: { id } })
+    revalidatePath('/admin')
+    return { success: true }
+  } catch (error: any) {
     return { success: false, error: error.message }
   }
 }
