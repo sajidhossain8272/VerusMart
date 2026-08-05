@@ -19,18 +19,30 @@ const baseUrl = 'https://verusmart.com'
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: 'Verus Mart - Online Grocery & Shopping in Bangladesh',
+    default: 'Verus Mart - Online Shopping & Grocery Delivery in Bangladesh | verusmart.com',
     template: '%s | Verus Mart Bangladesh',
   },
-  description: 'Shop authentic fresh groceries, fruits, electronics, and daily essentials with fast delivery and cash on delivery at Verus Mart Bangladesh.',
+  description: 'Shop authentic fresh groceries, organic fruits, daily essentials, and electronics with fast delivery and cash on delivery at Verus Mart Bangladesh (verusmart.com).',
   keywords: [
-    'Verus Mart',
-    'Online Grocery Bangladesh',
-    'Online Shopping Dhaka',
-    'Buy Fresh Fruits Online',
-    'Grocery Delivery Bangladesh',
-    'Cash on Delivery Shopping',
-    'VerusMart BD'
+    'verusmart',
+    'verus mart',
+    'verus',
+    'verusmart bd',
+    'verus mart bangladesh',
+    'verus market',
+    'verus store',
+    'verus online',
+    'verus mart online shopping',
+    'verus mart dhaka',
+    'verusmart.com',
+    'online shopping in bangladesh',
+    'online grocery store dhaka',
+    'buy fresh fruits online dhaka',
+    'best online shopping site in bd',
+    'cash on delivery shopping bd',
+    'fresh vegetables home delivery',
+    'online super shop bangladesh',
+    'grocery delivery dhaka'
   ],
   authors: [{ name: 'Verus Mart Bangladesh', url: baseUrl }],
   creator: 'Verus Mart',
@@ -51,8 +63,8 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: baseUrl,
     siteName: 'Verus Mart Bangladesh',
-    title: 'Verus Mart - Online Shopping & Grocery Delivery in Bangladesh',
-    description: 'Shop authentic groceries, fresh produce, and home essentials with fast home delivery and cash on delivery.',
+    title: 'Verus Mart (verusmart.com) - Online Shopping & Grocery Delivery in Bangladesh',
+    description: 'Verus Mart is Bangladesh\'s leading online super shop. Order fresh groceries, organic fruits, and daily essentials with cash on delivery.',
     images: [
       {
         url: `${baseUrl}/admin_uploads/logo.png`,
@@ -64,7 +76,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Verus Mart - Online Shopping in Bangladesh',
+    title: 'Verus Mart - Online Shopping in Bangladesh (verusmart.com)',
     description: 'Shop authentic products with fast delivery and cash on delivery at Verus Mart Bangladesh.',
     images: [`${baseUrl}/admin_uploads/logo.png`],
   },
@@ -100,6 +112,7 @@ export default async function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: 'Verus Mart',
+    alternateName: ['verusmart', 'verus', 'verus mart', 'verusmart bd', 'verus mart bangladesh', 'verus market', 'verus store', 'verus online'],
     url: baseUrl,
     logo: `${baseUrl}/admin_uploads/logo.png`,
     sameAs: [
