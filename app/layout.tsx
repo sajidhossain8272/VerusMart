@@ -42,7 +42,17 @@ export const metadata: Metadata = {
     'cash on delivery shopping bd',
     'fresh vegetables home delivery',
     'online super shop bangladesh',
-    'grocery delivery dhaka'
+    'grocery delivery dhaka',
+    'best perfume shop in bd',
+    'authentic perfume shop dhaka',
+    'perfume shop near airport dhaka',
+    'best perfume shop in ashkona',
+    'perfume shop kawla bazar',
+    'perfume shop hazi camp uttara',
+    'online perfume shop uttara dhaka',
+    'original perfume online bangladesh',
+    'grocery delivery kawla ashkona uttara',
+    'online shopping hazi camp ashkona'
   ],
   authors: [{ name: 'Verus Mart Bangladesh', url: baseUrl }],
   creator: 'Verus Mart',

@@ -180,15 +180,23 @@ export default async function HomePage() {
           Verus Mart (VerusMart) — Premier Online Grocery & Shopping in Bangladesh
         </h1>
         <p className="text-xs sm:text-sm text-gray-600 leading-relaxed mb-4">
-          Welcome to <strong>Verus Mart (verusmart.com)</strong>, your trusted destination for online grocery shopping, organic fruits, daily essentials, and consumer electronics in Bangladesh. Whether you search for <strong>VerusMart</strong>, <strong>Verus Mart</strong>, <strong>Verus</strong>, or <strong>Verus Mart BD</strong>, our mission is to deliver authentic products directly to your doorstep with unmatched speed and reliability.
+          Welcome to <strong>Verus Mart (verusmart.com)</strong>, your trusted destination for online grocery shopping, <strong>authentic perfumes</strong>, organic fruits, daily essentials, and consumer electronics in Bangladesh. Whether you search for <strong>VerusMart</strong>, <strong>Verus Mart</strong>, <strong>Verus</strong>, <strong>best perfume shop in BD</strong>, or <strong>Verus Mart BD</strong>, our mission is to deliver authentic products directly to your doorstep with unmatched speed and reliability across Dhaka (including Kawla Bazar, Ashkona, Hazi Camp, Uttara, and Dhaka Airport area) and nationwide.
         </p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6 pt-6 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6 pt-6 border-t border-gray-100">
+          <div>
+            <h2 className="text-sm font-black text-[#002b5b] uppercase mb-2 flex items-center gap-2">
+              <i className="fa-solid fa-spray-can-sparkles text-[#f85606]"></i> Authentic Perfumes Shop BD
+            </h2>
+            <p className="text-xs text-gray-500 leading-relaxed">
+              Looking for the <strong>best authentic perfumes shop in BD</strong> near Dhaka Airport, Ashkona, Kawla Bazar, Hazi Camp, or Uttara? Verus Mart provides 100% original designer and luxury fragrances with guaranteed authenticity.
+            </p>
+          </div>
           <div>
             <h2 className="text-sm font-black text-[#002b5b] uppercase mb-2 flex items-center gap-2">
               <i className="fa-solid fa-apple-whole text-[#f85606]"></i> Fresh Groceries & Fruits
             </h2>
             <p className="text-xs text-gray-500 leading-relaxed">
-              At <strong>Verus Mart</strong>, we source 100% fresh fruits, vegetables, dairy products, and daily groceries. Order online and get express home delivery inside Dhaka and all 64 districts across Bangladesh.
+              At <strong>Verus Mart</strong>, we source 100% fresh fruits, vegetables, dairy products, and daily groceries with express delivery inside Dhaka and all 64 districts across Bangladesh.
             </p>
           </div>
           <div>
@@ -201,10 +209,10 @@ export default async function HomePage() {
           </div>
           <div>
             <h2 className="text-sm font-black text-[#002b5b] uppercase mb-2 flex items-center gap-2">
-              <i className="fa-solid fa-shield-halved text-[#f85606]"></i> 100% Genuine Quality
+              <i className="fa-solid fa-location-dot text-[#f85606]"></i> Local Delivery Hubs
             </h2>
             <p className="text-xs text-gray-500 leading-relaxed">
-              Every item sold on <strong>Verus Mart Bangladesh</strong> is quality inspected. Enjoy authentic brands, best market prices, and easy returns.
+              Express super-fast delivery in local hubs: <strong>Kawla Bazar</strong>, <strong>Ashkona</strong>, <strong>Hazi Camp</strong>, <strong>Dhaka Airport Area</strong>, and <strong>Uttara</strong>.
             </p>
           </div>
         </div>
