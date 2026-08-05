@@ -14,15 +14,70 @@ const roboto = Roboto({
   variable: '--font-roboto',
 })
 
+const baseUrl = 'https://verusmart.com'
+
 export const metadata: Metadata = {
-  title: 'Verus Mart - Online Shopping in Bangladesh',
-  description: 'Shop authentic products with fast delivery and cash on delivery at Verus Mart Bangladesh.',
+  metadataBase: new URL(baseUrl),
+  title: {
+    default: 'Verus Mart - Online Grocery & Shopping in Bangladesh',
+    template: '%s | Verus Mart Bangladesh',
+  },
+  description: 'Shop authentic fresh groceries, fruits, electronics, and daily essentials with fast delivery and cash on delivery at Verus Mart Bangladesh.',
+  keywords: [
+    'Verus Mart',
+    'Online Grocery Bangladesh',
+    'Online Shopping Dhaka',
+    'Buy Fresh Fruits Online',
+    'Grocery Delivery Bangladesh',
+    'Cash on Delivery Shopping',
+    'VerusMart BD'
+  ],
+  authors: [{ name: 'Verus Mart Bangladesh', url: baseUrl }],
+  creator: 'Verus Mart',
+  publisher: 'Verus Mart',
   icons: {
     icon: '/admin_uploads/logo.png',
     apple: '/admin_uploads/logo.png',
   },
   appleWebApp: {
     title: 'VerusMart',
+    statusBarStyle: 'default',
+  },
+  alternates: {
+    canonical: baseUrl,
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: baseUrl,
+    siteName: 'Verus Mart Bangladesh',
+    title: 'Verus Mart - Online Shopping & Grocery Delivery in Bangladesh',
+    description: 'Shop authentic groceries, fresh produce, and home essentials with fast home delivery and cash on delivery.',
+    images: [
+      {
+        url: `${baseUrl}/admin_uploads/logo.png`,
+        width: 800,
+        height: 600,
+        alt: 'Verus Mart Bangladesh Logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Verus Mart - Online Shopping in Bangladesh',
+    description: 'Shop authentic products with fast delivery and cash on delivery at Verus Mart Bangladesh.',
+    images: [`${baseUrl}/admin_uploads/logo.png`],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 }
 
@@ -41,12 +96,52 @@ export default async function RootLayout({
     isAdmin = false
   }
 
+  const organizationJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Verus Mart',
+    url: baseUrl,
+    logo: `${baseUrl}/admin_uploads/logo.png`,
+    sameAs: [
+      'https://www.facebook.com/verusmartbd',
+    ],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+8801628083370',
+      contactType: 'customer service',
+      areaServed: 'BD',
+      availableLanguage: ['en', 'bn'],
+    },
+  }
+
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Verus Mart',
+    url: baseUrl,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${baseUrl}/products?search={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  }
+
   return (
     <html lang="en">
       <head>
         <meta name="apple-mobile-web-app-title" content="VerusMart" />
         <link rel="icon" href="/admin_uploads/logo.png" />
         <link rel="apple-touch-icon" href="/admin_uploads/logo.png" />
+
+        {/* Structured Data (JSON-LD) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+        />
         
         {/* Google Tag Manager */}
         <script
@@ -58,7 +153,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 })(window,document,'script','dataLayer','GTM-M4WDWDWX');`,
           }}
         />
-        {/* End Google Tag Manager */}
 
         {/* Meta Pixel Code */}
         <script
@@ -84,7 +178,6 @@ fbq('track', 'PageView');`,
             alt="Meta Pixel"
           />
         </noscript>
-        {/* End Meta Pixel Code */}
 
         {/* Google Analytics (gtag.js) */}
         <Script
@@ -104,7 +197,6 @@ fbq('track', 'PageView');`,
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
       </head>
       <body className={roboto.variable}>
-        {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-M4WDWDWX"
@@ -113,7 +205,6 @@ fbq('track', 'PageView');`,
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </noscript>
-        {/* End Google Tag Manager (noscript) */}
 
         <CartProvider>
           {isAdmin ? (

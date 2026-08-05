@@ -1,9 +1,55 @@
+import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import AddToCartBtn from './AddToCartBtn'
 
 export const dynamic = 'force-dynamic'
 const PAGE_SIZE = 24
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ category?: string; search?: string; type?: string }>
+}): Promise<Metadata> {
+  const params = await searchParams
+  const categoryId = params.category ? parseInt(params.category) : undefined
+  const search = params.search?.trim() || ''
+  const type = params.type || ''
+
+  let title = 'All Products & Groceries | Verus Mart Bangladesh'
+  let description = 'Browse our complete collection of authentic groceries, fresh produce, and home essentials with fast delivery in Bangladesh.'
+
+  if (categoryId && !isNaN(categoryId)) {
+    const cat = await prisma.categories.findUnique({ where: { id: categoryId } }).catch(() => null)
+    if (cat) {
+      title = `${cat.name} Online Shopping | Verus Mart Bangladesh`
+      description = `Buy authentic ${cat.name} at the best price in Bangladesh. Fast home delivery and cash on delivery at Verus Mart.`
+    }
+  } else if (search) {
+    title = `Search Results for "${search}" | Verus Mart Bangladesh`
+    description = `Discover best deals and top products matching "${search}" at Verus Mart Bangladesh.`
+  } else if (type === 'hot') {
+    title = 'Hot Mega Deals & Special Offers | Verus Mart Bangladesh'
+    description = 'Save big with hot deals and flash discounts on groceries, fruits, and electronics at Verus Mart.'
+  }
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: 'https://verusmart.com/products',
+      siteName: 'Verus Mart',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  }
+}
 
 export default async function ProductsPage({
   searchParams,

@@ -89,8 +89,41 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
 
   const formatTk = (num: number) => `৳${num.toLocaleString('en-BD')}`
 
+  const imageUrl = product.image ? `https://verusmart.com/admin_uploads/products/${product.image}` : 'https://verusmart.com/admin_uploads/logo.png'
+  const cleanDesc = (product.description || '').replace(/<[^>]*>?/gm, '').trim() || product.name
+
+  const productJsonLd = {
+    '@context': 'https://schema.org/',
+    '@type': 'Product',
+    name: product.name,
+    image: [imageUrl],
+    description: cleanDesc.substring(0, 300),
+    sku: `VM-PROD-${product.id}`,
+    brand: {
+      '@type': 'Brand',
+      name: 'Verus Mart'
+    },
+    offers: {
+      '@type': 'Offer',
+      url: `https://verusmart.com/product/${product.id}`,
+      priceCurrency: 'BDT',
+      price: defaultPrice,
+      priceValidUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: (product.stock ?? 1) > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'Verus Mart'
+      }
+    }
+  }
+
   return (
     <div className="w-[92%] max-w-[1240px] mx-auto py-6 sm:py-8 font-sans">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+      />
       
       {/* Breadcrumb Bar */}
       <nav className="text-xs sm:text-sm text-gray-500 mb-6 flex items-center gap-2 font-medium overflow-x-auto whitespace-nowrap">
