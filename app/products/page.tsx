@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import AddToCartBtn from './AddToCartBtn'
+import SortDropdown from './SortDropdown'
 
 export const dynamic = 'force-dynamic'
 const PAGE_SIZE = 24
@@ -73,11 +74,11 @@ export default async function ProductsPage({
   if (type === 'trending') where.is_trending = true
 
   // Build orderBy
-  type PrismaOrderBy = { price?: 'asc' | 'desc'; created_at?: 'desc' }
-  const orderByMap: Record<string, PrismaOrderBy> = {
-    newest: { created_at: 'desc' },
-    price_asc: { price: 'asc' },
-    price_desc: { price: 'desc' },
+  type PrismaOrderBy = Record<string, 'asc' | 'desc'>
+  const orderByMap: Record<string, PrismaOrderBy[]> = {
+    newest: [{ created_at: 'desc' }, { id: 'desc' }],
+    price_asc: [{ price: 'asc' }, { id: 'asc' }],
+    price_desc: [{ price: 'desc' }, { id: 'desc' }],
   }
   const orderBy = orderByMap[sort] || orderByMap.newest
 
@@ -221,23 +222,7 @@ export default async function ProductsPage({
             </div>
 
             {/* Sorting Dropdown */}
-            <div className="flex items-center gap-2 self-end sm:self-auto">
-              <span className="text-xs font-bold text-gray-600 uppercase tracking-wider hidden sm:inline">Sort By:</span>
-              <form method="GET" action="/products" className="flex items-center">
-                {categoryId && <input type="hidden" name="category" value={categoryId} />}
-                {search && <input type="hidden" name="search" value={search} />}
-                {type && <input type="hidden" name="type" value={type} />}
-                <select
-                  name="sort"
-                  defaultValue={sort}
-                  className="bg-gray-50 border border-gray-200 rounded-xl px-3.5 py-2 text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-[#f85606] cursor-pointer shadow-sm"
-                >
-                  <option value="newest">Newest Arrivals</option>
-                  <option value="price_asc">Price: Low to High</option>
-                  <option value="price_desc">Price: High to Low</option>
-                </select>
-              </form>
-            </div>
+            <SortDropdown currentSort={sort} />
           </div>
 
           {/* Empty State */}
