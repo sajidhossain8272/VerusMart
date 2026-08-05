@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getUserSession } from '@/lib/auth'
+import { sendOrderNotificationEmail } from '@/lib/email'
 
 interface ClientCartItem {
   id: number
@@ -218,6 +219,24 @@ export async function POST(req: Request) {
 
       return newOrder
     })
+
+    // Dispatch order notification email to verusmart4@gmail.com and customer
+    sendOrderNotificationEmail({
+      id: order.id,
+      customer_name: order.customer_name,
+      email: order.email,
+      phone: order.phone || '',
+      address: order.address || '',
+      city: order.city,
+      area: order.area,
+      order_note: order.order_note,
+      subtotal: Number(order.subtotal || 0),
+      shipping_fee: Number(order.shipping_fee || 0),
+      discount_amount: Number(order.discount_amount || 0),
+      total_amount: Number(order.total_amount || 0),
+      payment_method: order.payment_method,
+      tracking_number: order.tracking_number,
+    }, verifiedOrderItems).catch(err => console.error('Order notification email dispatch error:', err))
 
     return NextResponse.json({
       success: true,
