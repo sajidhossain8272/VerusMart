@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import AddToCartBtn from './AddToCartBtn'
 import SortDropdown from './SortDropdown'
+import WishlistHeartBtn from '../components/WishlistHeartBtn'
 
 export const dynamic = 'force-dynamic'
 const PAGE_SIZE = 24
@@ -271,7 +272,8 @@ export default async function ProductsPage({
                       </div>
                     )}
 
-                    {/* Image Area - Bigger display container */}
+                    {/* Wishlist Heart Button */}
+                    <WishlistHeartBtn productId={p.id} />
                     <Link href={`/product/${p.id}`} className="block relative bg-gradient-to-b from-[#f9fafb] to-[#f1f5f9] overflow-hidden">
                       <div className="h-[210px] sm:h-[250px] md:h-[270px] w-full p-4 flex items-center justify-center">
                         <img

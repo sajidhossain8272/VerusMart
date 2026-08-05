@@ -6,6 +6,7 @@ import Header from './components/Header'
 import Footer from './components/Footer'
 import MobileNav from './components/MobileNav'
 import { CartProvider } from './context/CartContext'
+import { WishlistProvider } from './context/WishlistContext'
 import { headers } from 'next/headers'
 
 const roboto = Roboto({
@@ -230,16 +231,18 @@ fbq('track', 'PageView');`,
         </noscript>
 
         <CartProvider>
-          {isAdmin ? (
-            <main className="min-h-screen bg-[#eff0f5]">{children}</main>
-          ) : (
-            <>
-              <Header />
-              <main className="min-h-screen bg-[#eff0f5] flow-root pb-16 lg:pb-0">{children}</main>
-              <Footer />
-              <MobileNav />
-            </>
-          )}
+          <WishlistProvider>
+            {isAdmin ? (
+              <main className="min-h-screen bg-[#eff0f5]">{children}</main>
+            ) : (
+              <>
+                <Header />
+                <main className="min-h-screen bg-[#eff0f5] flow-root pb-16 lg:pb-0">{children}</main>
+                <Footer />
+                <MobileNav />
+              </>
+            )}
+          </WishlistProvider>
         </CartProvider>
       </body>
     </html>

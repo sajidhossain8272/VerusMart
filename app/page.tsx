@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
 import HomeSlider from './components/HomeSlider'
 import AddToCartBtn from './products/AddToCartBtn'
+import WishlistHeartBtn from './components/WishlistHeartBtn'
 
 export const dynamic = 'force-dynamic'
 
@@ -105,6 +106,7 @@ export default async function HomePage() {
                         -{discount}%
                       </div>
                     )}
+                    <WishlistHeartBtn productId={p.id} />
                     <div className="h-[160px] sm:h-[180px] w-full flex items-center justify-center">
                       <img
                         src={p.image ? `/admin_uploads/products/${p.image}` : 'https://placehold.jp/300x300.png'}

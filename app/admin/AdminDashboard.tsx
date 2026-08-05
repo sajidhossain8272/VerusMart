@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useTransition } from 'react'
+import WishlistTab from './WishlistTab'
 import { 
   resetProducts, 
   updateOrderStatus, 
@@ -162,7 +163,7 @@ export default function AdminDashboard({
   initialReviews = []
 }: AdminDashboardProps) {
   const [activeTab, setActiveTab] = useState<
-    'dashboard' | 'products' | 'add-product' | 'categories' | 'coupons' | 'customers' | 'reviews' | 'marketing' | 'settings'
+    'dashboard' | 'products' | 'add-product' | 'categories' | 'coupons' | 'customers' | 'reviews' | 'marketing' | 'settings' | 'wishlist'
   >('dashboard')
   const [products, setProducts] = useState<Product[]>(initialProducts)
   const [categories, setCategories] = useState<Category[]>(initialCategories)
@@ -359,6 +360,7 @@ export default function AdminDashboard({
               { id: 'coupons', label: '🎟 COUPONS' },
               { id: 'customers', label: '👥 CUSTOMERS' },
               { id: 'reviews', label: '⭐ REVIEWS' },
+              { id: 'wishlist', label: '❤️ WISHLIST' },
               { id: 'marketing', label: '✨ MARKETING' },
               { id: 'settings', label: '⚙️ SETTINGS' },
             ].map(tab => (
@@ -829,6 +831,11 @@ export default function AdminDashboard({
                 </button>
               </form>
             </div>
+          )}
+
+          {/* TAB: WISHLIST ANALYTICS */}
+          {activeTab === 'wishlist' && (
+            <WishlistTab />
           )}
 
         </div>
