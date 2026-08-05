@@ -61,11 +61,11 @@ export default async function HomePage() {
                 key={c.id}
                 className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col"
               >
-                <div className="w-full h-[120px] sm:h-[160px] overflow-hidden bg-gray-50 flex items-center justify-center p-4">
+                <div className="w-full h-[140px] sm:h-[160px] overflow-hidden bg-gray-50 relative">
                   <img
                     src={c.image ? `/admin_uploads/category/${c.image}` : "https://placehold.jp/300x200.png"}
                     alt={c.name}
-                    className="max-h-full max-w-full object-contain"
+                    className="w-full h-full object-cover"
                   />
                 </div>
                 <div className={`text-white p-3 text-xs sm:text-sm font-black uppercase text-center ${colors[idx % 4]}`}>

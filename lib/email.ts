@@ -1,20 +1,29 @@
 import nodemailer from 'nodemailer'
 
 function getTransporter() {
-  const host = process.env.SMTP_HOST || 'smtp.gmail.com'
-  const port = parseInt(process.env.SMTP_PORT || '465')
   const user = (process.env.SMTP_USER || '').trim()
   const pass = (process.env.SMTP_PASS || '').replace(/\s+/g, '')
 
   if (!user || !pass) {
+    console.warn('[EMAIL] SMTP_USER or SMTP_PASS not set in environment.')
     return null
   }
 
+  // Use port 587 + STARTTLS (not port 465) — required for Vercel serverless environments
+  // Gmail port 465 (SSL) is blocked on many cloud providers
   return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
+    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,          // false = STARTTLS (upgraded after handshake)
     auth: { user, pass },
+    tls: {
+      rejectUnauthorized: false,  // Required on Vercel/AWS/cloud runtimes
+      minVersion: 'TLSv1.2',
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   })
 }
 
