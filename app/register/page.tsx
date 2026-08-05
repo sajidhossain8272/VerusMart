@@ -82,7 +82,7 @@ export default async function RegisterPage({ searchParams }: Props) {
               <input 
                 type="text" 
                 name="name" 
-                placeholder="e.g. Sajid Hossain" 
+                placeholder="e.g. John Doe" 
                 required 
                 className="w-full pl-11 pr-4 py-3 rounded-2xl border border-gray-200 outline-none text-xs font-medium text-gray-900 transition-all focus:border-[#f85606] focus:ring-2 focus:ring-orange-500/10 bg-gray-50/50 focus:bg-white"
               />
