@@ -77,18 +77,18 @@ export const metadata: Metadata = {
     description: 'Verus Mart is Bangladesh\'s leading online super shop. Order fresh groceries, organic fruits, and daily essentials with cash on delivery.',
     images: [
       {
-        url: `${baseUrl}/admin_uploads/logo.png`,
-        width: 800,
-        height: 600,
-        alt: 'Verus Mart Bangladesh Logo',
+        url: `${baseUrl}/og-image.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Verus Mart Bangladesh - Online Shopping & Authentic Perfumes',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Verus Mart - Online Shopping in Bangladesh (verusmart.com)',
-    description: 'Shop authentic products with fast delivery and cash on delivery at Verus Mart Bangladesh.',
-    images: [`${baseUrl}/admin_uploads/logo.png`],
+    description: 'Shop authentic groceries, fresh produce, and original perfumes with fast cash on delivery at Verus Mart Bangladesh.',
+    images: [`${baseUrl}/og-image.png`],
   },
   robots: {
     index: true,
