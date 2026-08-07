@@ -221,6 +221,12 @@ export async function updateStoreSettings(formData: FormData) {
       // Ensure directory exists
       await fs.mkdir(path.dirname(uploadPath), { recursive: true })
       await fs.writeFile(uploadPath, buffer)
+
+      // Update logo field in database
+      await prisma.business_settings.update({
+        where: { id: 1 },
+        data: { logo: 'logo.png' }
+      })
     }
 
     revalidatePath('/')
