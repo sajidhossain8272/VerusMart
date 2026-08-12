@@ -479,7 +479,7 @@ export default function AdminDashboard({
 
   // 2. MAIN ADMIN SYSTEM DASHBOARD
   return (
-    <div className="min-h-screen bg-[#eff0f5] text-black flex font-sans">
+    <div className="min-h-screen bg-[#eff0f5] text-black flex font-sans" suppressHydrationWarning>
       
       {/* Side Navigation */}
       <aside className="w-[260px] bg-[#002b5b] text-white flex flex-col justify-between shrink-0 min-h-screen border-r border-[#001c3d]">
