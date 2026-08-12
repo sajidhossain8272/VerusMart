@@ -726,7 +726,7 @@ export default function AdminDashboard({
                         <tr key={p.id} className="hover:bg-gray-50">
                           <td className="p-3">
                             <div className="w-12 h-12 bg-gray-50 border rounded-lg overflow-hidden flex items-center justify-center">
-                              {p.image ? <img src={`/admin_uploads/products/${p.image}`} alt={p.name} className="max-h-full max-w-full object-contain" /> : 'No Img'}
+                              {p.image ? <img src={getProductImageUrl(p.image)} alt={p.name} className="max-h-full max-w-full object-contain" /> : 'No Img'}
                             </div>
                           </td>
                           <td className="p-3 font-bold text-gray-900">{p.name}</td>

@@ -69,16 +69,13 @@ async function saveUploadedFile(file: File, folder: string): Promise<string> {
       await fs.mkdir(path.dirname(uploadPath2), { recursive: true })
       await fs.writeFile(uploadPath2, buffer)
     }
+    return imageName
   } catch (fsErr: any) {
-    console.warn('Local filesystem write notice (read-only filesystem or permissions):', fsErr.message)
-    try {
-      const tmpPath = path.join(os.tmpdir(), 'admin_uploads', folder, imageName)
-      await fs.mkdir(path.dirname(tmpPath), { recursive: true })
-      await fs.writeFile(tmpPath, buffer)
-    } catch {}
+    console.warn('Local disk write notice (read-only filesystem or serverless):', fsErr.message)
+    const mimeType = file.type || 'image/jpeg'
+    const base64Str = buffer.toString('base64')
+    return `data:${mimeType};base64,${base64Str}`
   }
-
-  return imageName
 }
 
 function sanitizeInput(value: string, maxLength = 5000): string {

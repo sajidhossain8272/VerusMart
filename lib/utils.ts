@@ -28,13 +28,20 @@ export function formatCurrency(amount: number | string | null | undefined): stri
  */
 export function getProductImageUrl(image: string | null | undefined): string {
   if (!image) return 'https://placehold.jp/300x300.png'
-  if (image.startsWith('http://') || image.startsWith('https://') || image.startsWith('data:')) {
-    return image
+  let cleanImg = image.trim()
+  if (cleanImg.startsWith('https:/') && !cleanImg.startsWith('https://')) {
+    cleanImg = cleanImg.replace('https:/', 'https://')
   }
-  if (image.startsWith('/')) {
-    return image
+  if (cleanImg.startsWith('http:/') && !cleanImg.startsWith('http://')) {
+    cleanImg = cleanImg.replace('http:/', 'http://')
   }
-  return `/admin_uploads/products/${image}`
+  if (cleanImg.startsWith('http://') || cleanImg.startsWith('https://') || cleanImg.startsWith('data:')) {
+    return cleanImg
+  }
+  if (cleanImg.startsWith('/')) {
+    return cleanImg
+  }
+  return `/admin_uploads/products/${cleanImg}`
 }
 
 /**
@@ -42,13 +49,20 @@ export function getProductImageUrl(image: string | null | undefined): string {
  */
 export function getCategoryImageUrl(image: string | null | undefined): string {
   if (!image) return 'https://placehold.jp/300x200.png'
-  if (image.startsWith('http://') || image.startsWith('https://') || image.startsWith('data:')) {
-    return image
+  let cleanImg = image.trim()
+  if (cleanImg.startsWith('https:/') && !cleanImg.startsWith('https://')) {
+    cleanImg = cleanImg.replace('https:/', 'https://')
   }
-  if (image.startsWith('/')) {
-    return image
+  if (cleanImg.startsWith('http:/') && !cleanImg.startsWith('http://')) {
+    cleanImg = cleanImg.replace('http:/', 'http://')
   }
-  return `/admin_uploads/category/${image}`
+  if (cleanImg.startsWith('http://') || cleanImg.startsWith('https://') || cleanImg.startsWith('data:')) {
+    return cleanImg
+  }
+  if (cleanImg.startsWith('/')) {
+    return cleanImg
+  }
+  return `/admin_uploads/category/${cleanImg}`
 }
 
 /**
@@ -56,11 +70,18 @@ export function getCategoryImageUrl(image: string | null | undefined): string {
  */
 export function getBannerImageUrl(image: string | null | undefined): string {
   if (!image) return 'https://placehold.jp/1200x400.png'
-  if (image.startsWith('http://') || image.startsWith('https://') || image.startsWith('data:')) {
-    return image
+  let cleanImg = image.trim()
+  if (cleanImg.startsWith('https:/') && !cleanImg.startsWith('https://')) {
+    cleanImg = cleanImg.replace('https:/', 'https://')
   }
-  if (image.startsWith('/')) {
-    return image
+  if (cleanImg.startsWith('http:/') && !cleanImg.startsWith('http://')) {
+    cleanImg = cleanImg.replace('http:/', 'http://')
   }
-  return `/admin_uploads/banners/${image}`
+  if (cleanImg.startsWith('http://') || cleanImg.startsWith('https://') || cleanImg.startsWith('data:')) {
+    return cleanImg
+  }
+  if (cleanImg.startsWith('/')) {
+    return cleanImg
+  }
+  return `/admin_uploads/banners/${cleanImg}`
 }

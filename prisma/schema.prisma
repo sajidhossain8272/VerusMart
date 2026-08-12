@@ -20,7 +20,7 @@ model admins {
 model banners {
   id         Int               @id @default(autoincrement())
   title      String?           @db.VarChar(255)
-  image      String            @db.VarChar(255)
+  image      String            @db.Text
   position   banners_position? @default(main)
   status     banners_status?   @default(active)
   created_at DateTime?         @default(now())
@@ -57,9 +57,9 @@ model categories {
   id       Int                @id @default(autoincrement())
   name     String             @db.VarChar(255)
   priority Int?               @default(0)
-  image    String?            @db.VarChar(255)
+  image    String?            @db.Text
   status   categories_status? @default(active)
-  banner   String?            @db.VarChar(255)
+  banner   String?            @db.Text
   products products[]
 
   @@index([status])
@@ -230,9 +230,9 @@ model products {
   status           String?            @default("active") @db.VarChar(20)
   is_recommended   Boolean?           @default(false)
   is_featured      Boolean?           @default(false)
-  image            String?            @db.VarChar(255)
-  image_2          String?            @db.VarChar(255)
-  image_3          String?            @db.VarChar(255)
+  image            String?            @db.Text
+  image_2          String?            @db.Text
+  image_3          String?            @db.Text
   old_price        Decimal?           @default(0.00) @db.Decimal(10, 2)
   discount_percent Int?               @default(0)
   rating           Int?               @default(5)
