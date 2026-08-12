@@ -347,7 +347,7 @@ export async function createProduct(formData: FormData) {
     revalidatePath('/products')
     revalidatePath('/admin')
 
-    const serializedProduct = {
+    const serializedProduct = JSON.parse(JSON.stringify({
       ...product,
       price: Number(product.price),
       old_price: Number(product.old_price),
@@ -357,7 +357,8 @@ export async function createProduct(formData: FormData) {
       is_trending: !!product.is_trending,
       is_best_seller: !!product.is_best_seller,
       is_weekday_deal: !!product.is_weekday_deal,
-    }
+      created_at: product.created_at ? product.created_at.toISOString() : null
+    }))
 
     return { success: true, product: serializedProduct }
   } catch (error: any) {
@@ -458,7 +459,7 @@ export async function updateProduct(id: number, formData: FormData) {
     revalidatePath('/products')
     revalidatePath('/admin')
 
-    const serializedProduct = {
+    const serializedProduct = JSON.parse(JSON.stringify({
       ...updatedProduct,
       price: Number(updatedProduct.price),
       old_price: Number(updatedProduct.old_price),
@@ -468,7 +469,8 @@ export async function updateProduct(id: number, formData: FormData) {
       is_trending: !!updatedProduct.is_trending,
       is_best_seller: !!updatedProduct.is_best_seller,
       is_weekday_deal: !!updatedProduct.is_weekday_deal,
-    }
+      created_at: updatedProduct.created_at ? updatedProduct.created_at.toISOString() : null
+    }))
 
     return { success: true, product: serializedProduct }
   } catch (error: any) {
