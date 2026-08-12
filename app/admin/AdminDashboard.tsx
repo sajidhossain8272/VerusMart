@@ -1,7 +1,9 @@
+
 'use client'
 
 import React, { useState, useTransition } from 'react'
 import WishlistTab from './WishlistTab'
+import { formatDate } from '@/lib/utils'
 import { 
   resetProducts, 
   updateOrderStatus, 
@@ -114,11 +116,11 @@ interface Coupon {
   discount_type: string
   discount_amount: number
   min_order_amount: number
-  max_discount: number
-  usage_limit: number
-  used_count: number
+  max_discount: number | null
+  usage_limit: number | null
+  used_count: number | null
   expires_at: string | Date | null
-  status: string
+  status: string | null
 }
 
 interface Customer {
@@ -235,8 +237,7 @@ export default function AdminDashboard({
     startTransition(async () => {
       const res = await updateStoreSettings(formData)
       if (res.success) {
-        showMsg('success', 'Settings updated.')
-        setTimeout(() => window.location.reload(), 1000)
+        showMsg('success', 'Store settings updated successfully.')
       } else showMsg('error', res.error || 'Failed to save settings.')
     })
   }
@@ -252,11 +253,12 @@ export default function AdminDashboard({
     
     startTransition(async () => {
       const res = await createProduct(formData)
-      if (res.success) {
+      if (res.success && res.product) {
         showMsg('success', 'Product created successfully.')
+        setProducts(prev => [res.product, ...prev])
         form.reset()
         setVariantInputs([])
-        setTimeout(() => window.location.reload(), 1000)
+        setActiveTab('products')
       } else showMsg('error', res.error || 'Failed to create product.')
     })
   }
@@ -272,11 +274,12 @@ export default function AdminDashboard({
     
     startTransition(async () => {
       const res = await updateProduct(editingProduct.id, formData)
-      if (res.success) {
+      if (res.success && res.product) {
         showMsg('success', 'Product updated successfully.')
+        setProducts(prev => prev.map(p => p.id === res.product.id ? res.product : p))
         setEditingProduct(null)
         setVariantInputs([])
-        setTimeout(() => window.location.reload(), 1000)
+        setActiveTab('products')
       } else showMsg('error', res.error || 'Failed to update product.')
     })
   }
@@ -312,10 +315,10 @@ export default function AdminDashboard({
     const formData = new FormData(form)
     startTransition(async () => {
       const res = await createCategory(formData)
-      if (res.success) {
+      if (res.success && res.category) {
         showMsg('success', 'Category created successfully.')
+        setCategories(prev => [...prev, res.category])
         form.reset()
-        setTimeout(() => window.location.reload(), 1000)
       } else showMsg('error', res.error || 'Failed to create category.')
     })
   }
@@ -327,10 +330,10 @@ export default function AdminDashboard({
     const formData = new FormData(form)
     startTransition(async () => {
       const res = await updateCategory(editingCategory.id, formData)
-      if (res.success) {
+      if (res.success && res.category) {
         showMsg('success', 'Category updated successfully.')
+        setCategories(prev => prev.map(c => c.id === res.category.id ? res.category : c))
         setEditingCategory(null)
-        setTimeout(() => window.location.reload(), 1000)
       } else showMsg('error', res.error || 'Failed to update category.')
     })
   }
@@ -357,10 +360,10 @@ export default function AdminDashboard({
     const formData = new FormData(form)
     startTransition(async () => {
       const res = await createBanner(formData)
-      if (res.success) {
+      if (res.success && res.banner) {
         showMsg('success', 'Banner created successfully.')
+        setBanners(prev => [res.banner, ...prev])
         form.reset()
-        setTimeout(() => window.location.reload(), 1000)
       } else showMsg('error', res.error || 'Failed to create banner.')
     })
   }
@@ -382,10 +385,10 @@ export default function AdminDashboard({
     const formData = new FormData(form)
     startTransition(async () => {
       const res = await createCoupon(formData)
-      if (res.success) {
+      if (res.success && res.coupon) {
         showMsg('success', 'Coupon code created.')
+        setCoupons(prev => [res.coupon, ...prev])
         form.reset()
-        window.location.reload()
       } else showMsg('error', res.error || 'Failed to create coupon.')
     })
   }
@@ -622,7 +625,7 @@ export default function AdminDashboard({
                             <td className="p-4 font-black text-[#002b5b]">
                               #{o.id}
                               <span className="block text-[10px] text-gray-400 font-normal">
-                                {o.order_date ? new Date(o.order_date).toLocaleDateString() : 'N/A'}
+                                {o.order_date ? formatDate(o.order_date) : 'N/A'}
                               </span>
                             </td>
                             <td className="p-4">
@@ -1358,7 +1361,7 @@ export default function AdminDashboard({
                         <td className="p-3 text-gray-600">{c.email}</td>
                         <td className="p-3 font-semibold text-gray-800">{c.phone}</td>
                         <td className="p-3 text-gray-400">
-                          {c.created_at ? new Date(c.created_at).toLocaleDateString() : 'N/A'}
+                          {c.created_at ? formatDate(c.created_at) : 'N/A'}
                         </td>
                       </tr>
                     ))}
@@ -1523,7 +1526,7 @@ export default function AdminDashboard({
               <div className="text-right">
                 <strong className="text-gray-800 block">Order Summary:</strong>
                 <p>Tracking: {invoiceOrder.tracking_number || `VM-${invoiceOrder.id}`}</p>
-                <p>Date: {invoiceOrder.order_date ? new Date(invoiceOrder.order_date).toLocaleDateString() : 'N/A'}</p>
+                <p>Date: {invoiceOrder.order_date ? formatDate(invoiceOrder.order_date) : 'N/A'}</p>
                 <p>Payment: {invoiceOrder.payment_method?.toUpperCase()}</p>
               </div>
             </div>

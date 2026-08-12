@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { formatDate } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,13 +28,7 @@ export default async function TrackOrderPage({ searchParams }: TrackOrderPagePro
       if (foundOrder) {
         order = {
           ...foundOrder,
-          order_date: foundOrder.order_date ? foundOrder.order_date.toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          }) : 'N/A',
+          order_date: formatDate(foundOrder.order_date),
           total_amount: Number(foundOrder.total_amount)
         }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { formatDate } from '@/lib/utils'
 
 interface WishlistProduct {
   id: number
@@ -153,7 +154,7 @@ export default function WishlistTab() {
                       </div>
                     </td>
                     <td className="p-4 text-gray-400">
-                      {entry.created_at ? new Date(entry.created_at).toLocaleDateString('en-BD', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                      {entry.created_at ? formatDate(entry.created_at) : '—'}
                     </td>
                   </tr>
                 ))}

@@ -2,13 +2,11 @@
 
 import { prisma } from '@/lib/prisma'
 import { revalidatePath } from 'next/cache'
-import { cookies } from 'next/headers'
-import fs from 'fs/promises'
 import path from 'path'
+import fs from 'fs/promises'
 import crypto from 'crypto'
 import { getAdminSession, setAdminSession, clearAdminSession } from '@/lib/auth'
 
-// Validate required env vars in production
 function getAdminCredentials() {
   const email = process.env.ADMIN_EMAIL
   const password = process.env.ADMIN_PASSWORD
@@ -29,7 +27,6 @@ function getAdminCredentials() {
   }
 }
 
-// Constant-time string comparison that handles different lengths safely
 function safeEqual(a: string, b: string) {
   const bufA = Buffer.from(a)
   const bufB = Buffer.from(b)
@@ -37,32 +34,50 @@ function safeEqual(a: string, b: string) {
   return crypto.timingSafeEqual(bufA, bufB)
 }
 
-// Validate uploaded image files
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
 
 function validateImageFile(file: File | null): string | null {
-  if (!file || file.size === 0) return null
-  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-    return `Invalid file type: ${file.type}. Allowed: ${ALLOWED_IMAGE_TYPES.join(', ')}`
+  if (!file || file.size === 0 || !file.name) return null
+  const ext = path.extname(file.name).toLowerCase()
+  const allowedExts = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg', '.avif']
+  const fileType = (file.type || '').toLowerCase()
+  
+  if (!allowedExts.includes(ext) && !fileType.startsWith('image/')) {
+    return `Invalid file type for ${file.name}. Allowed image formats: JPG, PNG, WebP, GIF, SVG`
   }
   if (file.size > MAX_IMAGE_SIZE) {
-    return `File too large: ${(file.size / 1024 / 1024).toFixed(1)}MB. Max size: 5MB`
+    return `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 5MB.`
   }
   return null
 }
 
-// Sanitize a string input to prevent XSS
+async function saveUploadedFile(file: File, folder: string): Promise<string> {
+  const sanitizeFileName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_')
+  const imageName = `${Date.now()}_${sanitizeFileName}`
+  const bytes = await file.arrayBuffer()
+  const buffer = Buffer.from(bytes)
+  
+  const uploadPath1 = path.join(process.cwd(), 'public', 'admin_uploads', folder, imageName)
+  await fs.mkdir(path.dirname(uploadPath1), { recursive: true })
+  await fs.writeFile(uploadPath1, buffer)
+
+  if (folder === 'products') {
+    const uploadPath2 = path.join(process.cwd(), 'public', 'products', imageName)
+    await fs.mkdir(path.dirname(uploadPath2), { recursive: true })
+    await fs.writeFile(uploadPath2, buffer)
+  }
+
+  return imageName
+}
+
 function sanitizeInput(value: string, maxLength = 5000): string {
   return value
-    .replace(/</g, '&' + 'lt;')
-    .replace(/>/g, '&' + 'gt;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
     .trim()
     .slice(0, maxLength)
 }
 
-// Parse variants from form data (JSON string in 'variants' field)
-// Format: [{ variant_name: string, price: number, old_price: number }]
 function parseVariants(formData: FormData): { variant_name: string; price: number; old_price: number }[] {
   const raw = formData.get('variants') as string || '[]'
   try {
@@ -72,25 +87,23 @@ function parseVariants(formData: FormData): { variant_name: string; price: numbe
       .filter(v => v && typeof v.variant_name === 'string' && v.variant_name.trim())
       .map(v => ({
         variant_name: sanitizeInput(v.variant_name, 100),
-        price: parseFloat(v.price) || 0,
-        old_price: parseFloat(v.old_price) || 0,
+        price: isNaN(parseFloat(v.price)) ? 0 : parseFloat(v.price),
+        old_price: isNaN(parseFloat(v.old_price)) ? 0 : parseFloat(v.old_price),
       }))
   } catch {
     return []
   }
 }
 
-// Authentication verification
 export async function checkAuth() {
   try {
     const session = await getAdminSession()
     return !!session
-  } catch (e) {
+  } catch {
     return false
   }
 }
 
-// Internal auth enforcement for mutating actions
 async function enforceAuth() {
   const authenticated = await checkAuth()
   if (!authenticated) {
@@ -98,7 +111,6 @@ async function enforceAuth() {
   }
 }
 
-// Login action
 export async function login(formData: FormData) {
   try {
     const email = formData.get('email') as string
@@ -110,7 +122,6 @@ export async function login(formData: FormData) {
 
     const { email: expectedEmail, password: expectedPassword } = getAdminCredentials()
 
-    // Constant-time comparison to prevent timing attacks
     const emailMatch = safeEqual(email.toLowerCase(), expectedEmail.toLowerCase())
     const pwdMatch = safeEqual(password, expectedPassword)
 
@@ -126,7 +137,6 @@ export async function login(formData: FormData) {
   }
 }
 
-// Logout action
 export async function logout() {
   try {
     await clearAdminSession()
@@ -136,11 +146,9 @@ export async function logout() {
   }
 }
 
-// Delete all products and their references
 export async function resetProducts() {
   await enforceAuth()
   try {
-    // Delete references first to avoid foreign key constraints
     await prisma.wishlist.deleteMany({})
     await prisma.product_colors.deleteMany({})
     await prisma.product_gallery.deleteMany({})
@@ -150,6 +158,7 @@ export async function resetProducts() {
     
     revalidatePath('/')
     revalidatePath('/products')
+    revalidatePath('/admin')
     return { success: true, message: 'All products removed successfully.' }
   } catch (error: any) {
     console.error('Reset products error:', error)
@@ -157,7 +166,6 @@ export async function resetProducts() {
   }
 }
 
-// Update order status
 export async function updateOrderStatus(orderId: number, status: string) {
   await enforceAuth()
   try {
@@ -172,7 +180,6 @@ export async function updateOrderStatus(orderId: number, status: string) {
   }
 }
 
-// Update Business/Store settings and upload Logo if provided
 export async function updateStoreSettings(formData: FormData) {
   await enforceAuth()
   try {
@@ -180,73 +187,92 @@ export async function updateStoreSettings(formData: FormData) {
     const phone = sanitizeInput(formData.get('phone') as string || '', 50)
     const email = sanitizeInput(formData.get('email') as string || '', 100)
     const address = sanitizeInput(formData.get('address') as string || '', 2000)
-    const shippingInside = parseFloat(formData.get('shippingInside') as string || '0')
-    const shippingOutside = parseFloat(formData.get('shippingOutside') as string || '0')
-    const logoFile = formData.get('logo') as File | null
+    
+    const shippingInsideRaw = parseFloat(formData.get('shippingInside') as string || '0')
+    const shippingInside = isNaN(shippingInsideRaw) ? 60 : shippingInsideRaw
 
-    // Validate logo file if provided
+    const shippingOutsideRaw = parseFloat(formData.get('shippingOutside') as string || '0')
+    const shippingOutside = isNaN(shippingOutsideRaw) ? 120 : shippingOutsideRaw
+
+    const logoFile = formData.get('logo') as File | null
     const logoError = validateImageFile(logoFile)
     if (logoError) {
       return { success: false, error: logoError }
     }
 
-    // Update DB settings
-    await prisma.business_settings.upsert({
-      where: { id: 1 },
-      update: {
-        company_name: companyName,
-        phone,
-        email,
-        address,
-        shipping_inside: shippingInside,
-        shipping_outside: shippingOutside,
-      },
-      create: {
-        id: 1,
-        company_name: companyName,
-        phone,
-        email,
-        address,
-        shipping_inside: shippingInside,
-        shipping_outside: shippingOutside,
-      }
-    })
-
-    // Handle Logo Upload to public/admin_uploads/logo.png
-    if (logoFile && logoFile.size > 0) {
+    let logoName: string | null = null
+    if (logoFile && logoFile.size > 0 && logoFile.name) {
       const bytes = await logoFile.arrayBuffer()
       const buffer = Buffer.from(bytes)
       const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'logo.png')
-      
-      // Ensure directory exists
       await fs.mkdir(path.dirname(uploadPath), { recursive: true })
       await fs.writeFile(uploadPath, buffer)
-
-      // Update logo field in database
-      await prisma.business_settings.update({
-        where: { id: 1 },
-        data: { logo: 'logo.png' }
-      })
+      logoName = 'logo.png'
     }
 
+    const settingsData: Record<string, any> = {
+      company_name: companyName,
+      phone,
+      email,
+      address,
+      shipping_inside: shippingInside,
+      shipping_outside: shippingOutside,
+    }
+    if (logoName) {
+      settingsData.logo = logoName
+    }
+
+    const updated = await prisma.business_settings.upsert({
+      where: { id: 1 },
+      update: settingsData,
+      create: {
+        id: 1,
+        ...settingsData
+      }
+    })
+
     revalidatePath('/')
-    return { success: true }
+    revalidatePath('/admin')
+    
+    return { 
+      success: true, 
+      settings: {
+        ...updated,
+        shipping_inside: Number(updated.shipping_inside),
+        shipping_outside: Number(updated.shipping_outside)
+      }
+    }
   } catch (error: any) {
     console.error('Update settings error:', error)
     return { success: false, error: error.message }
   }
 }
 
-// Add a Product
 export async function createProduct(formData: FormData) {
   await enforceAuth()
   try {
     const name = sanitizeInput(formData.get('name') as string || '', 255)
+    if (!name) {
+      return { success: false, error: 'Product name is required.' }
+    }
+
     const description = sanitizeInput(formData.get('description') as string || '', 10000)
-    const price = parseFloat(formData.get('price') as string)
-    const oldPrice = parseFloat(formData.get('oldPrice') as string || '0')
-    const stock = parseInt(formData.get('stock') as string || '0')
-    const categoryId = parseInt(formData.get('categoryId') as string || '0')
+    
+    const priceRaw = parseFloat(formData.get('price') as string)
+    if (isNaN(priceRaw) || priceRaw < 0) {
+      return { success: false, error: 'A valid product price is required.' }
+    }
+    const price = priceRaw
+
+    const oldPriceRaw = parseFloat(formData.get('oldPrice') as string || '0')
+    const oldPrice = isNaN(oldPriceRaw) ? 0 : oldPriceRaw
+
+    const stockRaw = parseInt(formData.get('stock') as string || '0')
+    const stock = isNaN(stockRaw) ? 0 : stockRaw
+
+    const categoryIdRaw = parseInt(formData.get('categoryId') as string || '0')
+    const categoryId = isNaN(categoryIdRaw) ? 0 : categoryIdRaw
+
     const unit = sanitizeInput(formData.get('unit') as string || 'per lb', 50)
     const isRecommended = formData.get('isRecommended') === 'true'
     const isFeatured = formData.get('isFeatured') === 'true'
@@ -255,24 +281,16 @@ export async function createProduct(formData: FormData) {
     const isWeekdayDeal = formData.get('isWeekdayDeal') === 'true'
     const metaTitle = sanitizeInput(formData.get('metaTitle') as string || '', 255) || null
     const metaDescription = sanitizeInput(formData.get('metaDescription') as string || '', 2000) || null
-    const imageFile = formData.get('image') as File | null
-    const variants = parseVariants(formData)
 
-    // Validate image file if provided
+    const imageFile = formData.get('image') as File | null
     const imageError = validateImageFile(imageFile)
     if (imageError) {
       return { success: false, error: imageError }
     }
 
-    let imageName = ''
-    if (imageFile && imageFile.size > 0) {
-      imageName = `${Date.now()}_${imageFile.name.replace(/\s+/g, '_')}`
-      const bytes = await imageFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'products', imageName)
-      
-      await fs.mkdir(path.dirname(uploadPath), { recursive: true })
-      await fs.writeFile(uploadPath, buffer)
+    let imageName: string | null = null
+    if (imageFile && imageFile.size > 0 && imageFile.name) {
+      imageName = await saveUploadedFile(imageFile, 'products')
     }
 
     const product = await prisma.products.create({
@@ -291,12 +309,12 @@ export async function createProduct(formData: FormData) {
         is_weekday_deal: isWeekdayDeal,
         meta_title: metaTitle,
         meta_description: metaDescription,
-        image: imageName ? imageName : null,
+        image: imageName,
         status: 'active'
       }
     })
 
-    // Save product variants
+    const variants = parseVariants(formData)
     if (variants.length > 0 && product.id) {
       await prisma.product_variants.createMany({
         data: variants.map(v => ({
@@ -310,23 +328,52 @@ export async function createProduct(formData: FormData) {
 
     revalidatePath('/')
     revalidatePath('/products')
-    return { success: true }
+    revalidatePath('/admin')
+
+    const serializedProduct = {
+      ...product,
+      price: Number(product.price),
+      old_price: Number(product.old_price),
+      stock: product.stock ?? 0,
+      is_recommended: !!product.is_recommended,
+      is_featured: !!product.is_featured,
+      is_trending: !!product.is_trending,
+      is_best_seller: !!product.is_best_seller,
+      is_weekday_deal: !!product.is_weekday_deal,
+    }
+
+    return { success: true, product: serializedProduct }
   } catch (error: any) {
     console.error('Create product error:', error)
-    return { success: false, error: error.message }
+    return { success: false, error: error.message || 'Failed to create product.' }
   }
 }
 
-// Edit a Product
 export async function updateProduct(id: number, formData: FormData) {
   await enforceAuth()
   try {
     const name = sanitizeInput(formData.get('name') as string || '', 255)
+    if (!name) {
+      return { success: false, error: 'Product name is required.' }
+    }
+
     const description = sanitizeInput(formData.get('description') as string || '', 10000)
-    const price = parseFloat(formData.get('price') as string)
-    const oldPrice = parseFloat(formData.get('oldPrice') as string || '0')
-    const stock = parseInt(formData.get('stock') as string || '0')
-    const categoryId = parseInt(formData.get('categoryId') as string || '0')
+
+    const priceRaw = parseFloat(formData.get('price') as string)
+    if (isNaN(priceRaw) || priceRaw < 0) {
+      return { success: false, error: 'A valid product price is required.' }
+    }
+    const price = priceRaw
+
+    const oldPriceRaw = parseFloat(formData.get('oldPrice') as string || '0')
+    const oldPrice = isNaN(oldPriceRaw) ? 0 : oldPriceRaw
+
+    const stockRaw = parseInt(formData.get('stock') as string || '0')
+    const stock = isNaN(stockRaw) ? 0 : stockRaw
+
+    const categoryIdRaw = parseInt(formData.get('categoryId') as string || '0')
+    const categoryId = isNaN(categoryIdRaw) ? 0 : categoryIdRaw
+
     const unit = sanitizeInput(formData.get('unit') as string || 'per lb', 50)
     const isRecommended = formData.get('isRecommended') === 'true'
     const isFeatured = formData.get('isFeatured') === 'true'
@@ -335,30 +382,22 @@ export async function updateProduct(id: number, formData: FormData) {
     const isWeekdayDeal = formData.get('isWeekdayDeal') === 'true'
     const metaTitle = sanitizeInput(formData.get('metaTitle') as string || '', 255) || null
     const metaDescription = sanitizeInput(formData.get('metaDescription') as string || '', 2000) || null
-    const imageFile = formData.get('image') as File | null
-    const variants = parseVariants(formData)
 
     const existingProduct = await prisma.products.findUnique({ where: { id } })
     if (!existingProduct) throw new Error('Product not found')
 
-    // Validate image file if provided
+    const imageFile = formData.get('image') as File | null
     const imageError = validateImageFile(imageFile)
     if (imageError) {
       return { success: false, error: imageError }
     }
 
     let imageName = existingProduct.image
-    if (imageFile && imageFile.size > 0) {
-      imageName = `${Date.now()}_${imageFile.name.replace(/\s+/g, '_')}`
-      const bytes = await imageFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'products', imageName)
-      
-      await fs.mkdir(path.dirname(uploadPath), { recursive: true })
-      await fs.writeFile(uploadPath, buffer)
+    if (imageFile && imageFile.size > 0 && imageFile.name) {
+      imageName = await saveUploadedFile(imageFile, 'products')
     }
 
-    await prisma.products.update({
+    const updatedProduct = await prisma.products.update({
       where: { id },
       data: {
         name,
@@ -379,7 +418,7 @@ export async function updateProduct(id: number, formData: FormData) {
       }
     })
 
-    // Replace product variants (delete old, insert new)
+    const variants = parseVariants(formData)
     await prisma.product_variants.deleteMany({ where: { product_id: id } })
     if (variants.length > 0) {
       await prisma.product_variants.createMany({
@@ -394,18 +433,30 @@ export async function updateProduct(id: number, formData: FormData) {
 
     revalidatePath('/')
     revalidatePath('/products')
-    return { success: true }
+    revalidatePath('/admin')
+
+    const serializedProduct = {
+      ...updatedProduct,
+      price: Number(updatedProduct.price),
+      old_price: Number(updatedProduct.old_price),
+      stock: updatedProduct.stock ?? 0,
+      is_recommended: !!updatedProduct.is_recommended,
+      is_featured: !!updatedProduct.is_featured,
+      is_trending: !!updatedProduct.is_trending,
+      is_best_seller: !!updatedProduct.is_best_seller,
+      is_weekday_deal: !!updatedProduct.is_weekday_deal,
+    }
+
+    return { success: true, product: serializedProduct }
   } catch (error: any) {
     console.error('Update product error:', error)
-    return { success: false, error: error.message }
+    return { success: false, error: error.message || 'Failed to update product.' }
   }
 }
 
-// Delete a Product
 export async function deleteProduct(id: number) {
   await enforceAuth()
   try {
-    // Delete product references first
     await prisma.wishlist.deleteMany({ where: { product_id: id } })
     await prisma.product_colors.deleteMany({ where: { product_id: id } })
     await prisma.product_gallery.deleteMany({ where: { product_id: id } })
@@ -418,6 +469,7 @@ export async function deleteProduct(id: number) {
 
     revalidatePath('/')
     revalidatePath('/products')
+    revalidatePath('/admin')
     return { success: true }
   } catch (error: any) {
     console.error('Delete product error:', error)
@@ -425,17 +477,21 @@ export async function deleteProduct(id: number) {
   }
 }
 
-// Create a Category
 export async function createCategory(formData: FormData) {
   await enforceAuth()
   try {
     const name = sanitizeInput(formData.get('name') as string || '', 255)
-    const priority = parseInt(formData.get('priority') as string || '0')
+    if (!name) {
+      return { success: false, error: 'Category name is required.' }
+    }
+
+    const priorityRaw = parseInt(formData.get('priority') as string || '0')
+    const priority = isNaN(priorityRaw) ? 0 : priorityRaw
+
     const status = sanitizeInput(formData.get('status') as string || 'active', 20)
     const imageFile = formData.get('image') as File | null
     const bannerFile = formData.get('banner') as File | null
 
-    // Validate image files if provided
     const imageError = validateImageFile(imageFile)
     if (imageError) {
       return { success: false, error: imageError }
@@ -445,51 +501,48 @@ export async function createCategory(formData: FormData) {
       return { success: false, error: bannerError }
     }
 
-    let imageName = ''
-    if (imageFile && imageFile.size > 0) {
-      imageName = `${Date.now()}_icon_${imageFile.name.replace(/\s+/g, '_')}`
-      const bytes = await imageFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'category', imageName)
-      await fs.mkdir(path.dirname(uploadPath), { recursive: true })
-      await fs.writeFile(uploadPath, buffer)
+    let imageName: string | null = null
+    if (imageFile && imageFile.size > 0 && imageFile.name) {
+      imageName = await saveUploadedFile(imageFile, 'category')
     }
 
-    let bannerName = ''
-    if (bannerFile && bannerFile.size > 0) {
-      bannerName = `${Date.now()}_banner_${bannerFile.name.replace(/\s+/g, '_')}`
-      const bytes = await bannerFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'category', bannerName)
-      await fs.mkdir(path.dirname(uploadPath), { recursive: true })
-      await fs.writeFile(uploadPath, buffer)
+    let bannerName: string | null = null
+    if (bannerFile && bannerFile.size > 0 && bannerFile.name) {
+      bannerName = await saveUploadedFile(bannerFile, 'category')
     }
 
-    await prisma.categories.create({
+    const newCategory = await prisma.categories.create({
       data: {
         name,
         priority,
         status: status as any,
-        image: imageName ? imageName : null,
-        banner: bannerName ? bannerName : null
+        image: imageName,
+        banner: bannerName
       }
     })
 
     revalidatePath('/')
     revalidatePath('/products')
-    return { success: true }
+    revalidatePath('/admin')
+
+    return { success: true, category: JSON.parse(JSON.stringify(newCategory)) }
   } catch (error: any) {
     console.error('Create category error:', error)
     return { success: false, error: error.message }
   }
 }
 
-// Update a Category
 export async function updateCategory(id: number, formData: FormData) {
   await enforceAuth()
   try {
     const name = sanitizeInput(formData.get('name') as string || '', 255)
-    const priority = parseInt(formData.get('priority') as string || '0')
+    if (!name) {
+      return { success: false, error: 'Category name is required.' }
+    }
+
+    const priorityRaw = parseInt(formData.get('priority') as string || '0')
+    const priority = isNaN(priorityRaw) ? 0 : priorityRaw
+
     const status = sanitizeInput(formData.get('status') as string || 'active', 20)
     const imageFile = formData.get('image') as File | null
     const bannerFile = formData.get('banner') as File | null
@@ -497,7 +550,6 @@ export async function updateCategory(id: number, formData: FormData) {
     const existingCategory = await prisma.categories.findUnique({ where: { id } })
     if (!existingCategory) throw new Error('Category not found')
 
-    // Validate image files if provided
     const imageError = validateImageFile(imageFile)
     if (imageError) {
       return { success: false, error: imageError }
@@ -508,26 +560,16 @@ export async function updateCategory(id: number, formData: FormData) {
     }
 
     let imageName = existingCategory.image
-    if (imageFile && imageFile.size > 0) {
-      imageName = `${Date.now()}_icon_${imageFile.name.replace(/\s+/g, '_')}`
-      const bytes = await imageFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'category', imageName)
-      await fs.mkdir(path.dirname(uploadPath), { recursive: true })
-      await fs.writeFile(uploadPath, buffer)
+    if (imageFile && imageFile.size > 0 && imageFile.name) {
+      imageName = await saveUploadedFile(imageFile, 'category')
     }
 
     let bannerName = existingCategory.banner
-    if (bannerFile && bannerFile.size > 0) {
-      bannerName = `${Date.now()}_banner_${bannerFile.name.replace(/\s+/g, '_')}`
-      const bytes = await bannerFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'category', bannerName)
-      await fs.mkdir(path.dirname(uploadPath), { recursive: true })
-      await fs.writeFile(uploadPath, buffer)
+    if (bannerFile && bannerFile.size > 0 && bannerFile.name) {
+      bannerName = await saveUploadedFile(bannerFile, 'category')
     }
 
-    await prisma.categories.update({
+    const updatedCategory = await prisma.categories.update({
       where: { id },
       data: {
         name,
@@ -540,18 +582,18 @@ export async function updateCategory(id: number, formData: FormData) {
 
     revalidatePath('/')
     revalidatePath('/products')
-    return { success: true }
+    revalidatePath('/admin')
+
+    return { success: true, category: JSON.parse(JSON.stringify(updatedCategory)) }
   } catch (error: any) {
     console.error('Update category error:', error)
     return { success: false, error: error.message }
   }
 }
 
-// Delete a Category
 export async function deleteCategory(id: number) {
   await enforceAuth()
   try {
-    // Unlink products associated with this category
     await prisma.products.updateMany({
       where: { category_id: id },
       data: { category_id: null }
@@ -563,6 +605,7 @@ export async function deleteCategory(id: number) {
 
     revalidatePath('/')
     revalidatePath('/products')
+    revalidatePath('/admin')
     return { success: true }
   } catch (error: any) {
     console.error('Delete category error:', error)
@@ -570,7 +613,6 @@ export async function deleteCategory(id: number) {
   }
 }
 
-// Create a Banner
 export async function createBanner(formData: FormData) {
   await enforceAuth()
   try {
@@ -579,24 +621,18 @@ export async function createBanner(formData: FormData) {
     const status = sanitizeInput(formData.get('status') as string || 'active', 20)
     const imageFile = formData.get('image') as File | null
 
-    if (!imageFile || imageFile.size === 0) {
-      throw new Error('Image file is required for banners')
+    if (!imageFile || imageFile.size === 0 || !imageFile.name) {
+      return { success: false, error: 'Image file is required for banners.' }
     }
 
-    // Validate banner image
     const imageError = validateImageFile(imageFile)
     if (imageError) {
       return { success: false, error: imageError }
     }
 
-    const imageName = `${Date.now()}_banner_${imageFile.name.replace(/\s+/g, '_')}`
-    const bytes = await imageFile.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'banners', imageName)
-    await fs.mkdir(path.dirname(uploadPath), { recursive: true })
-    await fs.writeFile(uploadPath, buffer)
+    const imageName = await saveUploadedFile(imageFile, 'banners')
 
-    await prisma.banners.create({
+    const newBanner = await prisma.banners.create({
       data: {
         title,
         position: position as any,
@@ -606,14 +642,15 @@ export async function createBanner(formData: FormData) {
     })
 
     revalidatePath('/')
-    return { success: true }
+    revalidatePath('/admin')
+
+    return { success: true, banner: JSON.parse(JSON.stringify(newBanner)) }
   } catch (error: any) {
     console.error('Create banner error:', error)
     return { success: false, error: error.message }
   }
 }
 
-// Delete a Banner
 export async function deleteBanner(id: number) {
   await enforceAuth()
   try {
@@ -621,6 +658,7 @@ export async function deleteBanner(id: number) {
       where: { id }
     })
     revalidatePath('/')
+    revalidatePath('/admin')
     return { success: true }
   } catch (error: any) {
     console.error('Delete banner error:', error)
@@ -628,7 +666,6 @@ export async function deleteBanner(id: number) {
   }
 }
 
-// Create Coupon
 export async function createCoupon(formData: FormData) {
   await enforceAuth()
   try {
@@ -640,33 +677,42 @@ export async function createCoupon(formData: FormData) {
     const usage_limit = parseInt(formData.get('usage_limit') as string || '100')
     const expires_at_raw = formData.get('expires_at') as string
 
-    if (!code || discount_amount <= 0) {
-      return { success: false, error: 'Coupon code and discount amount are required.' }
+    if (!code || isNaN(discount_amount) || discount_amount <= 0) {
+      return { success: false, error: 'Coupon code and a valid discount amount are required.' }
     }
 
     const expires_at = expires_at_raw ? new Date(expires_at_raw) : null
 
-    await prisma.coupons.create({
+    const newCoupon = await prisma.coupons.create({
       data: {
         code,
         discount_type,
         discount_amount,
-        min_order_amount,
-        max_discount,
-        usage_limit,
+        min_order_amount: isNaN(min_order_amount) ? 0 : min_order_amount,
+        max_discount: isNaN(max_discount as any) ? null : max_discount,
+        usage_limit: isNaN(usage_limit) ? 100 : usage_limit,
         expires_at,
         status: 'active'
       }
     })
 
     revalidatePath('/admin')
-    return { success: true }
+
+    return { 
+      success: true, 
+      coupon: {
+        ...newCoupon,
+        discount_amount: Number(newCoupon.discount_amount),
+        min_order_amount: Number(newCoupon.min_order_amount || 0),
+        max_discount: Number(newCoupon.max_discount || 0),
+        expires_at: newCoupon.expires_at ? newCoupon.expires_at.toISOString() : null
+      } 
+    }
   } catch (error: any) {
     return { success: false, error: error.message || 'Failed to create coupon' }
   }
 }
 
-// Delete Coupon
 export async function deleteCoupon(id: number) {
   await enforceAuth()
   try {
@@ -678,7 +724,6 @@ export async function deleteCoupon(id: number) {
   }
 }
 
-// Moderate Review
 export async function updateReviewStatus(id: number, status: 'approved' | 'rejected') {
   await enforceAuth()
   try {
@@ -693,7 +738,6 @@ export async function updateReviewStatus(id: number, status: 'approved' | 'rejec
   }
 }
 
-// Delete Review
 export async function deleteReview(id: number) {
   await enforceAuth()
   try {

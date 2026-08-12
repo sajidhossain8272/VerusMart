@@ -2,6 +2,7 @@ import { getUserSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { formatDate } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -112,7 +113,7 @@ export default async function AccountPage() {
                     <div>
                       <span className="text-xs text-gray-400 font-bold uppercase tracking-wider block">Date</span>
                       <span className="text-xs font-semibold text-gray-700">
-                        {order.order_date ? new Date(order.order_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                        {order.order_date ? formatDate(order.order_date) : 'N/A'}
                       </span>
                     </div>
                     <div>

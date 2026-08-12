@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { formatDate } from '@/lib/utils'
 
 interface ReviewItem {
   id: number
@@ -112,7 +113,7 @@ export default function ReviewSection({ productId, initialReviews }: Props) {
               </div>
               <p className="text-xs text-gray-700 leading-relaxed">{r.comment}</p>
               <span className="text-[10px] text-gray-400 mt-1 block">
-                {r.created_at ? new Date(r.created_at).toLocaleDateString() : ''}
+                {r.created_at ? formatDate(r.created_at) : ''}
               </span>
             </div>
           ))
