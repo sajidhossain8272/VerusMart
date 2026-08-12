@@ -7,6 +7,8 @@ import fs from 'fs/promises'
 import crypto from 'crypto'
 import { getAdminSession, setAdminSession, clearAdminSession } from '@/lib/auth'
 
+import os from 'os'
+
 function getAdminCredentials() {
   const email = process.env.ADMIN_EMAIL
   const password = process.env.ADMIN_PASSWORD
@@ -57,14 +59,23 @@ async function saveUploadedFile(file: File, folder: string): Promise<string> {
   const bytes = await file.arrayBuffer()
   const buffer = Buffer.from(bytes)
   
-  const uploadPath1 = path.join(process.cwd(), 'public', 'admin_uploads', folder, imageName)
-  await fs.mkdir(path.dirname(uploadPath1), { recursive: true })
-  await fs.writeFile(uploadPath1, buffer)
+  try {
+    const uploadPath1 = path.join(process.cwd(), 'public', 'admin_uploads', folder, imageName)
+    await fs.mkdir(path.dirname(uploadPath1), { recursive: true })
+    await fs.writeFile(uploadPath1, buffer)
 
-  if (folder === 'products') {
-    const uploadPath2 = path.join(process.cwd(), 'public', 'products', imageName)
-    await fs.mkdir(path.dirname(uploadPath2), { recursive: true })
-    await fs.writeFile(uploadPath2, buffer)
+    if (folder === 'products') {
+      const uploadPath2 = path.join(process.cwd(), 'public', 'products', imageName)
+      await fs.mkdir(path.dirname(uploadPath2), { recursive: true })
+      await fs.writeFile(uploadPath2, buffer)
+    }
+  } catch (fsErr: any) {
+    console.warn('Local filesystem write notice (read-only filesystem or permissions):', fsErr.message)
+    try {
+      const tmpPath = path.join(os.tmpdir(), 'admin_uploads', folder, imageName)
+      await fs.mkdir(path.dirname(tmpPath), { recursive: true })
+      await fs.writeFile(tmpPath, buffer)
+    } catch {}
   }
 
   return imageName
@@ -257,12 +268,16 @@ export async function createProduct(formData: FormData) {
     }
 
     const description = sanitizeInput(formData.get('description') as string || '', 10000)
+    const variants = parseVariants(formData)
     
     const priceRaw = parseFloat(formData.get('price') as string)
-    if (isNaN(priceRaw) || priceRaw < 0) {
-      return { success: false, error: 'A valid product price is required.' }
+    let price = isNaN(priceRaw) ? 0 : priceRaw
+    if (price <= 0 && variants.length > 0) {
+      price = variants[0].price
     }
-    const price = priceRaw
+    if (price <= 0) {
+      return { success: false, error: 'A valid product price or size variant price is required.' }
+    }
 
     const oldPriceRaw = parseFloat(formData.get('oldPrice') as string || '0')
     const oldPrice = isNaN(oldPriceRaw) ? 0 : oldPriceRaw
@@ -282,6 +297,7 @@ export async function createProduct(formData: FormData) {
     const metaTitle = sanitizeInput(formData.get('metaTitle') as string || '', 255) || null
     const metaDescription = sanitizeInput(formData.get('metaDescription') as string || '', 2000) || null
 
+    const imageUrlInput = sanitizeInput(formData.get('imageUrl') as string || '', 500)
     const imageFile = formData.get('image') as File | null
     const imageError = validateImageFile(imageFile)
     if (imageError) {
@@ -291,6 +307,8 @@ export async function createProduct(formData: FormData) {
     let imageName: string | null = null
     if (imageFile && imageFile.size > 0 && imageFile.name) {
       imageName = await saveUploadedFile(imageFile, 'products')
+    } else if (imageUrlInput) {
+      imageName = imageUrlInput
     }
 
     const product = await prisma.products.create({
@@ -314,7 +332,6 @@ export async function createProduct(formData: FormData) {
       }
     })
 
-    const variants = parseVariants(formData)
     if (variants.length > 0 && product.id) {
       await prisma.product_variants.createMany({
         data: variants.map(v => ({
@@ -358,12 +375,16 @@ export async function updateProduct(id: number, formData: FormData) {
     }
 
     const description = sanitizeInput(formData.get('description') as string || '', 10000)
+    const variants = parseVariants(formData)
 
     const priceRaw = parseFloat(formData.get('price') as string)
-    if (isNaN(priceRaw) || priceRaw < 0) {
-      return { success: false, error: 'A valid product price is required.' }
+    let price = isNaN(priceRaw) ? 0 : priceRaw
+    if (price <= 0 && variants.length > 0) {
+      price = variants[0].price
     }
-    const price = priceRaw
+    if (price <= 0) {
+      return { success: false, error: 'A valid product price or size variant price is required.' }
+    }
 
     const oldPriceRaw = parseFloat(formData.get('oldPrice') as string || '0')
     const oldPrice = isNaN(oldPriceRaw) ? 0 : oldPriceRaw
@@ -386,6 +407,7 @@ export async function updateProduct(id: number, formData: FormData) {
     const existingProduct = await prisma.products.findUnique({ where: { id } })
     if (!existingProduct) throw new Error('Product not found')
 
+    const imageUrlInput = sanitizeInput(formData.get('imageUrl') as string || '', 500)
     const imageFile = formData.get('image') as File | null
     const imageError = validateImageFile(imageFile)
     if (imageError) {
@@ -395,6 +417,8 @@ export async function updateProduct(id: number, formData: FormData) {
     let imageName = existingProduct.image
     if (imageFile && imageFile.size > 0 && imageFile.name) {
       imageName = await saveUploadedFile(imageFile, 'products')
+    } else if (imageUrlInput) {
+      imageName = imageUrlInput
     }
 
     const updatedProduct = await prisma.products.update({
@@ -418,7 +442,6 @@ export async function updateProduct(id: number, formData: FormData) {
       }
     })
 
-    const variants = parseVariants(formData)
     await prisma.product_variants.deleteMany({ where: { product_id: id } })
     if (variants.length > 0) {
       await prisma.product_variants.createMany({

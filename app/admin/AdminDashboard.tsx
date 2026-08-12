@@ -3,7 +3,7 @@
 
 import React, { useState, useTransition } from 'react'
 import WishlistTab from './WishlistTab'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getProductImageUrl } from '@/lib/utils'
 import { 
   resetProducts, 
   updateOrderStatus, 
@@ -858,17 +858,29 @@ export default function AdminDashboard({
                   />
                 </div>
 
-                <div>
-                  <label className="text-xs font-bold text-gray-700 block mb-1">Product Image</label>
-                  <input
-                    type="file"
-                    name="image"
-                    accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
-                    className="w-full border p-2.5 rounded-xl text-xs font-semibold outline-none"
-                  />
+                {/* Image Upload or URL */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Product Image File</label>
+                    <input
+                      type="file"
+                      name="image"
+                      accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+                      className="w-full border p-2.5 rounded-xl text-xs font-semibold outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-bold text-gray-700 block mb-1">Or Image URL / Path (Optional)</label>
+                    <input
+                      name="imageUrl"
+                      defaultValue={editingProduct?.image?.startsWith('http') || editingProduct?.image?.startsWith('/') ? editingProduct.image : ''}
+                      placeholder="e.g. https://domain.com/image.jpg"
+                      className="w-full border p-2.5 rounded-xl text-xs font-semibold outline-none focus:border-[#f85606]"
+                    />
+                  </div>
                   {editingProduct?.image && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <img src={`/admin_uploads/products/${editingProduct.image}`} alt="Current" className="w-12 h-12 object-contain border rounded-lg" />
+                    <div className="md:col-span-2 flex items-center gap-2">
+                      <img src={getProductImageUrl(editingProduct.image)} alt="Current" className="w-12 h-12 object-contain border rounded-lg" />
                       <span className="text-[10px] text-gray-400">Current image: {editingProduct.image}</span>
                     </div>
                   )}
@@ -896,53 +908,76 @@ export default function AdminDashboard({
                   ))}
                 </div>
 
-                {/* Variants */}
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-xs font-bold text-gray-700">Product Variants (Optional)</label>
+                {/* Variants / Size Unit Options */}
+                <div className="border border-orange-100 bg-[#fffcfb] p-5 rounded-2xl space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <label className="text-xs font-black text-[#002b5b] uppercase tracking-wider block">
+                        Product Size / Volume Options & Unit Prices (Optional)
+                      </label>
+                      <p className="text-[11px] text-gray-500 font-medium">
+                        Add per-ML, per-unit, or per-size options (e.g. <strong className="text-[#f85606]">6 ML — ৳185</strong>, <strong className="text-[#f85606]">15 ML — ৳370</strong>, <strong className="text-[#f85606]">30 ML — ৳550</strong>, <strong className="text-[#f85606]">50 ML — ৳820</strong>). Products can be single pricing or multi-size options.
+                      </p>
+                    </div>
                     <button
                       type="button"
                       onClick={addVariantInput}
-                      className="text-xs font-bold text-[#f85606] hover:text-[#d04300] cursor-pointer"
+                      className="bg-[#f85606] hover:bg-[#d04300] text-white text-xs font-bold px-4 py-2.5 rounded-xl transition-all shadow-sm shrink-0 cursor-pointer"
                     >
-                      + Add Variant
+                      + Add Option / Size Variant
                     </button>
                   </div>
-                  {variantInputs.length > 0 && (
-                    <div className="space-y-2">
+
+                  {variantInputs.length > 0 ? (
+                    <div className="space-y-2.5 pt-2">
                       {variantInputs.map((v, idx) => (
-                        <div key={idx} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center border p-3 rounded-xl bg-gray-50">
-                          <input
-                            placeholder="Variant name (e.g. 1kg)"
-                            value={v.variant_name}
-                            onChange={e => updateVariantInput(idx, 'variant_name', e.target.value)}
-                            className="border p-2 rounded-lg text-xs font-semibold outline-none"
-                          />
-                          <input
-                            type="number"
-                            step="0.01"
-                            placeholder="Price"
-                            value={v.price}
-                            onChange={e => updateVariantInput(idx, 'price', e.target.value)}
-                            className="border p-2 rounded-lg text-xs font-semibold outline-none"
-                          />
-                          <input
-                            type="number"
-                            step="0.01"
-                            placeholder="Old Price"
-                            value={v.old_price}
-                            onChange={e => updateVariantInput(idx, 'old_price', e.target.value)}
-                            className="border p-2 rounded-lg text-xs font-semibold outline-none"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => removeVariantInput(idx)}
-                            className="text-red-500 font-bold text-xs cursor-pointer"
-                          >
-                            ✕ Remove
-                          </button>
+                        <div key={idx} className="grid grid-cols-1 sm:grid-cols-4 gap-2.5 items-center border border-gray-200 p-3 rounded-xl bg-white shadow-sm">
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-400 block mb-1">Option / Size Name *</label>
+                            <input
+                              placeholder="e.g. 6 ML, 15 ML, 1 kg"
+                              value={v.variant_name}
+                              onChange={e => updateVariantInput(idx, 'variant_name', e.target.value)}
+                              className="w-full border border-gray-300 p-2 rounded-lg text-xs font-bold text-gray-900 outline-none focus:border-[#f85606]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-400 block mb-1">Price (৳) *</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              placeholder="e.g. 185"
+                              value={v.price}
+                              onChange={e => updateVariantInput(idx, 'price', e.target.value)}
+                              className="w-full border border-gray-300 p-2 rounded-lg text-xs font-bold text-[#f85606] outline-none focus:border-[#f85606]"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-gray-400 block mb-1">Old Price (৳)</label>
+                            <input
+                              type="number"
+                              step="0.01"
+                              placeholder="e.g. 200"
+                              value={v.old_price}
+                              onChange={e => updateVariantInput(idx, 'old_price', e.target.value)}
+                              className="w-full border border-gray-300 p-2 rounded-lg text-xs font-semibold text-gray-500 outline-none"
+                            />
+                          </div>
+                          <div className="flex items-end h-full pt-4 sm:pt-0">
+                            <button
+                              type="button"
+                              onClick={() => removeVariantInput(idx)}
+                              className="w-full bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 font-bold text-xs py-2 px-3 rounded-lg transition-colors cursor-pointer"
+                            >
+                              ✕ Remove
+                            </button>
+                          </div>
                         </div>
                       ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-4 text-xs text-gray-400 font-semibold border border-dashed rounded-xl bg-white">
+                      No size options added yet. Main price above will be used for single-unit pricing.
                     </div>
                   )}
                 </div>

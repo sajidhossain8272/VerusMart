@@ -132,23 +132,27 @@ export default function ProductActions({ product, variants, defaultPrice, defaul
           {/* Variants Selector */}
           {variants.length > 0 && (
             <div className="mb-6">
-              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider block mb-2">
-                Select Option / Size:
+              <label className="text-xs font-black text-[#002b5b] uppercase tracking-wider block mb-2.5">
+                SELECT OPTION / SIZE:
               </label>
-              <div className="flex flex-wrap gap-2">
-                {variants.map((v) => (
-                  <button
-                    key={v.id}
-                    onClick={() => setSelectedVariant(v)}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold border-2 transition-all cursor-pointer ${
-                      selectedVariant?.id === v.id
-                        ? 'border-[#f85606] bg-[#f85606] text-white shadow-sm'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-[#f85606]'
-                    }`}
-                  >
-                    {v.variant_name} — ৳{Number(v.price).toLocaleString('en-BD')}
-                  </button>
-                ))}
+              <div className="flex flex-wrap gap-2.5">
+                {variants.map((v) => {
+                  const isSelected = selectedVariant?.id === v.id
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => setSelectedVariant(v)}
+                      className={`px-5 py-2.5 rounded-full text-xs font-bold border transition-all cursor-pointer shadow-sm ${
+                        isSelected
+                          ? 'border-[#f85606] bg-[#f85606] text-white shadow-md font-black'
+                          : 'border-gray-200 bg-white text-gray-800 hover:border-[#f85606] hover:text-[#f85606]'
+                      }`}
+                    >
+                      {v.variant_name} — ৳{Number(v.price).toLocaleString('en-BD')}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           )}
