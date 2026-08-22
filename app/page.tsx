@@ -5,12 +5,11 @@ import AddToCartBtn from './products/AddToCartBtn'
 import WishlistHeartBtn from './components/WishlistHeartBtn'
 import { getProductImageUrl, getCategoryImageUrl } from '@/lib/utils'
 
-
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
   try {
-    const [categories, banners, featuredProducts, recommendedProducts] = await Promise.all([
+    const [rawCategories, rawBanners, rawFeatured, rawRecommended] = await Promise.all([
       prisma.categories.findMany({ where: { status: 'active' }, orderBy: { priority: 'asc' }, take: 8 }).catch(() => []),
       prisma.banners.findMany({ where: { status: 'active' }, orderBy: { id: 'desc' } }).catch(() => []),
       prisma.products.findMany({ where: { status: 'active', is_featured: true }, orderBy: { id: 'desc' }, take: 8 }).catch(() => []),
@@ -19,19 +18,50 @@ export default async function HomePage() {
 
     const formatTk = (num: number) => `৳${num.toLocaleString('en-BD')}`
 
-    const serializedBanners = (banners || []).map(b => ({
+    const banners = (rawBanners || []).map(b => ({
       id: b.id,
       title: b.title || '',
-      image: b.image,
+      image: b.image || '',
       position: b.position || 'main',
       status: b.status || 'active'
     }))
+
+    const categories = (rawCategories || []).map(c => ({
+      id: c.id,
+      name: c.name,
+      image: c.image || null,
+      priority: c.priority || 0
+    }))
+
+    const featuredProducts = (rawFeatured || []).map(p => {
+      const price = Number(p.price || 0)
+      const oldPrice = Number(p.old_price || 0)
+      const discount = oldPrice > price && oldPrice > 0 ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0
+      return {
+        id: p.id,
+        name: p.name,
+        price,
+        oldPrice,
+        discount,
+        image: p.image || null,
+      }
+    })
+
+    const recommendedProducts = (rawRecommended || []).map(p => {
+      const price = Number(p.price || 0)
+      return {
+        id: p.id,
+        name: p.name,
+        price,
+        image: p.image || null,
+      }
+    })
 
     return (
       <div className="w-[92%] max-w-[1240px] mx-auto py-6 sm:py-8 font-sans">
         
         {/* Banner Slider */}
-        <HomeSlider banners={serializedBanners} />
+        <HomeSlider banners={banners} />
 
         {/* Mega Sale Banner */}
         <div className="bg-gradient-to-br from-[#f85606] to-[#ff8c00] p-4 sm:p-6 rounded-2xl mt-4 flex flex-col sm:flex-row justify-between items-center text-white shadow-lg">
@@ -48,43 +78,48 @@ export default async function HomePage() {
         </div>
 
         {/* SHOP BY CATEGORY */}
-        <div className="my-8">
-          <div className="flex items-center text-center mb-6 before:content-[''] before:flex-1 before:border-b-2 before:border-[#002b5b] after:content-[''] after:flex-1 after:border-b-2 after:border-[#002b5b]">
-            <span className="px-4 font-black text-[#002b5b] text-base sm:text-xl uppercase whitespace-nowrap">
-              Shop By Category
-            </span>
-          </div>
+        {categories.length > 0 && (
+          <div className="my-8">
+            <div className="flex items-center justify-between mb-6 border-b-2 border-[#002b5b] pb-2">
+              <span className="font-black text-[#002b5b] text-base sm:text-xl uppercase">
+                Shop By Category
+              </span>
+              <Link href="/categories" className="text-xs font-bold text-[#f85606] hover:underline">
+                View All →
+              </Link>
+            </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {(categories || []).map((c, idx) => {
-              const colors = ['bg-[#0088cc]', 'bg-[#002b5b]', 'bg-[#333333]', 'bg-[#2e7d32]']
-              return (
-                <Link
-                  href={`/products?category=${c.id}`}
-                  key={c.id}
-                  className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col"
-                >
-                  <div className="w-full h-[140px] sm:h-[160px] overflow-hidden bg-gray-50 relative">
-                    <img
-                      src={getCategoryImageUrl(c.image)}
-                      alt={c.name}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x200.png'
-                      }}
-                    />
-                  </div>
-                  <div className={`text-white p-3 text-xs sm:text-sm font-black uppercase text-center ${colors[idx % 4]}`}>
-                    {c.name}
-                  </div>
-                </Link>
-              )
-            })}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              {categories.map((c, idx) => {
+                const colors = ['bg-[#0088cc]', 'bg-[#002b5b]', 'bg-[#333333]', 'bg-[#2e7d32]']
+                return (
+                  <Link
+                    href={`/products?category=${c.id}`}
+                    key={c.id}
+                    className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 flex flex-col"
+                  >
+                    <div className="w-full h-[140px] sm:h-[160px] overflow-hidden bg-gray-50 relative">
+                      <img
+                        src={getCategoryImageUrl(c.image)}
+                        alt={c.name}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x200.png'
+                        }}
+                      />
+                    </div>
+                    <div className={`text-white p-3 text-xs sm:text-sm font-black uppercase text-center ${colors[idx % 4]}`}>
+                      {c.name}
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* FEATURED PRODUCTS */}
-        {(featuredProducts || []).length > 0 && (
+        {featuredProducts.length > 0 && (
           <div className="mb-10">
             <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-3">
               <h2 className="text-base sm:text-xl font-black text-[#002b5b] uppercase tracking-wide flex items-center gap-2">
@@ -97,19 +132,15 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
               {featuredProducts.map((p) => {
-                const price = Number(p.price || 0)
-                const oldPrice = Number(p.old_price || 0)
-                const discount = oldPrice > price && oldPrice > 0 ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0
-
                 return (
                   <div
                     key={p.id}
                     className="bg-white rounded-2xl overflow-hidden border border-gray-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
                   >
                     <Link href={`/product/${p.id}`} className="block bg-gray-50 p-4 relative">
-                      {discount > 0 && (
+                      {p.discount > 0 && (
                         <div className="absolute top-3 left-3 bg-[#f85606] text-white text-[10px] font-black px-2 py-0.5 rounded-full">
-                          -{discount}%
+                          -{p.discount}%
                         </div>
                       )}
                       <WishlistHeartBtn productId={p.id} />
@@ -133,10 +164,10 @@ export default async function HomePage() {
                       </div>
                       <div>
                         <div className="flex items-baseline gap-2 mb-3">
-                          <span className="text-sm sm:text-base font-black text-[#f85606]">{formatTk(price)}</span>
-                          {discount > 0 && <span className="text-xs text-gray-400 line-through font-semibold">{formatTk(oldPrice)}</span>}
+                          <span className="text-sm sm:text-base font-black text-[#f85606]">{formatTk(p.price)}</span>
+                          {p.discount > 0 && <span className="text-xs text-gray-400 line-through font-semibold">{formatTk(p.oldPrice)}</span>}
                         </div>
-                        <AddToCartBtn product={{ id: p.id, name: p.name, price, image: p.image }} />
+                        <AddToCartBtn product={{ id: p.id, name: p.name, price: p.price, image: p.image }} />
                       </div>
                     </div>
                   </div>
@@ -147,7 +178,7 @@ export default async function HomePage() {
         )}
 
         {/* RECOMMENDED FOR YOU */}
-        {(recommendedProducts || []).length > 0 && (
+        {recommendedProducts.length > 0 && (
           <div className="mb-10">
             <div className="flex justify-between items-center mb-6 border-b border-gray-100 pb-3">
               <h2 className="text-base sm:text-xl font-black text-[#002b5b] uppercase tracking-wide flex items-center gap-2">
@@ -160,7 +191,6 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
               {recommendedProducts.map((p) => {
-                const price = Number(p.price || 0)
                 return (
                   <div
                     key={p.id}
@@ -180,8 +210,8 @@ export default async function HomePage() {
                       <h3 className="text-xs font-bold text-gray-800 line-clamp-2 mb-1">{p.name}</h3>
                     </Link>
                     <div>
-                      <div className="text-xs sm:text-sm font-black text-[#f85606] mb-2">{formatTk(price)}</div>
-                      <AddToCartBtn product={{ id: p.id, name: p.name, price, image: p.image }} />
+                      <div className="text-xs sm:text-sm font-black text-[#f85606] mb-2">{formatTk(p.price)}</div>
+                      <AddToCartBtn product={{ id: p.id, name: p.name, price: p.price, image: p.image }} />
                     </div>
                   </div>
                 )

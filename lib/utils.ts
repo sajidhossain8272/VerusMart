@@ -45,10 +45,8 @@ export function getProductImageUrl(image: string | null | undefined): string {
   }
   // Cloudinary public ID shorthand
   if (cleanImg.startsWith('verusmart/')) {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME
-    if (cloudName) {
-      return `https://res.cloudinary.com/${cloudName}/image/upload/${cleanImg}`
-    }
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dson1fyr'
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${cleanImg}`
   }
   return `/admin_uploads/products/${cleanImg}`
 }
@@ -74,10 +72,8 @@ export function getCategoryImageUrl(image: string | null | undefined): string {
     return cleanImg
   }
   if (cleanImg.startsWith('verusmart/')) {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME
-    if (cloudName) {
-      return `https://res.cloudinary.com/${cloudName}/image/upload/${cleanImg}`
-    }
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dson1fyr'
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${cleanImg}`
   }
   return `/admin_uploads/category/${cleanImg}`
 }
@@ -103,10 +99,8 @@ export function getBannerImageUrl(image: string | null | undefined): string {
     return cleanImg
   }
   if (cleanImg.startsWith('verusmart/')) {
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || process.env.CLOUDINARY_CLOUD_NAME
-    if (cloudName) {
-      return `https://res.cloudinary.com/${cloudName}/image/upload/${cleanImg}`
-    }
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dson1fyr'
+    return `https://res.cloudinary.com/${cloudName}/image/upload/${cleanImg}`
   }
   return `/admin_uploads/banners/${cleanImg}`
 }
