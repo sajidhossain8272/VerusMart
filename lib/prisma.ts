@@ -9,11 +9,16 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
+const prismaConfig: any = {
+  log: ['error'],
+}
+if (urlWithLimit) {
+  prismaConfig.datasourceUrl = urlWithLimit
+}
+
 export const prisma =
   globalForPrisma.prisma ??
-  new PrismaClient({
-    datasourceUrl: urlWithLimit,
-    log: ['error'],
-  })
+  new PrismaClient(prismaConfig)
+
 
 globalForPrisma.prisma = prisma

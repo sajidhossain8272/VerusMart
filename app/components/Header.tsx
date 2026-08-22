@@ -42,7 +42,7 @@ export default async function Header() {
           <Link href="/track-order" className="hover:text-[#f85606] transition-colors">TRACK MY ORDER</Link>
           {user ? (
             <Link href="/account" className="text-[#f85606] font-bold flex items-center gap-1.5 hover:underline">
-              <i className="fa-solid fa-user-check"></i> {user.full_name.split(' ')[0]}
+              <i className="fa-solid fa-user-check"></i> {user.full_name ? user.full_name.split(' ')[0] : user.email ? user.email.split('@')[0] : 'My Account'}
             </Link>
           ) : (
             <div className="flex items-center gap-2">
@@ -53,6 +53,7 @@ export default async function Header() {
           )}
         </div>
       </div>
+
 
       {/* Main Header Desktop */}
       <header className="hidden lg:flex bg-white py-[15px] px-[8%] items-center justify-between gap-[30px] sticky top-0 z-[1000] shadow-[0_2px_10px_rgba(0,0,0,0.05)]">
