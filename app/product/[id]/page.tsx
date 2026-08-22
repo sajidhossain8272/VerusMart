@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const productId = parseInt(id)
   if (isNaN(productId)) return {}
 
-  const product = await prisma.products.findUnique({ where: { id: productId } })
+  const product = await prisma.products.findUnique({ where: { id: productId } }).catch(() => null)
   if (!product) return {}
 
   const metaTitle = (product as any).meta_title || `${product.name} | Verus Mart`
@@ -57,7 +57,8 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
 
   const product = await prisma.products.findUnique({
     where: { id: productId },
-  })
+  }).catch(() => null)
+
 
   if (!product) {
     return notFound()
