@@ -1,26 +1,30 @@
-import { v2 as cloudinary } from 'cloudinary'
+function getCloudinary() {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { v2: cloudinary } = require('cloudinary')
 
-// Configure Cloudinary from environment variables
-const cloudName =
-  process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
-  process.env.CLOUDINARY_CLOUD_NAME ||
-  ''
-const apiKey = process.env.CLOUDINARY_API_KEY || ''
-const apiSecret = process.env.CLOUDINARY_API_SECRET || ''
-const cloudinaryUrl = process.env.CLOUDINARY_URL || ''
+  const cloudinaryUrl = process.env.CLOUDINARY_URL || ''
+  const cloudName =
+    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
+    process.env.CLOUDINARY_CLOUD_NAME ||
+    ''
+  const apiKey = process.env.CLOUDINARY_API_KEY || ''
+  const apiSecret = process.env.CLOUDINARY_API_SECRET || ''
 
-if (cloudinaryUrl) {
-  cloudinary.config({
-    cloudinary_url: cloudinaryUrl,
-    secure: true,
-  })
-} else if (cloudName && apiKey && apiSecret) {
-  cloudinary.config({
-    cloud_name: cloudName,
-    api_key: apiKey,
-    api_secret: apiSecret,
-    secure: true,
-  })
+  if (cloudinaryUrl) {
+    cloudinary.config({
+      cloudinary_url: cloudinaryUrl,
+      secure: true,
+    })
+  } else if (cloudName && apiKey && apiSecret) {
+    cloudinary.config({
+      cloud_name: cloudName,
+      api_key: apiKey,
+      api_secret: apiSecret,
+      secure: true,
+    })
+  }
+
+  return cloudinary
 }
 
 export function isCloudinaryConfigured(): boolean {
@@ -59,28 +63,7 @@ export async function uploadToCloudinary(
   folder: string = 'products',
   customFileName?: string
 ): Promise<CloudinaryUploadResponse> {
-  // Re-check config in case env was loaded at runtime
-  if (process.env.CLOUDINARY_URL) {
-    cloudinary.config({
-      cloudinary_url: process.env.CLOUDINARY_URL,
-      secure: true,
-    })
-  } else {
-    const cName =
-      process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
-      process.env.CLOUDINARY_CLOUD_NAME
-    const key = process.env.CLOUDINARY_API_KEY
-    const secret = process.env.CLOUDINARY_API_SECRET
-    if (cName && key && secret) {
-      cloudinary.config({
-        cloud_name: cName,
-        api_key: key,
-        api_secret: secret,
-        secure: true,
-      })
-    }
-  }
-
+  const cloudinary = getCloudinary()
   const uploadFolder = `verusmart/${folder}`
 
   if (typeof fileInput === 'string') {
@@ -92,7 +75,7 @@ export async function uploadToCloudinary(
           folder: uploadFolder,
           resource_type: 'auto',
         },
-        (error, result) => {
+        (error: any, result: any) => {
           if (error || !result) {
             reject(error || new Error('Cloudinary upload returned empty response.'))
           } else {
@@ -118,7 +101,7 @@ export async function uploadToCloudinary(
         folder: uploadFolder,
         resource_type: 'auto',
       },
-      (error, result) => {
+      (error: any, result: any) => {
         if (error || !result) {
           reject(error || new Error('Cloudinary upload stream returned empty response.'))
         } else {
@@ -138,4 +121,3 @@ export async function uploadToCloudinary(
   })
 }
 
-export default cloudinary
