@@ -1,3 +1,7 @@
+const DEFAULT_CLOUD_NAME = 'dson1fyr'
+const DEFAULT_API_KEY = '723191414244734'
+const DEFAULT_API_SECRET = '7_1fiFCLtws-zALZraigNQR_hR8'
+
 function getCloudinary() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports
   const { v2: cloudinary } = require('cloudinary')
@@ -6,16 +10,16 @@ function getCloudinary() {
   const cloudName =
     process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
     process.env.CLOUDINARY_CLOUD_NAME ||
-    ''
-  const apiKey = process.env.CLOUDINARY_API_KEY || ''
-  const apiSecret = process.env.CLOUDINARY_API_SECRET || ''
+    DEFAULT_CLOUD_NAME
+  const apiKey = process.env.CLOUDINARY_API_KEY || DEFAULT_API_KEY
+  const apiSecret = process.env.CLOUDINARY_API_SECRET || DEFAULT_API_SECRET
 
   if (cloudinaryUrl) {
     cloudinary.config({
       cloudinary_url: cloudinaryUrl,
       secure: true,
     })
-  } else if (cloudName && apiKey && apiSecret) {
+  } else {
     cloudinary.config({
       cloud_name: cloudName,
       api_key: apiKey,
@@ -31,9 +35,10 @@ export function isCloudinaryConfigured(): boolean {
   if (process.env.CLOUDINARY_URL) return true
   const cName =
     process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
-    process.env.CLOUDINARY_CLOUD_NAME
-  const key = process.env.CLOUDINARY_API_KEY
-  const secret = process.env.CLOUDINARY_API_SECRET
+    process.env.CLOUDINARY_CLOUD_NAME ||
+    DEFAULT_CLOUD_NAME
+  const key = process.env.CLOUDINARY_API_KEY || DEFAULT_API_KEY
+  const secret = process.env.CLOUDINARY_API_SECRET || DEFAULT_API_SECRET
   return !!(cName && key && secret)
 }
 
@@ -41,7 +46,7 @@ export function getCloudinaryCloudName(): string {
   return (
     process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
     process.env.CLOUDINARY_CLOUD_NAME ||
-    ''
+    DEFAULT_CLOUD_NAME
   )
 }
 
