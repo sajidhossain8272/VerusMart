@@ -6,11 +6,11 @@ export const dynamic = 'force-dynamic'
 export async function GET() {
   const health = {
     status: 'ok',
-    version: 'e302dda-debug',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     database: 'unknown',
   }
+
 
 
   try {

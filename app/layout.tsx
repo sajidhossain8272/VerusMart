@@ -203,6 +203,9 @@ fbq('track', 'PageView');`,
           />
         </noscript>
 
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+      </head>
+      <body className={roboto.variable}>
         {/* Google Analytics (gtag.js) */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-01JZ2L20C3"
@@ -218,9 +221,6 @@ fbq('track', 'PageView');`,
           `}
         </Script>
 
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-      </head>
-      <body className={roboto.variable}>
         <noscript>
           <iframe
             src="https://www.googletagmanager.com/ns.html?id=GTM-M4WDWDWX"

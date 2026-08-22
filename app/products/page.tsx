@@ -6,7 +6,6 @@ import SortDropdown from './SortDropdown'
 import WishlistHeartBtn from '../components/WishlistHeartBtn'
 import { getProductImageUrl } from '@/lib/utils'
 
-
 export const dynamic = 'force-dynamic'
 const PAGE_SIZE = 24
 
@@ -15,43 +14,50 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<{ category?: string; search?: string; type?: string }>
 }): Promise<Metadata> {
-  const params = await searchParams
-  const categoryId = params.category ? parseInt(params.category) : undefined
-  const search = params.search?.trim() || ''
-  const type = params.type || ''
+  try {
+    const params = await searchParams
+    const categoryId = params.category ? parseInt(params.category) : undefined
+    const search = params.search?.trim() || ''
+    const type = params.type || ''
 
-  let title = 'All Products & Groceries | Verus Mart Bangladesh'
-  let description = 'Browse our complete collection of authentic groceries, fresh produce, and home essentials with fast delivery in Bangladesh.'
+    let title = 'All Products & Groceries | Verus Mart Bangladesh'
+    let description = 'Browse our complete collection of authentic groceries, fresh produce, and home essentials with fast delivery in Bangladesh.'
 
-  if (categoryId && !isNaN(categoryId)) {
-    const cat = await prisma.categories.findUnique({ where: { id: categoryId } }).catch(() => null)
-    if (cat) {
-      title = `${cat.name} Online Shopping | Verus Mart Bangladesh`
-      description = `Buy authentic ${cat.name} at the best price in Bangladesh. Fast home delivery and cash on delivery at Verus Mart.`
+    if (categoryId && !isNaN(categoryId)) {
+      const cat = await prisma.categories.findUnique({ where: { id: categoryId } }).catch(() => null)
+      if (cat) {
+        title = `${cat.name} Online Shopping | Verus Mart Bangladesh`
+        description = `Buy authentic ${cat.name} at the best price in Bangladesh. Fast home delivery and cash on delivery at Verus Mart.`
+      }
+    } else if (search) {
+      title = `Search Results for "${search}" | Verus Mart Bangladesh`
+      description = `Discover best deals and top products matching "${search}" at Verus Mart Bangladesh.`
+    } else if (type === 'hot') {
+      title = 'Hot Mega Deals & Special Offers | Verus Mart Bangladesh'
+      description = 'Save big with hot deals and flash discounts on groceries, fruits, and electronics at Verus Mart.'
     }
-  } else if (search) {
-    title = `Search Results for "${search}" | Verus Mart Bangladesh`
-    description = `Discover best deals and top products matching "${search}" at Verus Mart Bangladesh.`
-  } else if (type === 'hot') {
-    title = 'Hot Mega Deals & Special Offers | Verus Mart Bangladesh'
-    description = 'Save big with hot deals and flash discounts on groceries, fruits, and electronics at Verus Mart.'
-  }
 
-  return {
-    title,
-    description,
-    openGraph: {
+    return {
       title,
       description,
-      url: 'https://verusmart.com/products',
-      siteName: 'Verus Mart',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
+      openGraph: {
+        title,
+        description,
+        url: 'https://verusmart.com/products',
+        siteName: 'Verus Mart',
+        type: 'website',
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+      },
+    }
+  } catch {
+    return {
+      title: 'Products | Verus Mart Bangladesh',
+      description: 'Shop top quality authentic products online with cash on delivery at Verus Mart.',
+    }
   }
 }
 
@@ -79,7 +85,6 @@ export default async function ProductsPage({
         { meta_title: { contains: search, mode: 'insensitive' } },
         { meta_description: { contains: search, mode: 'insensitive' } },
         { unit: { contains: search, mode: 'insensitive' } },
-        { category: { is: { name: { contains: search, mode: 'insensitive' } } } },
       ]
     }
     if (type === 'hot') where.is_featured = true
@@ -102,12 +107,8 @@ export default async function ProductsPage({
       categoryId && !isNaN(categoryId) ? prisma.categories.findUnique({ where: { id: categoryId } }).catch(() => null) : Promise.resolve(null),
     ])
 
-    function cAndPStatusCheck(item: any) {
-      return item && (!item.status || String(item.status) === 'active')
-    }
-
-    const products = (rawProducts || []).filter(p => cAndPStatusCheck(p))
-    const categories = (rawCategories || []).filter(c => cAndPStatusCheck(c))
+    const products = (rawProducts || []).filter(p => p && (!p.status || String(p.status) === 'active'))
+    const categories = (rawCategories || []).filter(c => c && (!c.status || String(c.status) === 'active'))
 
     const totalPages = Math.ceil(total / PAGE_SIZE)
 
@@ -118,9 +119,7 @@ export default async function ProductsPage({
       return `/products?${p.toString()}`
     }
 
-    const formatTk = (num: number) => {
-      return `৳${num.toLocaleString('en-BD')}`
-    }
+    const formatTk = (num: number) => `৳${num.toLocaleString('en-BD')}`
 
     return (
       <div className="w-[92%] max-w-[1240px] mx-auto py-6 sm:py-8 font-sans">
@@ -230,7 +229,7 @@ export default async function ProductsPage({
             <div className="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-gray-200/80 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-base sm:text-lg font-black text-[#002b5b] uppercase tracking-wide">
-                  {selectedCat ? selectedCat.name : 'ALL PRODUCTS'}
+                  {selectedCat ? selectedCat.name : search ? `Search: "${search}"` : type === 'hot' ? 'Hot Mega Deals' : type === 'weekly' ? 'Weekly Deals' : 'All Products'}
                 </h1>
                 <p className="text-xs text-gray-500 mt-0.5 font-medium">
                   {search && <span>Showing results for &ldquo;<strong className="text-gray-800">{search}</strong>&rdquo; — </span>}
@@ -250,7 +249,9 @@ export default async function ProductsPage({
                 </div>
                 <h2 className="text-lg font-bold text-gray-900 mb-2">No matching products found</h2>
                 <p className="text-xs text-gray-500 max-w-sm mx-auto mb-6">
-                  We couldn't find any products matching your criteria. Try adjusting your filters or search keywords.
+                  {search
+                    ? `We couldn't find any products matching "${search}". Try adjusting your filters or search keywords.`
+                    : 'There are no products in this category at the moment. Please check back later.'}
                 </p>
                 <Link
                   href="/products"
@@ -292,7 +293,6 @@ export default async function ProductsPage({
                             }}
                           />
                         </div>
-
                       </Link>
 
                       {/* Card Details Body */}
@@ -307,7 +307,7 @@ export default async function ProductsPage({
                               <i className="fa-solid fa-star"></i>
                               <i className="fa-solid fa-star"></i>
                             </div>
-                            <span className="text-[10px] text-gray-400 font-bold">(4.9)</span>
+                            <span className="text-[10px] text-gray-400 font-bold">(5.0)</span>
                           </div>
 
                           {/* Title */}
