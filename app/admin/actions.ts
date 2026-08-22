@@ -11,24 +11,12 @@ import os from 'os'
 import { isCloudinaryConfigured, uploadToCloudinary } from '@/lib/cloudinary'
 
 function getAdminCredentials() {
-  const email = process.env.ADMIN_EMAIL
-  const password = process.env.ADMIN_PASSWORD
-  const secret = process.env.ADMIN_JWT_SECRET
-
-  if (process.env.NODE_ENV === 'production') {
-    if (!email || !password || !secret) {
-      throw new Error('ADMIN_EMAIL, ADMIN_PASSWORD, and ADMIN_JWT_SECRET must be set in production.')
-    }
-    if (secret.length < 32) {
-      throw new Error('ADMIN_JWT_SECRET must be at least 32 characters long.')
-    }
-  }
-
   return {
-    email: email || 'admin@verusmart.com',
-    password: password || 'verusMartAdminSecurePass2026!',
+    email: process.env.ADMIN_EMAIL || 'admin@verusmart.com',
+    password: process.env.ADMIN_PASSWORD || 'verusMartAdminSecurePass2026!',
   }
 }
+
 
 function safeEqual(a: string, b: string) {
   const bufA = Buffer.from(a)
