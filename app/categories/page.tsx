@@ -24,9 +24,6 @@ export default async function CategoriesPage() {
                     src={getCategoryImageUrl(c.image)}
                     alt={c.name}
                     className="max-w-[100%] max-h-[100%] object-contain"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/150x150.png'
-                    }}
                   />
                </div>
 

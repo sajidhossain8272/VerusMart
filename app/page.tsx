@@ -103,9 +103,6 @@ export default async function HomePage() {
                         src={getCategoryImageUrl(c.image)}
                         alt={c.name}
                         className="w-full h-full object-cover"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x200.png'
-                        }}
                       />
                     </div>
                     <div className={`text-white p-3 text-xs sm:text-sm font-black uppercase text-center ${colors[idx % 4]}`}>
@@ -149,9 +146,6 @@ export default async function HomePage() {
                           src={getProductImageUrl(p.image)}
                           alt={p.name}
                           className="max-h-full max-w-full object-contain"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x300.png'
-                          }}
                         />
                       </div>
                     </Link>
@@ -202,9 +196,6 @@ export default async function HomePage() {
                           src={getProductImageUrl(p.image)}
                           alt={p.name}
                           className="max-h-full max-w-full object-contain"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x300.png'
-                          }}
                         />
                       </div>
                       <h3 className="text-xs font-bold text-gray-800 line-clamp-2 mb-1">{p.name}</h3>

@@ -87,9 +87,6 @@ export default async function OrderSuccessPage({ params }: Props) {
                         src={getProductImageUrl(item.image)}
                         alt={item.product_name || ''}
                         className="max-w-full max-h-full object-contain"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
-                        }}
                       />
                     ) : (
                       <i className="fa-solid fa-box text-gray-300"></i>

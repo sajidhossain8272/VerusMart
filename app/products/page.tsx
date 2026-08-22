@@ -288,9 +288,6 @@ export default async function ProductsPage({
                             src={getProductImageUrl(p.image)}
                             alt={p.name}
                             className="max-h-full max-w-full object-contain filter drop-shadow-md group-hover:scale-108 transition-transform duration-500 ease-out"
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x300.png'
-                            }}
                           />
                         </div>
                       </Link>

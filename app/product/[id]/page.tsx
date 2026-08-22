@@ -134,9 +134,6 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
                 src={getProductImageUrl(product.image)}
                 alt={product.name}
                 className="max-h-[350px] w-auto max-w-full object-contain filter drop-shadow-md"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/400x400.png'
-                }}
               />
             </div>
           </div>
@@ -265,9 +262,6 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
                           src={getProductImageUrl(p.image)}
                           alt={p.name}
                           className="max-h-full max-w-full object-contain"
-                          onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x300.png'
-                          }}
                         />
                       </div>
                     </Link>
