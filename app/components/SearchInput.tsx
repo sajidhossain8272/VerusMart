@@ -3,6 +3,8 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { getProductImageUrl } from '@/lib/utils'
+
 
 interface ProductResult {
   id: number
@@ -142,11 +144,15 @@ export default function SearchInput() {
                   >
                     <div className="w-12 h-12 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100 p-1 flex items-center justify-center">
                       <img
-                        src={product.image ? `/admin_uploads/products/${product.image}` : 'https://placehold.jp/100x100.png'}
+                        src={getProductImageUrl(product.image)}
                         alt={product.name}
                         className="max-h-full max-w-full object-contain"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                        }}
                       />
                     </div>
+
                     <div className="flex-1 min-w-0">
                       <h4 className="text-xs font-bold text-gray-900 group-hover:text-[#f85606] transition-colors truncate">
                         {product.name}

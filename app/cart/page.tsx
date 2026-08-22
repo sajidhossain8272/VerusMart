@@ -2,7 +2,7 @@
 
 import { useCart } from '@/app/context/CartContext'
 import Link from 'next/link'
-import Image from 'next/image'
+import { getProductImageUrl } from '@/lib/utils'
 
 export default function CartPage() {
   const { cartItems, cartCount, cartTotal, removeFromCart, updateQty, clearCart } = useCart()
@@ -52,13 +52,17 @@ export default function CartPage() {
             <div key={`${item.id}-${item.variantName}`} className="bg-white rounded-xl p-3 sm:p-[15px] border border-[#f0f0f0] shadow-[0_2px_8px_rgba(0,0,0,0.04)] flex gap-3 sm:gap-[15px] items-center">
               <Link href={`/product/${item.id}`} className="shrink-0">
                 <div className="w-[65px] h-[65px] sm:w-[80px] sm:h-[80px] border border-[#eee] rounded-[6px] flex items-center justify-center overflow-hidden bg-[#fafafa]">
-                  {item.image ? (
-                    <img src={`/admin_uploads/products/${item.image}`} alt={item.name} className="max-w-full max-h-full object-contain" />
-                  ) : (
-                    <img src="https://placehold.jp/150x150.png" alt={item.name} className="max-w-full max-h-full object-contain" />
-                  )}
+                  <img
+                    src={getProductImageUrl(item.image)}
+                    alt={item.name}
+                    className="max-w-full max-h-full object-contain"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/150x150.png'
+                    }}
+                  />
                 </div>
               </Link>
+
 
               <div className="flex-1 min-w-0">
                 <Link href={`/product/${item.id}`} className="text-[13px] sm:text-[14px] font-medium text-[#212121] hover:text-[#f85606] transition-colors line-clamp-2 block mb-1">

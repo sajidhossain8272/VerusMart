@@ -1,9 +1,10 @@
-
 'use client'
 
 import React, { useState, useTransition } from 'react'
 import WishlistTab from './WishlistTab'
-import { formatDate, getProductImageUrl } from '@/lib/utils'
+import { formatDate, getProductImageUrl, getCategoryImageUrl, getBannerImageUrl, getStoreLogoUrl } from '@/lib/utils'
+
+
 import { 
   resetProducts, 
   updateOrderStatus, 
@@ -1086,8 +1087,15 @@ export default function AdminDashboard({
                     />
                     {editingCategory?.image && (
                       <div className="mt-2 flex items-center gap-2">
-                        <img src={`/admin_uploads/category/${editingCategory.image}`} alt="Current" className="w-12 h-12 object-contain border rounded-lg" />
-                        <span className="text-[10px] text-gray-400">Current: {editingCategory.image}</span>
+                        <img
+                          src={getCategoryImageUrl(editingCategory.image)}
+                          alt="Current"
+                          className="w-12 h-12 object-contain border rounded-lg"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                          }}
+                        />
+                        <span className="text-[10px] text-gray-400 truncate max-w-xs">Current: {editingCategory.image}</span>
                       </div>
                     )}
                   </div>
@@ -1101,8 +1109,15 @@ export default function AdminDashboard({
                     />
                     {editingCategory?.banner && (
                       <div className="mt-2 flex items-center gap-2">
-                        <img src={`/admin_uploads/category/${editingCategory.banner}`} alt="Current Banner" className="w-12 h-12 object-contain border rounded-lg" />
-                        <span className="text-[10px] text-gray-400">Current: {editingCategory.banner}</span>
+                        <img
+                          src={getCategoryImageUrl(editingCategory.banner)}
+                          alt="Current Banner"
+                          className="w-12 h-12 object-contain border rounded-lg"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                          }}
+                        />
+                        <span className="text-[10px] text-gray-400 truncate max-w-xs">Current: {editingCategory.banner}</span>
                       </div>
                     )}
                   </div>
@@ -1140,9 +1155,19 @@ export default function AdminDashboard({
                           <tr key={c.id} className="hover:bg-gray-50">
                             <td className="p-3">
                               <div className="w-12 h-12 bg-gray-50 border rounded-lg overflow-hidden flex items-center justify-center">
-                                {c.image ? <img src={`/admin_uploads/category/${c.image}`} alt={c.name} className="max-h-full max-w-full object-contain" /> : 'No Img'}
+                                {c.image ? (
+                                  <img
+                                    src={getCategoryImageUrl(c.image)}
+                                    alt={c.name}
+                                    className="max-h-full max-w-full object-contain"
+                                    onError={(e) => {
+                                      (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                                    }}
+                                  />
+                                ) : 'No Img'}
                               </div>
                             </td>
+
                             <td className="p-3 font-bold text-gray-900">{c.name}</td>
                             <td className="p-3 text-gray-600">{c.priority ?? 0}</td>
                             <td className="p-3">
@@ -1245,8 +1270,16 @@ export default function AdminDashboard({
                     banners.map(b => (
                       <div key={b.id} className="border rounded-xl overflow-hidden bg-gray-50">
                         <div className="h-[120px] overflow-hidden bg-gray-100">
-                          <img src={`/admin_uploads/banners/${b.image}`} alt={b.title || 'Banner'} className="w-full h-full object-cover" />
+                          <img
+                            src={getBannerImageUrl(b.image)}
+                            alt={b.title || 'Banner'}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/1200x400.png'
+                            }}
+                          />
                         </div>
+
                         <div className="p-4 flex justify-between items-center">
                           <div>
                             <div className="font-bold text-xs text-gray-900">{b.title || 'Untitled Banner'}</div>
@@ -1492,10 +1525,18 @@ export default function AdminDashboard({
                   />
                   {initialSettings?.logo && (
                     <div className="mt-2 flex items-center gap-2">
-                      <img src={`/admin_uploads/${initialSettings.logo}`} alt="Current Logo" className="w-12 h-12 object-contain border rounded-lg" />
+                      <img
+                        src={getStoreLogoUrl(initialSettings.logo)}
+                        alt="Current Logo"
+                        className="w-12 h-12 object-contain border rounded-lg"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = '/admin_uploads/logo.png'
+                        }}
+                      />
                       <span className="text-[10px] text-gray-400">Current logo</span>
                     </div>
                   )}
+
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>

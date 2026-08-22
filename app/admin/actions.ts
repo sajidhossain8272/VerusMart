@@ -8,6 +8,7 @@ import crypto from 'crypto'
 import { getAdminSession, setAdminSession, clearAdminSession } from '@/lib/auth'
 
 import os from 'os'
+import { isCloudinaryConfigured, uploadToCloudinary } from '@/lib/cloudinary'
 
 function getAdminCredentials() {
   const email = process.env.ADMIN_EMAIL
@@ -36,7 +37,7 @@ function safeEqual(a: string, b: string) {
   return crypto.timingSafeEqual(bufA, bufB)
 }
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024 // 5MB
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024 // 10MB
 
 function validateImageFile(file: File | null): string | null {
   if (!file || file.size === 0 || !file.name) return null
@@ -45,20 +46,34 @@ function validateImageFile(file: File | null): string | null {
   const fileType = (file.type || '').toLowerCase()
   
   if (!allowedExts.includes(ext) && !fileType.startsWith('image/')) {
-    return `Invalid file type for ${file.name}. Allowed image formats: JPG, PNG, WebP, GIF, SVG`
+    return `Invalid file type for ${file.name}. Allowed image formats: JPG, PNG, WebP, GIF, SVG, AVIF`
   }
   if (file.size > MAX_IMAGE_SIZE) {
-    return `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 5MB.`
+    return `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Maximum size is 10MB.`
   }
   return null
 }
 
 async function saveUploadedFile(file: File, folder: string): Promise<string> {
-  const sanitizeFileName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_')
-  const imageName = `${Date.now()}_${sanitizeFileName}`
   const bytes = await file.arrayBuffer()
   const buffer = Buffer.from(bytes)
-  
+
+  // 1. Prioritize Cloudinary if configured
+  if (isCloudinaryConfigured()) {
+    try {
+      const uploadRes = await uploadToCloudinary(buffer, folder, file.name)
+      if (uploadRes?.secure_url) {
+        return uploadRes.secure_url
+      }
+    } catch (cldErr: any) {
+      console.error('Cloudinary upload attempt failed:', cldErr?.message || cldErr)
+      // Fall through to local storage if Cloudinary fails
+    }
+  }
+
+  // 2. Local disk write
+  const sanitizeFileName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_')
+  const imageName = `${Date.now()}_${sanitizeFileName}`
   try {
     const uploadPath1 = path.join(process.cwd(), 'public', 'admin_uploads', folder, imageName)
     await fs.mkdir(path.dirname(uploadPath1), { recursive: true })
@@ -71,12 +86,11 @@ async function saveUploadedFile(file: File, folder: string): Promise<string> {
     }
     return imageName
   } catch (fsErr: any) {
-    console.warn('Local disk write notice (read-only filesystem or serverless):', fsErr.message)
-    const mimeType = file.type || 'image/jpeg'
-    const base64Str = buffer.toString('base64')
-    return `data:${mimeType};base64,${base64Str}`
+    console.error('Local disk write error:', fsErr.message)
+    throw new Error('Failed to save image. Please verify your Cloudinary configuration in .env or check disk permissions.')
   }
 }
+
 
 function sanitizeInput(value: string, maxLength = 5000): string {
   return value
@@ -210,13 +224,9 @@ export async function updateStoreSettings(formData: FormData) {
 
     let logoName: string | null = null
     if (logoFile && logoFile.size > 0 && logoFile.name) {
-      const bytes = await logoFile.arrayBuffer()
-      const buffer = Buffer.from(bytes)
-      const uploadPath = path.join(process.cwd(), 'public', 'admin_uploads', 'logo.png')
-      await fs.mkdir(path.dirname(uploadPath), { recursive: true })
-      await fs.writeFile(uploadPath, buffer)
-      logoName = 'logo.png'
+      logoName = await saveUploadedFile(logoFile, 'business')
     }
+
 
     const settingsData: Record<string, any> = {
       company_name: companyName,

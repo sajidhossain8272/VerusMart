@@ -5,6 +5,7 @@ import type { Metadata } from 'next'
 import ProductActions from './ProductActions'
 import AddToCartBtn from '@/app/products/AddToCartBtn'
 import ReviewSection from './ReviewSection'
+import { getProductImageUrl } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,7 +20,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const metaTitle = (product as any).meta_title || `${product.name} | Verus Mart`
   const cleanDesc = product.description?.replace(/<[^>]*>?/gm, '').trim() || ''
   const metaDesc = (product as any).meta_description || cleanDesc.substring(0, 160) || `Buy ${product.name} at Verus Mart Bangladesh with fast delivery.`
-  const imageUrl = product.image ? `https://verusmart.com/admin_uploads/products/${product.image}` : 'https://verusmart.com/admin_uploads/logo.png'
+  const imageUrl = getProductImageUrl(product.image)
+
 
   return {
     title: metaTitle,
@@ -89,7 +91,7 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
 
   const formatTk = (num: number) => `৳${num.toLocaleString('en-BD')}`
 
-  const imageUrl = product.image ? `https://verusmart.com/admin_uploads/products/${product.image}` : 'https://verusmart.com/admin_uploads/logo.png'
+  const imageUrl = getProductImageUrl(product.image)
   const cleanDesc = (product.description || '').replace(/<[^>]*>?/gm, '').trim() || product.name
 
   const productJsonLd = {
@@ -207,12 +209,16 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
                   <Link href={`/product/${p.id}`} className="block relative bg-gradient-to-b from-[#f9fafb] to-[#f1f5f9] overflow-hidden">
                     <div className="h-[200px] sm:h-[230px] w-full p-4 flex items-center justify-center">
                       <img
-                        src={p.image ? `/admin_uploads/products/${p.image}` : 'https://placehold.jp/300x300.png'}
+                        src={getProductImageUrl(p.image)}
                         alt={p.name}
                         className="max-h-full max-w-full object-contain filter drop-shadow-md group-hover:scale-108 transition-transform duration-500 ease-out"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x300.png'
+                        }}
                       />
                     </div>
                   </Link>
+
 
                   <div className="p-4 flex flex-col flex-1 justify-between bg-white">
                     <div>

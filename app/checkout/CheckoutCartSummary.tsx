@@ -1,6 +1,7 @@
 'use client'
 
 import { useCart } from '@/app/context/CartContext'
+import { getProductImageUrl } from '@/lib/utils'
 
 export default function CheckoutCartSummary() {
   const { cartItems, cartCount, cartTotal } = useCart()
@@ -17,12 +18,16 @@ export default function CheckoutCartSummary() {
           cartItems.map(item => (
             <div key={`${item.id}-${item.variantName}`} className="flex items-center gap-[10px] py-[8px] border-b border-[#f5f5f5]">
               <div className="w-[45px] h-[45px] rounded-[4px] border border-[#eee] overflow-hidden shrink-0 bg-[#fafafa] flex items-center justify-center">
-                {item.image ? (
-                  <img src={`/admin_uploads/products/${item.image}`} alt={item.name} className="max-w-full max-h-full object-contain" />
-                ) : (
-                  <img src="https://placehold.jp/100x100.png" alt={item.name} className="max-w-full max-h-full object-contain" />
-                )}
+                <img
+                  src={getProductImageUrl(item.image)}
+                  alt={item.name}
+                  className="max-w-full max-h-full object-contain"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                  }}
+                />
               </div>
+
               <div className="flex-1 min-w-0">
                 <div className="text-[12px] text-[#333] line-clamp-1 font-medium">{item.name}</div>
                 {item.variantName && item.variantName !== 'Regular' && (

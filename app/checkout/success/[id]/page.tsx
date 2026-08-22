@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import { getProductImageUrl } from '@/lib/utils'
+
 
 export const dynamic = 'force-dynamic'
 
@@ -81,11 +83,19 @@ export default async function OrderSuccessPage({ params }: Props) {
                 <div key={item.id} className="py-4 flex gap-4 items-center">
                   <div className="w-14 h-14 bg-gray-50 border border-gray-100 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
                     {item.image ? (
-                      <img src={`/admin_uploads/products/${item.image}`} alt={item.product_name || ''} className="max-w-full max-h-full object-contain" />
+                      <img
+                        src={getProductImageUrl(item.image)}
+                        alt={item.product_name || ''}
+                        className="max-w-full max-h-full object-contain"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                        }}
+                      />
                     ) : (
                       <i className="fa-solid fa-box text-gray-300"></i>
                     )}
                   </div>
+
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-gray-900 truncate">{item.product_name}</p>
                     {item.variant_name && item.variant_name !== 'Regular' && (

@@ -4,6 +4,8 @@ import Link from 'next/link'
 import AddToCartBtn from './AddToCartBtn'
 import SortDropdown from './SortDropdown'
 import WishlistHeartBtn from '../components/WishlistHeartBtn'
+import { getProductImageUrl } from '@/lib/utils'
+
 
 export const dynamic = 'force-dynamic'
 const PAGE_SIZE = 24
@@ -277,11 +279,15 @@ export default async function ProductsPage({
                     <Link href={`/product/${p.id}`} className="block relative bg-gradient-to-b from-[#f9fafb] to-[#f1f5f9] overflow-hidden">
                       <div className="h-[210px] sm:h-[250px] md:h-[270px] w-full p-4 flex items-center justify-center">
                         <img
-                          src={p.image ? `/admin_uploads/products/${p.image}` : 'https://placehold.jp/300x300.png'}
+                          src={getProductImageUrl(p.image)}
                           alt={p.name}
                           className="max-h-full max-w-full object-contain filter drop-shadow-md group-hover:scale-108 transition-transform duration-500 ease-out"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x300.png'
+                          }}
                         />
                       </div>
+
                     </Link>
 
                     {/* Card Details Body */}

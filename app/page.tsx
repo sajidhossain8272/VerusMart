@@ -3,6 +3,8 @@ import Link from 'next/link'
 import HomeSlider from './components/HomeSlider'
 import AddToCartBtn from './products/AddToCartBtn'
 import WishlistHeartBtn from './components/WishlistHeartBtn'
+import { getProductImageUrl, getCategoryImageUrl } from '@/lib/utils'
+
 
 export const dynamic = 'force-dynamic'
 
@@ -63,9 +65,12 @@ export default async function HomePage() {
               >
                 <div className="w-full h-[140px] sm:h-[160px] overflow-hidden bg-gray-50 relative">
                   <img
-                    src={c.image ? `/admin_uploads/category/${c.image}` : "https://placehold.jp/300x200.png"}
+                    src={getCategoryImageUrl(c.image)}
                     alt={c.name}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x200.png'
+                    }}
                   />
                 </div>
                 <div className={`text-white p-3 text-xs sm:text-sm font-black uppercase text-center ${colors[idx % 4]}`}>
@@ -109,9 +114,12 @@ export default async function HomePage() {
                     <WishlistHeartBtn productId={p.id} />
                     <div className="h-[160px] sm:h-[180px] w-full flex items-center justify-center">
                       <img
-                        src={p.image ? `/admin_uploads/products/${p.image}` : 'https://placehold.jp/300x300.png'}
+                        src={getProductImageUrl(p.image)}
                         alt={p.name}
                         className="max-h-full max-w-full object-contain"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x300.png'
+                        }}
                       />
                     </div>
                   </Link>
@@ -159,9 +167,12 @@ export default async function HomePage() {
                 <Link href={`/product/${p.id}`} className="block">
                   <div className="h-[120px] sm:h-[140px] flex items-center justify-center p-2 bg-gray-50 rounded-xl mb-2">
                     <img
-                      src={p.image ? `/admin_uploads/products/${p.image}` : 'https://placehold.jp/300x300.png'}
+                      src={getProductImageUrl(p.image)}
                       alt={p.name}
                       className="max-h-full max-w-full object-contain"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/300x300.png'
+                      }}
                     />
                   </div>
                   <h3 className="text-xs font-bold text-gray-800 line-clamp-2 mb-1">{p.name}</h3>
@@ -175,6 +186,7 @@ export default async function HomePage() {
           })}
         </div>
       </div>
+
 
       {/* SEO Content Section */}
       <section className="bg-white rounded-3xl p-6 sm:p-10 border border-gray-200/80 shadow-sm mt-12">

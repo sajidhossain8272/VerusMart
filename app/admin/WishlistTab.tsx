@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { formatDate } from '@/lib/utils'
+import { formatDate, getProductImageUrl } from '@/lib/utils'
 
 interface WishlistProduct {
   id: number
@@ -97,9 +97,12 @@ export default function WishlistTab() {
                 <span className="text-xs font-black text-gray-400 w-6 shrink-0 text-right">#{idx + 1}</span>
                 <div className="w-12 h-12 bg-gray-50 rounded-xl overflow-hidden border border-gray-100 p-1 flex items-center justify-center shrink-0">
                   <img
-                    src={prod.image ? `/admin_uploads/products/${prod.image}` : 'https://placehold.jp/100x100.png'}
+                    src={getProductImageUrl(prod.image)}
                     alt={prod.name}
                     className="max-h-full max-w-full object-contain"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                    }}
                   />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -145,9 +148,12 @@ export default function WishlistTab() {
                       <div className="flex items-center gap-2">
                         {entry.product?.image && (
                           <img
-                            src={`/admin_uploads/products/${entry.product.image}`}
+                            src={getProductImageUrl(entry.product.image)}
                             className="w-8 h-8 object-contain rounded-lg bg-gray-50 border border-gray-100 p-0.5"
                             alt={entry.product?.name}
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                            }}
                           />
                         )}
                         <span className="font-bold text-gray-800 truncate max-w-[200px]">{entry.product?.name || '—'}</span>
@@ -163,6 +169,7 @@ export default function WishlistTab() {
           </div>
         )}
       </div>
+
 
     </div>
   )

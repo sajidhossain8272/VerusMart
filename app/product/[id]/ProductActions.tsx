@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/app/context/CartContext'
+import { getProductImageUrl } from '@/lib/utils'
 
 interface Variant {
   id: number
@@ -73,9 +74,12 @@ export default function ProductActions({ product, variants, defaultPrice, defaul
             </span>
           )}
           <img
-            src={activeImage ? `/admin_uploads/products/${activeImage}` : 'https://placehold.jp/500x500.png'}
+            src={getProductImageUrl(activeImage)}
             className="max-h-full max-w-full object-contain filter drop-shadow-md transition-all duration-300 hover:scale-105"
             alt={product.name}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/500x500.png'
+            }}
           />
         </div>
 
@@ -87,12 +91,20 @@ export default function ProductActions({ product, variants, defaultPrice, defaul
                 onClick={() => setActiveImage(img)}
                 className={`w-20 h-20 border-2 rounded-xl p-1.5 cursor-pointer bg-white transition-all overflow-hidden ${activeImage === img ? 'border-[#f85606] shadow-sm' : 'border-gray-200 opacity-70 hover:opacity-100'}`}
               >
-                <img src={`/admin_uploads/products/${img}`} className="w-full h-full object-contain" alt={`Thumbnail ${idx + 1}`} />
+                <img
+                  src={getProductImageUrl(img)}
+                  className="w-full h-full object-contain"
+                  alt={`Thumbnail ${idx + 1}`}
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/100x100.png'
+                  }}
+                />
               </button>
             ))}
           </div>
         )}
       </div>
+
 
       {/* Product Details & Actions Column */}
       <div className="flex-[1.4] flex flex-col justify-between">

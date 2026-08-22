@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import Link from 'next/link'
+import { getCategoryImageUrl } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,8 +19,16 @@ export default async function CategoriesPage() {
         {categories.map(c => (
           <Link href={`/products?category=${c.id}`} key={c.id} className="bg-white rounded-[20px] p-[20px] text-center no-underline text-[#1e293b] border border-[#e2e8f0] transition-all duration-300 shadow-[0_4px_6px_-1px_rgba(0,0,0,0.05)] hover:-translate-y-1 hover:shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] hover:border-[#f85606] group flex flex-col items-center">
              <div className="w-[80px] h-[80px] mx-auto mb-[15px] bg-[#f8fafc] rounded-full flex justify-center items-center overflow-hidden border-2 border-transparent transition-all group-hover:border-[#f85606] p-[10px]">
-                <img src={c.image ? `/admin_uploads/category/${c.image}` : 'https://placehold.jp/150x150.png'} alt={c.name} className="max-w-[100%] max-h-[100%] object-contain" />
+                <img
+                  src={getCategoryImageUrl(c.image)}
+                  alt={c.name}
+                  className="max-w-[100%] max-h-[100%] object-contain"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/150x150.png'
+                  }}
+                />
              </div>
+
              <h3 className="text-[16px] font-bold m-0 transition-colors group-hover:text-[#f85606]">{c.name}</h3>
              <span className="text-[12px] text-gray-500 font-medium mt-[5px] block opacity-0 transform translate-y-2 transition-all group-hover:opacity-100 group-hover:translate-y-0">View Products &rarr;</span>
           </Link>

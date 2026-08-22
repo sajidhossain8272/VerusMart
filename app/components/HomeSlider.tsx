@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { getBannerImageUrl } from '@/lib/utils'
 
 interface Banner {
   id: number
@@ -51,10 +52,14 @@ export default function HomeSlider({ banners }: HomeSliderProps) {
           }`}
         >
           <img
-            src={`/admin_uploads/banners/${slide.image}`}
+            src={getBannerImageUrl(slide.image)}
             alt={slide.title || 'Banner'}
             className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = 'https://placehold.jp/1200x400.png'
+            }}
           />
+
           {slide.title && (
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end p-6 md:p-10 text-white">
               <h2 className="text-xl md:text-3xl font-black uppercase tracking-wide drop-shadow-md">
