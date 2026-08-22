@@ -236,10 +236,14 @@ export default function AdminDashboard({
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     startTransition(async () => {
-      const res = await updateStoreSettings(formData)
-      if (res.success) {
-        showMsg('success', 'Store settings updated successfully.')
-      } else showMsg('error', res.error || 'Failed to save settings.')
+      try {
+        const res = await updateStoreSettings(formData)
+        if (res.success) {
+          showMsg('success', 'Store settings updated successfully.')
+        } else showMsg('error', res.error || 'Failed to save settings.')
+      } catch (err: any) {
+        showMsg('error', err.message || 'Operation failed. Please reload the page.')
+      }
     })
   }
 
@@ -253,14 +257,20 @@ export default function AdminDashboard({
     formData.set('variants', JSON.stringify(variantInputs.filter(v => v.variant_name.trim())))
     
     startTransition(async () => {
-      const res = await createProduct(formData)
-      if (res.success && res.product) {
-        showMsg('success', 'Product created successfully.')
-        setProducts(prev => [res.product, ...prev])
-        form.reset()
-        setVariantInputs([])
-        setActiveTab('products')
-      } else showMsg('error', res.error || 'Failed to create product.')
+      try {
+        const res = await createProduct(formData)
+        if (res.success && res.product) {
+          showMsg('success', 'Product created successfully.')
+          setProducts(prev => [res.product, ...prev])
+          form.reset()
+          setVariantInputs([])
+          setActiveTab('products')
+        } else {
+          showMsg('error', res.error || 'Failed to create product.')
+        }
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh and try again.')
+      }
     })
   }
 
@@ -274,14 +284,20 @@ export default function AdminDashboard({
     formData.set('variants', JSON.stringify(variantInputs.filter(v => v.variant_name.trim())))
     
     startTransition(async () => {
-      const res = await updateProduct(editingProduct.id, formData)
-      if (res.success && res.product) {
-        showMsg('success', 'Product updated successfully.')
-        setProducts(prev => prev.map(p => p.id === res.product.id ? res.product : p))
-        setEditingProduct(null)
-        setVariantInputs([])
-        setActiveTab('products')
-      } else showMsg('error', res.error || 'Failed to update product.')
+      try {
+        const res = await updateProduct(editingProduct.id, formData)
+        if (res.success && res.product) {
+          showMsg('success', 'Product updated successfully.')
+          setProducts(prev => prev.map(p => p.id === res.product.id ? res.product : p))
+          setEditingProduct(null)
+          setVariantInputs([])
+          setActiveTab('products')
+        } else {
+          showMsg('error', res.error || 'Failed to update product.')
+        }
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh and try again.')
+      }
     })
   }
 
@@ -315,12 +331,16 @@ export default function AdminDashboard({
     const form = e.currentTarget
     const formData = new FormData(form)
     startTransition(async () => {
-      const res = await createCategory(formData)
-      if (res.success && res.category) {
-        showMsg('success', 'Category created successfully.')
-        setCategories(prev => [...prev, res.category])
-        form.reset()
-      } else showMsg('error', res.error || 'Failed to create category.')
+      try {
+        const res = await createCategory(formData)
+        if (res.success && res.category) {
+          showMsg('success', 'Category created successfully.')
+          setCategories(prev => [...prev, res.category])
+          form.reset()
+        } else showMsg('error', res.error || 'Failed to create category.')
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh.')
+      }
     })
   }
 
@@ -330,23 +350,31 @@ export default function AdminDashboard({
     const form = e.currentTarget
     const formData = new FormData(form)
     startTransition(async () => {
-      const res = await updateCategory(editingCategory.id, formData)
-      if (res.success && res.category) {
-        showMsg('success', 'Category updated successfully.')
-        setCategories(prev => prev.map(c => c.id === res.category.id ? res.category : c))
-        setEditingCategory(null)
-      } else showMsg('error', res.error || 'Failed to update category.')
+      try {
+        const res = await updateCategory(editingCategory.id, formData)
+        if (res.success && res.category) {
+          showMsg('success', 'Category updated successfully.')
+          setCategories(prev => prev.map(c => c.id === res.category.id ? res.category : c))
+          setEditingCategory(null)
+        } else showMsg('error', res.error || 'Failed to update category.')
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh.')
+      }
     })
   }
 
   const handleDeleteCategory = async (id: number) => {
     if (!confirm('Delete this category? Products in this category will be unlinked.')) return
     startTransition(async () => {
-      const res = await deleteCategory(id)
-      if (res.success) {
-        setCategories(prev => prev.filter(c => c.id !== id))
-        showMsg('success', 'Category deleted.')
-      } else showMsg('error', res.error || 'Failed to delete category.')
+      try {
+        const res = await deleteCategory(id)
+        if (res.success) {
+          setCategories(prev => prev.filter(c => c.id !== id))
+          showMsg('success', 'Category deleted.')
+        } else showMsg('error', res.error || 'Failed to delete category.')
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh.')
+      }
     })
   }
 
@@ -360,23 +388,31 @@ export default function AdminDashboard({
     const form = e.currentTarget
     const formData = new FormData(form)
     startTransition(async () => {
-      const res = await createBanner(formData)
-      if (res.success && res.banner) {
-        showMsg('success', 'Banner created successfully.')
-        setBanners(prev => [res.banner, ...prev])
-        form.reset()
-      } else showMsg('error', res.error || 'Failed to create banner.')
+      try {
+        const res = await createBanner(formData)
+        if (res.success && res.banner) {
+          showMsg('success', 'Banner created successfully.')
+          setBanners(prev => [res.banner, ...prev])
+          form.reset()
+        } else showMsg('error', res.error || 'Failed to create banner.')
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh.')
+      }
     })
   }
 
   const handleDeleteBanner = async (id: number) => {
     if (!confirm('Delete this banner?')) return
     startTransition(async () => {
-      const res = await deleteBanner(id)
-      if (res.success) {
-        setBanners(prev => prev.filter(b => b.id !== id))
-        showMsg('success', 'Banner deleted.')
-      } else showMsg('error', res.error || 'Failed to delete banner.')
+      try {
+        const res = await deleteBanner(id)
+        if (res.success) {
+          setBanners(prev => prev.filter(b => b.id !== id))
+          showMsg('success', 'Banner deleted.')
+        } else showMsg('error', res.error || 'Failed to delete banner.')
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh.')
+      }
     })
   }
 
@@ -385,34 +421,46 @@ export default function AdminDashboard({
     const form = e.currentTarget
     const formData = new FormData(form)
     startTransition(async () => {
-      const res = await createCoupon(formData)
-      if (res.success && res.coupon) {
-        showMsg('success', 'Coupon code created.')
-        setCoupons(prev => [res.coupon, ...prev])
-        form.reset()
-      } else showMsg('error', res.error || 'Failed to create coupon.')
+      try {
+        const res = await createCoupon(formData)
+        if (res.success && res.coupon) {
+          showMsg('success', 'Coupon code created.')
+          setCoupons(prev => [res.coupon, ...prev])
+          form.reset()
+        } else showMsg('error', res.error || 'Failed to create coupon.')
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh.')
+      }
     })
   }
 
   const handleDeleteCoupon = async (id: number) => {
     if (!confirm('Delete this coupon?')) return
     startTransition(async () => {
-      const res = await deleteCoupon(id)
-      if (res.success) {
-        setCoupons(prev => prev.filter(c => c.id !== id))
-        showMsg('success', 'Coupon deleted.')
-      } else showMsg('error', res.error || 'Failed to delete coupon.')
+      try {
+        const res = await deleteCoupon(id)
+        if (res.success) {
+          setCoupons(prev => prev.filter(c => c.id !== id))
+          showMsg('success', 'Coupon deleted.')
+        } else showMsg('error', res.error || 'Failed to delete coupon.')
+      } catch (err: any) {
+        showMsg('error', err.message || 'Action error. Please refresh.')
+      }
     })
   }
 
   const handleReviewAction = async (id: number, action: 'approved' | 'rejected' | 'delete') => {
     startTransition(async () => {
-      if (action === 'delete') {
-        const res = await deleteReview(id)
-        if (res.success) setReviews(prev => prev.filter(r => r.id !== id))
-      } else {
-        const res = await updateReviewStatus(id, action)
-        if (res.success) setReviews(prev => prev.map(r => r.id === id ? { ...r, status: action } : r))
+      try {
+        if (action === 'delete') {
+          const res = await deleteReview(id)
+          if (res.success) setReviews(prev => prev.filter(r => r.id !== id))
+        } else {
+          const res = await updateReviewStatus(id, action)
+          if (res.success) setReviews(prev => prev.map(r => r.id === id ? { ...r, status: action } : r))
+        }
+      } catch (err: any) {
+        showMsg('error', err.message || 'Review action error.')
       }
     })
   }
