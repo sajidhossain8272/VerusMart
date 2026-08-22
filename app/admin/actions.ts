@@ -54,12 +54,15 @@ async function saveUploadedFile(file: File, folder: string): Promise<string> {
         return uploadRes.secure_url
       }
     } catch (cldErr: any) {
-      console.error('Cloudinary upload attempt failed:', cldErr?.message || cldErr)
-      // Fall through to local storage if Cloudinary fails
+      console.error('Cloudinary upload error:', cldErr?.message || cldErr)
+      // If we are on Vercel/serverless where disk writes are impossible, throw the real Cloudinary error
+      if (process.env.VERCEL || process.env.NODE_ENV === 'production') {
+        throw new Error(`Cloudinary upload failed: ${cldErr?.message || 'Unknown Cloudinary error'}`)
+      }
     }
   }
 
-  // 2. Local disk write
+  // 2. Local disk write (development fallback)
   const sanitizeFileName = file.name.replace(/[^a-zA-Z0-9_.-]/g, '_')
   const imageName = `${Date.now()}_${sanitizeFileName}`
   try {
@@ -75,7 +78,7 @@ async function saveUploadedFile(file: File, folder: string): Promise<string> {
     return imageName
   } catch (fsErr: any) {
     console.error('Local disk write error:', fsErr.message)
-    throw new Error('Failed to save image. Please verify your Cloudinary configuration in .env or check disk permissions.')
+    throw new Error('Failed to save image. Please verify your Cloudinary configuration or check disk permissions.')
   }
 }
 
