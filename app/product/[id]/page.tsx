@@ -177,13 +177,19 @@ export default async function ProductDetails({ params }: { params: Promise<{ id:
 
               {/* Dynamic Interactive Client Actions (Price, Variant Selector, Quantity, Direct Buy, Add To Cart) */}
               <ProductActions
-                productId={product.id}
-                productName={product.name}
-                productImage={product.image}
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  image: product.image,
+                  image_2: product.image_2,
+                  image_3: product.image_3,
+                  price: defaultPrice,
+                  old_price: defaultOldPrice,
+                }}
                 variants={serializedVariants}
                 defaultPrice={defaultPrice}
                 defaultOldPrice={defaultOldPrice}
-                defaultVariantName={defaultVName}
+                defaultVName={defaultVName}
               />
             </div>
 
